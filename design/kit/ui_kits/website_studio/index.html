@@ -1,0 +1,46 @@
+<!-- @dsCard group="Website · calm" viewport="1280x900" name="Calm page style" subtitle="Studios and professionals — white, centred, photography-led" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Halden &amp; Reyes — Goodwork calm page style</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0}#root{position:relative;min-height:100vh;min-width:1200px}.toastwrap{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="StudioChrome.jsx"></script>
+<script type="text/babel" src="StudioSections.jsx"></script>
+<script type="text/babel">
+const { Toast, Dialog, Button, Field, Input, Select, Icon } = window.GoodworkDesignSystem_fee824;
+function Site(){
+  const [route,setRoute]=React.useState("home");
+  const [enquire,setEnquire]=React.useState(false);
+  const [toast,setToast]=React.useState(null);
+  return (<React.Fragment>
+    <StudioHeader route={route} onNavigate={setRoute} onEnquire={()=>setEnquire(true)}/>
+    <main>
+      <StudioHero onEnquire={()=>setEnquire(true)}/>
+      <StudioProof/>
+      <StudioWork/>
+      <StudioServices onEnquire={()=>setEnquire(true)}/>
+      <StudioProcess/>
+      <StudioWords/>
+      <StudioPricing onEnquire={()=>setEnquire(true)}/>
+      <StudioQuestions/>
+      <StudioEnquiry onSubmit={()=>setToast("Enquiry sent. You'll hear from us within a day.")}/>
+    </main>
+    <StudioFooter/>
+    <Dialog open={enquire} title="Check your date" description="Two fields to start — we'll ask the rest by email." width={460} onClose={()=>setEnquire(false)}
+      footer={<><Button variant="secondary" onClick={()=>setEnquire(false)}>Cancel</Button>
+      <Button variant="primary" onClick={()=>{setEnquire(false);setToast("Enquiry sent. You'll hear from us within a day.");}} iconRight={<Icon name="arrow-right" size={16}/>}>Send enquiry</Button></>}>
+      <div style={{display:"grid",gap:"var(--space-5)"}}>
+        <Field label="Your names" required><Input placeholder="Dana & Ravi"/></Field>
+        <Field label="Email" required><Input type="email" placeholder="dana@example.com"/></Field>
+        <Field label="Date"><Input placeholder="12 June 2027"/></Field>
+        <Field label="What are you planning?"><Select placeholder="Choose one" options={["Full-day wedding","Elopement","Portraits","Something else"]}/></Field>
+      </div>
+    </Dialog>
+    {toast ? <div className="toastwrap"><Toast message={toast} onClose={()=>setToast(null)}/></div> : null}
+  </React.Fragment>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Site/>);
+</script></body></html>

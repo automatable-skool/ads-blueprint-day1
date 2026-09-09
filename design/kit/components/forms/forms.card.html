@@ -1,0 +1,31 @@
+<!-- @dsCard group="Components" viewport="700x270" name="Forms" subtitle="Field, input, textarea, select, checkbox, radio, switch" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Forms</title><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:18px 20px;background:var(--surface-page)}.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:start}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Field, Input, Textarea, Select, Checkbox, RadioGroup, Switch } = window.GoodworkDesignSystem_fee824;
+function Demo(){
+const [w,setW]=React.useState("Morning (8–12)");
+return(<div className="grid">
+<div style={{display:"grid",gap:14}}>
+<Field label="Full name" required><Input defaultValue="Dana Reyes"/></Field>
+<Field label="Phone" hint="We only call about this job"><Input type="tel" placeholder="(905) 555-0142"/></Field>
+<Field label="Email" error="Enter a valid email"><Input defaultValue="dana@" invalid/></Field>
+</div>
+<div style={{display:"grid",gap:14}}>
+<Field label="Job type"><Select placeholder="Choose one" options={["Repair","Install","Quote","Maintenance"]}/></Field>
+<Field label="What do you need?"><Textarea rows={4} placeholder="Kitchen sink backing up since Sunday…"/></Field>
+</div>
+<div style={{display:"grid",gap:14}}>
+<Field label="Time window"><RadioGroup name="w" value={w} onChange={setW} options={["Morning (8–12)","Afternoon (12–5)","First available"]}/></Field>
+<Checkbox label="Text me when the tech is on the way" defaultChecked/>
+<Checkbox label="Someone will be home" />
+<Switch label="Accepting new jobs" defaultChecked/>
+</div>
+</div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>

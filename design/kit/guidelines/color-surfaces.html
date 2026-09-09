@@ -1,0 +1,26 @@
+<!-- @dsCard group="Colors" viewport="700x200" name="Surfaces" subtitle="The page is white. Blue is two bands out of nine surfaces." -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>
+body{margin:0;padding:16px 18px;background:var(--ink-100);font:var(--type-body)}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.row+.row{margin-top:8px}
+.s{height:64px;border-radius:var(--radius-card);padding:8px 9px;display:flex;flex-direction:column;justify-content:flex-end;gap:1px}
+.s b{font:var(--weight-bold) 11px/1.2 var(--font-core)}
+.s i{font-style:normal;font-size:10px;opacity:.75}
+.note{margin-top:11px;font:var(--type-caption);color:var(--text-muted)}
+</style></head><body>
+<div class="row">
+<div class="s" style="background:var(--surface-page);border:1px solid var(--line-hairline)"><b>--surface-page</b><i>#FFFFFF</i></div>
+<div class="s" style="background:var(--surface-card);border:1px solid var(--line-hairline);box-shadow:var(--shadow-sm)"><b>--surface-card</b><i>#FFFFFF</i></div>
+<div class="s" style="background:var(--surface-tint);border:1px solid var(--line-hairline)"><b>--surface-tint</b><i>#F2F8FF</i></div>
+<div class="s" style="background:var(--surface-sunken);border:1px solid var(--line-hairline)"><b>--surface-sunken</b><i>#F0EFEC</i></div>
+<div class="s" style="background:var(--surface-brand-soft);border:1px solid var(--line-hairline)"><b>--surface-brand-soft</b><i>#E2EFFE</i></div>
+</div>
+<div class="row">
+<div class="s" style="background:var(--surface-brand);color:#fff"><b>--surface-brand</b><i>#0A7CFF · hero + closing CTA</i></div>
+<div class="s" style="background:var(--surface-brand-deep);color:#fff"><b>--surface-brand-deep</b><i>#0B62C9 · app UI only</i></div>
+<div class="s" style="background:var(--surface-accent);color:#fff"><b>--surface-accent</b><i>#1C201E · promo + footer</i></div>
+<div class="s" style="background:var(--surface-inverse);color:var(--ink-300)"><b>--surface-inverse</b><i>#1A1A19</i></div>
+<div class="s" style="background:var(--surface-overlay);color:#fff"><b>--surface-overlay</b><i>scrim</i></div>
+</div>
+<p class="note">Top row is what a page is actually made of — four of the five are white or within a hair of it. Bottom row is used sparingly: two blue bands per page, a graphite promo strip and footer.</p>
+</body></html>

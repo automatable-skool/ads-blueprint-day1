@@ -1,0 +1,21 @@
+:root{
+--weight-regular:400;/* @kind other */--weight-medium:500;/* @kind other */--weight-semibold:600;/* @kind other */--weight-bold:700;/* @kind other */--weight-black:900;/* @kind other */
+/* Sizes — display is tight and set in caps-free sentence case */
+--size-display-xl:64px;--size-display:48px;--size-h1:38px;--size-h2:29px;--size-h3:22px;--size-h4:18px;
+--size-body-lg:18px;--size-body:16px;--size-body-sm:14px;--size-caption:12.5px;--size-label:12px;
+--lh-display:1.02;/* @kind other */--lh-heading:1.14;/* @kind other */--lh-snug:1.35;/* @kind other */--lh-body:1.6;/* @kind other */--lh-loose:1.75;/* @kind other */
+--track-display:-0.032em;/* @kind other */--track-heading:-0.024em;/* @kind other */--track-body:0em;/* @kind other */--track-label:0.11em;/* @kind other */
+/* Semantic roles */
+--type-display:var(--weight-black) var(--size-display)/var(--lh-display) var(--font-core);
+--type-h1:var(--weight-black) var(--size-h1)/var(--lh-heading) var(--font-core);
+--type-h2:var(--weight-black) var(--size-h2)/var(--lh-heading) var(--font-core);
+--type-h3:var(--weight-bold) var(--size-h3)/var(--lh-snug) var(--font-core);
+--type-h4:var(--weight-bold) var(--size-h4)/var(--lh-snug) var(--font-core);
+--type-body:var(--weight-regular) var(--size-body)/var(--lh-body) var(--font-core);
+--type-body-lg:var(--weight-regular) var(--size-body-lg)/var(--lh-body) var(--font-core);
+--type-body-sm:var(--weight-regular) var(--size-body-sm)/var(--lh-body) var(--font-core);
+--type-caption:var(--weight-regular) var(--size-caption)/var(--lh-snug) var(--font-core);
+--type-button:var(--weight-bold) var(--size-body-sm)/1 var(--font-core);
+--type-label:var(--weight-bold) var(--size-label)/1.2 var(--font-core);
+--type-phone:var(--weight-black) var(--size-h3)/1.1 var(--font-core);
+}

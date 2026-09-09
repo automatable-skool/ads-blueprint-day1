@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+
+/* Landing pages: every CTA anchors to #lead-form, so the scroll is smooth and the
+   heading is not tucked under the top of the viewport. Anyone who asked for less
+   motion gets an instant jump instead. (Jono, 2 September 2026.) */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+[id] { scroll-margin-top: 24px; }
+
+/* The mobile CTA bar is fixed to the bottom of the viewport on phones only -
+   desktop repeats the CTA at every section instead. The padding keeps the last
+   section clear of the bar. */
+.lp-mobile-cta { display: grid; }
+@media (min-width: 768px) { .lp-mobile-cta { display: none; } }
+@media (max-width: 767px) { body:has(.lp-mobile-cta) { padding-bottom: 84px; } }
+
+/* Landing page hero: two columns on desktop, stacked on a phone. The face and the
+   promise share the first screen - a centred stack pushed the video 900px down. */
+.lp-hero { grid-template-columns: 1fr; }
+@media (min-width: 900px) { .lp-hero { grid-template-columns: 1.05fr 1fr; } }
+
+/* Landing page grids. The calm kit uses fixed column counts; these collapse on a phone. */
+.lp-2up, .lp-3up, .lp-4up, .lp-2up-media, .lp-2up-faq { grid-template-columns: 1fr; }
+@media (min-width: 760px) {
+  .lp-2up { grid-template-columns: repeat(2, 1fr); }
+  .lp-3up { grid-template-columns: repeat(3, 1fr); }
+  .lp-4up { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1000px) {
+  .lp-4up { grid-template-columns: repeat(4, 1fr); }
+  .lp-2up-media { grid-template-columns: .9fr 1.1fr; }
+  .lp-2up-faq { grid-template-columns: 1fr 1.2fr; }
+}
+
+/* The repeating section CTA is DESKTOP ONLY. On a phone the fixed bar at the bottom of the
+   viewport is the call to action, so a second button under every section is noise between the
+   visitor and the proof. (Jono, 2 September 2026.) */
+.lp-section-cta { display: none; }
+@media (min-width: 760px) { .lp-section-cta { display: grid; } }
+/* The closing form: reassurance left, the form card right. */
+.lp-2up-form { grid-template-columns: 1fr; }
+@media (min-width: 900px) { .lp-2up-form { grid-template-columns: 1fr 1.05fr; } }
+
+/* 64px headings need to come down on a phone or they wrap to five lines. */
+@media (max-width: 640px) {
+  .gw-container h1 { font-size: var(--size-display) !important; }
+  .gw-container h2 { font-size: var(--size-h1) !important; }
+}
+
+/* Two-column sections alternate which side the photo sits on. Without this every media section
+   stacks its picture on the left and the page reads as one long left rail. */
+@media (min-width: 1000px) {
+  .lp-2up-media.lp-flip { grid-template-columns: 1.1fr .9fr; }
+  .lp-2up-media.lp-flip > :first-child { order: 2; }
+}

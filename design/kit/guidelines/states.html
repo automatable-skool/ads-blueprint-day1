@@ -1,0 +1,12 @@
+<!-- @dsCard group="Brand" viewport="700x170" name="Interaction states" subtitle="Hover lightens, press nudges 1px, focus rings blue" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>body{margin:0;padding:18px 20px;background:var(--surface-page);font:var(--type-body)}.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.btn{font:var(--type-button);padding:var(--pad-control);border-radius:var(--radius-control);border:1px solid var(--blue-800);background:var(--surface-brand);color:#fff;display:inline-flex;align-items:center}.cap{font:var(--type-caption);color:var(--text-muted);margin-top:14px}</style></head><body>
+<div class="row">
+<span class="btn">Rest · blue-700</span>
+<span class="btn" style="background:var(--blue-600)">Hover · blue-600</span>
+<span class="btn" style="background:var(--blue-600);transform:translateY(1px);box-shadow:var(--shadow-inset-press)">Press · +1px inset</span>
+<span class="btn" style="box-shadow:var(--ring-focus)">Focus · blue ring</span>
+<span class="btn" style="opacity:.45">Disabled · 45%</span>
+<span class="btn" style="background:var(--surface-accent);color:var(--text-on-accent);border-color:var(--accent-900)">Accent · graphite</span>
+</div>
+<div class="cap">--ring-focus: 2px blue-600 + 4px blue-200. Accent buttons hover to accent-700. Links thicken their underline rather than changing weight.</div>
+</body></html>

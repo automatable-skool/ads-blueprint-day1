@@ -1,0 +1,4 @@
+:root{--radius-0:0px;--radius-xs:4px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-pill:999px;
+/* Chunkier than a typical web app: buttons are pills, cards are 16px. */
+--radius-control:var(--radius-pill);--radius-input:var(--radius-sm);--radius-card:var(--radius-lg);--radius-media:var(--radius-xl);--radius-badge:var(--radius-pill);--radius-sheet:var(--radius-lg);
+--border-hairline:1px;--border-strong:1.5px;--border-focus:2px}

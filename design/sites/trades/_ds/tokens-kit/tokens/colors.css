@@ -1,0 +1,41 @@
+:root{
+/* Base — blue (the brand: nav, hero, buttons, links, stats) */
+--blue-900:#062f66;--blue-800:#0a4794;--blue-700:#0b62c9;--blue-600:#0a7cff;--blue-500:#3d97ff;--blue-400:#6fb2ff;--blue-300:#9ccbff;--blue-200:#c6e1ff;--blue-100:#e2effe;--blue-50:#f2f8ff;
+/* Base — accent (the one accent: promo strip, the money action, active states).
+   Graphite by design: high contrast on white AND on any brand hue, so a business
+   can re-skin --blue-* without ever restyling the accent. Swap these nine values
+   to change the accent everywhere; nothing else references a hue name. */
+--accent-900:#0f1211;--accent-800:#1c201e;--accent-700:#2c312e;--accent-600:#3d4340;
+/* The accent has FOUR steps on purpose. It is a near-black used at full strength
+   for the promo strip, the money action and the footer — it never appears as a
+   pale tint, so pale steps would only ever be misused. Anything that needs a
+   light neutral uses --ink-*; anything that needs a light brand tint uses
+   --blue-50 / --blue-100. Earlier pale accent steps were removed: they were
+   blue-grey (#C2CBD6 etc), unused in both page styles, and they leaked blue
+   into icons sitting on the hero. */
+/* Base — neutral. TRUE greys, very slightly warm, with NO blue cast.
+   This matters more than it looks: a page carries twenty-plus photo slots,
+   borders and icon tiles drawn from this ramp but only two brand-blue bands,
+   so a blue-tinted neutral makes the whole page read blue no matter how white
+   the sections are. Keep the R/G/B channels within ~4 of each other. */
+--ink-900:#1a1a19;--ink-800:#272725;--ink-700:#3f3f3c;--ink-600:#575754;--ink-500:#73726e;--ink-400:#9a9995;--ink-300:#c5c4bf;--ink-200:#e3e2de;--ink-100:#f0efec;--ink-50:#f9f8f6;--white:#ffffff;
+/* Base — semantic hues */
+--positive-600:#0a7a52;--positive-500:#0d9668;--positive-50:#e6f6f0;
+--caution-600:#a35a06;--caution-500:#c26f09;--caution-50:#fdf3e6;
+--critical-600:#b52d24;--critical-500:#d93a2f;--critical-50:#fdedec;
+--info-600:#0b62c9;--info-500:#0a7cff;--info-50:#e8f2ff;
+
+/* Semantic — text */
+--text-strong:var(--ink-900);--text-body:var(--ink-700);--text-muted:var(--ink-500);--text-faint:var(--ink-400);--text-inverse:var(--white);--text-brand:var(--blue-700);--text-accent:var(--accent-600);--text-link:var(--blue-700);--text-link-hover:var(--blue-600);
+/* Semantic — surfaces */
+--surface-page:var(--white);--surface-card:var(--white);--surface-sunken:var(--ink-100);--surface-tint:var(--blue-50);--surface-brand:var(--blue-600);--surface-brand-deep:var(--blue-700);--surface-brand-soft:var(--blue-100);--surface-accent:var(--accent-800);--surface-accent-soft:var(--ink-100);--surface-inverse:var(--ink-900);--surface-overlay:rgba(26,26,25,.5);
+/* Semantic — lines */
+--line-hairline:var(--ink-200);--line-strong:var(--ink-300);--line-brand:var(--blue-600);--line-focus:var(--blue-600);
+/* Semantic — text that sits on --surface-accent */
+--text-on-accent:var(--white);
+/* Semantic — rating stars (own token: the accent is too light to read on white) */
+--star-filled:var(--blue-600);--star-empty:var(--ink-300);--star-on-brand:var(--white);
+/* Semantic — status */
+--status-positive:var(--positive-500);--status-positive-bg:var(--positive-50);--status-caution:var(--caution-500);--status-caution-bg:var(--caution-50);--status-critical:var(--critical-500);--status-critical-bg:var(--critical-50);--status-info:var(--info-500);--status-info-bg:var(--info-50);
+}
+[data-theme="dark"]{--text-strong:var(--white);--text-body:var(--blue-100);--text-muted:var(--blue-200);--text-faint:var(--blue-300);--text-brand:var(--blue-200);--text-link:var(--blue-300);--surface-page:var(--blue-900);--surface-card:var(--blue-800);--surface-sunken:#052654;--surface-tint:var(--blue-800);--surface-brand-soft:var(--blue-800);--line-hairline:rgba(255,255,255,.16);--line-strong:rgba(255,255,255,.28)}

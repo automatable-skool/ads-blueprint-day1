@@ -1,0 +1,78 @@
+/* Mainstay's component CSS, lifted verbatim from design/mainstay/components/marketing/*.jsx.
+   The kit injects these at runtime; a Next app ships them as a stylesheet instead. */
+
+/* SectionHeading */
+.ms-sh{display:flex;flex-direction:column;gap:var(--space-4);max-width:640px}
+.ms-sh--center{align-items:center;text-align:center;margin-inline:auto}
+.ms-sh__eyebrow{font:var(--type-eyebrow);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-accent)}
+.ms-sh__title{font:var(--type-h2);letter-spacing:var(--ls-heading);color:var(--text-strong)}
+.ms-sh__lead{font:var(--type-lead);color:var(--text-body)}
+
+/* TrustBar */
+.ms-trust{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-5) var(--space-9)}
+.ms-trust--center{justify-content:center}
+.ms-trust__item{display:inline-flex;align-items:center;gap:9px;font:var(--fw-medium) var(--fs-small)/1.2 var(--font-core);color:var(--text-body)}
+.ms-trust__item svg{color:var(--accent-500)}
+
+/* Stars */
+.ms-stars{display:inline-flex;align-items:center;gap:2px}
+.ms-stars__on{color:var(--star-filled)}
+.ms-stars__off{color:var(--star-empty)}
+.ms-stars__label{margin-left:8px;font:var(--fw-medium) var(--fs-small)/1 var(--font-core);color:var(--text-body)}
+
+/* StatBlock */
+.ms-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--space-8)}
+.ms-stats--bordered{border-top:var(--border-w) solid var(--border-subtle);border-bottom:var(--border-w) solid var(--border-subtle);padding-block:var(--space-8)}
+.ms-stat__value{font:var(--fw-bold) var(--fs-h1)/1 var(--font-core);letter-spacing:var(--ls-display);color:var(--text-strong)}
+.ms-stat__label{margin-top:8px;font:var(--type-small);color:var(--text-muted)}
+
+/* ServiceCard */
+.ms-service{display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-7);background:var(--surface-card);border:var(--border-w) solid var(--border-subtle);border-radius:var(--radius-card);text-decoration:none;color:inherit;transition:var(--transition-card)}
+a.ms-service:hover{box-shadow:var(--shadow-card-hover);transform:translateY(-2px);border-color:var(--border-default)}
+.ms-service__icon{width:44px;height:44px;border-radius:var(--radius-md);background:var(--accent-50);color:var(--accent-600);display:flex;align-items:center;justify-content:center}
+.ms-service__title{font:var(--fw-semibold) var(--fs-h4)/1.3 var(--font-core);letter-spacing:var(--ls-heading);color:var(--text-strong)}
+.ms-service__body{font:var(--type-small);color:var(--text-body)}
+.ms-service__meta{margin-top:auto;padding-top:var(--space-4);display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);border-top:var(--border-w) solid var(--border-subtle)}
+.ms-service__price{font:var(--fw-semibold) var(--fs-small)/1 var(--font-core);color:var(--text-strong)}
+.ms-service__cta{display:inline-flex;align-items:center;gap:6px;font:var(--fw-semibold) var(--fs-small)/1 var(--font-core);color:var(--text-link)}
+
+/* TestimonialCard */
+.ms-testimonial{display:flex;flex-direction:column;gap:var(--space-5);padding:var(--space-7);background:var(--surface-card);border:var(--border-w) solid var(--border-subtle);border-radius:var(--radius-card)}
+.ms-testimonial--sunken{background:var(--surface-sunken);border-color:transparent}
+.ms-testimonial__quote{font:var(--fw-medium) var(--fs-body-lg)/1.55 var(--font-core);letter-spacing:-0.01em;color:var(--text-strong)}
+.ms-testimonial__foot{display:flex;align-items:center;gap:var(--space-4);margin-top:auto}
+.ms-testimonial__initial{width:38px;height:38px;flex:none;border-radius:var(--radius-pill);background:var(--n-100);color:var(--n-700);display:flex;align-items:center;justify-content:center;font:var(--fw-semibold) var(--fs-small)/1 var(--font-core)}
+.ms-testimonial__name{font:var(--fw-semibold) var(--fs-small)/1.3 var(--font-core);color:var(--text-strong)}
+.ms-testimonial__meta{font:var(--fw-regular) var(--fs-caption)/1.3 var(--font-core);color:var(--text-muted)}
+
+/* FAQItem */
+.ms-faq{border-bottom:var(--border-w) solid var(--border-subtle)}
+.ms-faq__q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--space-5);padding:var(--space-6) 0;background:none;border:0;text-align:left;cursor:pointer;font:var(--fw-semibold) var(--fs-body-lg)/1.4 var(--font-core);letter-spacing:-0.01em;color:var(--text-strong)}
+.ms-faq__q:hover{color:var(--accent-600)}
+.ms-faq__chev{flex:none;color:var(--text-muted);transition:transform var(--dur-base) var(--ease-out)}
+.ms-faq.is-open .ms-faq__chev{transform:rotate(180deg)}
+.ms-faq__a{overflow:hidden;max-height:0;transition:max-height var(--dur-slow) var(--ease-out)}
+.ms-faq.is-open .ms-faq__a{max-height:420px}
+.ms-faq__a-inner{padding-bottom:var(--space-6);font:var(--type-body);color:var(--text-body);max-width:60ch}
+
+/* CTABanner */
+.ms-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-8);padding:var(--space-10) var(--space-10);border-radius:var(--radius-xl);background:var(--surface-sunken)}
+.ms-cta--accent{background:var(--accent-50)}
+.ms-cta--ink{background:var(--surface-inverse)}
+.ms-cta--ink .ms-cta__title{color:var(--text-inverse)}
+.ms-cta--ink .ms-cta__lead{color:rgba(255,255,255,.72)}
+.ms-cta__title{font:var(--type-h2);letter-spacing:var(--ls-heading);color:var(--text-strong);max-width:22ch}
+.ms-cta__lead{margin-top:var(--space-4);font:var(--type-lead);color:var(--text-body);max-width:46ch}
+.ms-cta__actions{display:flex;flex-wrap:wrap;gap:var(--space-4)}
+
+/* Button, ported from Mainstay's core/Button. */
+.ms-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--control-h-md);padding:0 var(--space-7);border-radius:var(--radius-control);font:var(--type-button);text-decoration:none;cursor:pointer;border:var(--border-w) solid transparent;transition:var(--transition-control,all .14s ease)}
+.ms-btn--primary{background:var(--accent-500);color:var(--n-0)}
+.ms-btn--primary:hover{background:var(--accent-600)}
+.ms-btn--outline{background:transparent;color:var(--text-strong);border-color:var(--border-default,var(--n-300))}
+.ms-btn--outline:hover{background:var(--n-50)}
+
+/* Figure - the labelled photo slot. */
+.ms-figure{position:relative;overflow:hidden;border-radius:var(--radius-lg);background:var(--n-100);border:var(--border-w) solid var(--border-subtle)}
+.ms-figure img{width:100%;height:100%;object-fit:cover;display:block}
+.ms-figure__label{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:8px;font:var(--type-eyebrow);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--n-400)}

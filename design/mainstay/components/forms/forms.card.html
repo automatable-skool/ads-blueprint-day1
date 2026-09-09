@@ -1,0 +1,26 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Forms" subtitle="Input, textarea, select, checkbox, radio, switch" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<style>body{padding:22px 24px;background:var(--surface-page)}.grp{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:14px}.lbl{font:600 10px/1 var(--font-core);letter-spacing:.09em;text-transform:uppercase;color:var(--n-400);width:100%;margin-bottom:-4px}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script></head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, IconButton, Badge, Tag, Card, Tabs, Tooltip, Dialog, Toast, Icon, Input, Textarea, Select, Checkbox, Radio, Switch, SectionHeading, Stars, ServiceCard, TestimonialCard, StatBlock, FAQItem, CTABanner, TrustBar, PricingCard, QuoteForm, SiteHeader, SiteFooter } = window.MainstayDesignSystem_eaeaf9;
+function Demo(){return (<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'18px 24px'}}>
+  <Input label="Name" placeholder="Jane Whitfield" required />
+  <Input label="Phone" icon="phone" defaultValue="(555) 018 2244" hint="We only use this to confirm your slot." />
+  <Select label="Service" placeholder="Choose a service" options={["Emergency repair","Installation","Servicing"]} />
+  <Input label="Postcode" error="Please enter a valid postcode" defaultValue="X" />
+  <Textarea label="Tell us about the job" rows={2} placeholder="Kitchen tap has been dripping…" />
+  <div>
+    <Checkbox label="Send me an SMS confirmation" defaultChecked />
+    <Switch label="Text me when the engineer leaves" defaultChecked />
+    <div style={{display:'flex',gap:12,marginTop:6}}>
+      <Radio card name="slot" label="Morning" description="8am – 12pm" defaultChecked />
+      <Radio card name="slot" label="Afternoon" description="12pm – 5pm" />
+    </div>
+  </div>
+</div>);}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script></body></html>

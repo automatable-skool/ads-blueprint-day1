@@ -1,0 +1,40 @@
+<!-- @dsCard group="Components" viewport="700x760" name="Marketing" subtitle="Promo bar, service card, stat band, avatar cluster, process steps, plan card, testimonial, hours, FAQ, media" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Marketing</title><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:18px 20px;background:var(--surface-page)}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}.g2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start;margin-top:16px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { PromoBar, StatBand, PlanCard, Button, AvatarCluster, ProcessSteps, ServiceCard, TestimonialCard, Rating, StatBlock, TrustRow, ContactBar, HoursTable, FAQItem, MediaFrame } = window.GoodworkDesignSystem_fee824;
+function Demo(){return(<div>
+<PromoBar message="Furnace or AC trouble? Upfront pricing in 60 seconds." ctaLabel="Get my estimate" style={{borderRadius:"var(--radius-sm)",marginBottom:12}}/>
+<ContactBar phone="(905) 555-0142" area="Serving Hamilton & Burlington" hours="Mon–Sat, 7am–7pm" style={{borderRadius:"var(--radius-sm)",marginBottom:12}}/>
+<StatBand items={[{value:"14+",label:"years in the trade"},{value:"1,400+",label:"jobs completed"},{value:"4.9",label:"across 2,500 reviews"},{value:"24/7",label:"emergency service"}]} style={{borderRadius:"var(--radius-sm)",marginBottom:16}}/>
+<div className="g3">
+<ServiceCard icon="wrench" title="Drain clearing" description="Camera inspection included on every visit." price="From $149" image="" imageLabel="On the job"/>
+<ServiceCard icon="zap" title="Emergency call-out" description="Burst pipes and no-heat calls, day or night." price="From $220"/>
+<TestimonialCard rating={5} quote="Came out the same evening and stayed until the heat was back on." name="Dana R." detail="Furnace repair · Westdale" source="Google"/>
+</div>
+<div className="g2">
+<div style={{display:"grid",gap:14}}>
+<div style={{display:"flex",gap:32}}>
+<StatBlock value="1,400+" label="jobs completed since 2011" icon="badge-check"/>
+<StatBlock value="4.9" label="average across 182 reviews" icon="star"/>
+</div>
+<TrustRow items={["Licensed & insured","1-year workmanship warranty","Upfront pricing"]} iconColor="var(--blue-600)"/>
+<Rating value={4.9} count={182} showValue/>
+<div><FAQItem question="Do you charge for quotes?" answer="No — quotes are free anywhere in our service area." defaultOpen/><FAQItem question="What are your call-out hours?"/></div>
+</div>
+<div style={{display:"grid",gap:14}}>
+<MediaFrame ratio="16 / 9" label="Van & crew"/>
+<HoursTable todayIndex={2} rows={[{day:"Monday",hours:"7am–7pm"},{day:"Tuesday",hours:"7am–7pm"},{day:"Wednesday",hours:"7am–7pm"},{day:"Sunday",hours:"Closed"}]}/>
+</div>
+</div>
+<AvatarCluster people={["KM","JP","LB","DR"]} rating="4.9" label="2,500+ verified Google reviews" style={{marginTop:16}}/>
+<ProcessSteps style={{marginTop:16}} steps={[{title:"You call, we answer",body:"No phone menus. Someone picks up and books you in.",badge:"No robots"},{title:"Honest diagnosis",body:"The fault, explained in plain English."},{title:"Upfront quote",body:"Parts and labour before any work starts."}]}/>
+<PlanCard price="$34.99" period="per month" footnote="12 month minimum." title="Join the Comfort Club" description="Two tune-ups a year, 5% off repairs, same-day service." perks={["2 tune-ups / year","5% off repairs","Same-day service","No overtime fees"]} action={<Button variant="accent" size="sm">Join now</Button>} style={{marginTop:16}}/>
+</div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>

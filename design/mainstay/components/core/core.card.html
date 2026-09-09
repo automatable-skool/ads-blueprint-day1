@@ -1,0 +1,50 @@
+<!-- @dsCard group="Components" viewport="700x430" name="Core" subtitle="Buttons, icon buttons, badges, tags, cards, tabs, dialog, toast" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<style>body{padding:22px 24px;background:var(--surface-page)}.grp{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:14px}.lbl{font:600 10px/1 var(--font-core);letter-spacing:.09em;text-transform:uppercase;color:var(--n-400);width:100%;margin-bottom:-4px}</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script></head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, IconButton, Badge, Tag, Card, Tabs, Tooltip, Dialog, Toast, Icon, Input, Textarea, Select, Checkbox, Radio, Switch, SectionHeading, Stars, ServiceCard, TestimonialCard, StatBlock, FAQItem, CTABanner, TrustBar, PricingCard, QuoteForm, SiteHeader, SiteFooter } = window.MainstayDesignSystem_eaeaf9;
+function Demo(){
+  const [open,setOpen]=React.useState(false);
+  return (<div>
+    <div className="grp"><span className="lbl">Button — variant</span>
+      <Button>Get a free quote</Button>
+      <Button variant="secondary">Book a visit</Button>
+      <Button variant="outline" iconLeft="phone">Call now</Button>
+      <Button variant="ghost">See all services</Button>
+      <Button variant="link" iconRight="arrow-right">Read the guide</Button>
+    </div>
+    <div className="grp"><span className="lbl">Button — size, state</span>
+      <Button size="sm">Small</Button><Button size="md">Medium</Button><Button size="lg" iconRight="arrow-right">Large</Button>
+      <Button loading>Sending</Button><Button disabled>Disabled</Button>
+      <IconButton icon="menu" label="Menu" variant="outline" /><IconButton icon="phone" label="Call" variant="primary" round />
+    </div>
+    <div className="grp"><span className="lbl">Badge · Tag</span>
+      <Badge tone="accent">Most booked</Badge>
+      <Badge tone="success" icon="circle-check">Available today</Badge>
+      <Badge tone="warning" variant="outline">2 slots left</Badge>
+      <Badge tone="neutral" variant="solid">Licensed</Badge>
+      <Tag icon="droplets" selected onSelect={()=>{}}>Plumbing</Tag>
+      <Tag icon="plug-zap" onSelect={()=>{}}>Electrical</Tag>
+      <Tag onRemove={()=>{}}>Ashbourne</Tag>
+    </div>
+    <div className="grp"><span className="lbl">Tabs · Tooltip</span>
+      <Tabs items={[{id:'r',label:'Residential'},{id:'c',label:'Commercial'}]} />
+      <Tabs variant="pill" items={[{id:'m',label:'Monthly'},{id:'y',label:'Per visit'}]} />
+      <Tooltip content="Parts and labour included"><Badge tone="neutral" icon="info">Fixed price</Badge></Tooltip>
+    </div>
+    <div className="grp" style={{alignItems:'stretch'}}><span className="lbl">Card · Toast · Dialog</span>
+      <Card style={{width:180}}><b style={{color:'var(--text-strong)'}}>Outline</b><div style={{font:'var(--type-small)',color:'var(--text-muted)'}}>Default surface</div></Card>
+      <Card variant="elevated" style={{width:180}}><b style={{color:'var(--text-strong)'}}>Elevated</b><div style={{font:'var(--type-small)',color:'var(--text-muted)'}}>shadow-sm</div></Card>
+      <Toast tone="success" title="Quote requested" message="We'll call within the hour." onDismiss={()=>{}} />
+      <Button variant="outline" onClick={()=>setOpen(true)}>Open dialog</Button>
+      <Dialog open={open} onClose={()=>setOpen(false)} title="Request a callback" description="Leave a number and we'll ring you back within the hour."
+        footer={<><Button variant="ghost" onClick={()=>setOpen(false)}>Cancel</Button><Button onClick={()=>setOpen(false)}>Request call</Button></>} />
+    </div>
+  </div>);
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script></body></html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Local service website" description="One-page conversion site for a trades or professional-services business: hero quote form, services, proof, FAQ and CTA." -->
+<helmet><script src="./ds-base.js"></script></helmet>
+<div style="background:var(--surface-page)">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.SiteHeader" brand="{{ brandFirst }}" brand-accent="{{ brandSecond }}" phone="{{ phone }}" links="{{ links }}" active-href="#services" hint-size="100%,114px"></x-import>
+<section style="padding-block:56px 88px">
+<div style="max-width:1160px;margin-inline:auto;padding-inline:24px;display:grid;grid-template-columns:1.05fr .95fr;gap:96px;align-items:start">
+<div>
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.Badge" tone="accent" icon="clock" size="lg" hint-size="180px,32px">Same-day slots available</x-import>
+<h1 style="font:var(--type-display);letter-spacing:var(--ls-display);color:var(--text-strong);margin-top:20px;max-width:14ch">Fixed today, not next week.</h1>
+<p style="font:var(--type-lead);color:var(--text-body);margin-top:20px;max-width:46ch">Plumbing, heating, electrical and everything else around the property — one local team, one number, prices agreed before we start.</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:32px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.Button" size="lg" icon-right="arrow-right" hint-size="190px,52px">Get a free quote</x-import>
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.Button" size="lg" variant="outline" icon-left="phone" href="{{ telHref }}" hint-size="190px,52px">{{ phone }}</x-import>
+</div>
+<div style="margin-top:32px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.TrustBar" items="{{ trust }}" hint-size="100%,24px"></x-import>
+</div>
+<div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border-subtle)">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.Stars" rating="{{ five }}" size="{{ starSize }}" label="4.9 average from 312 local reviews" hint-size="300px,20px"></x-import>
+</div>
+</div>
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.QuoteForm" services="{{ serviceNames }}" hint-size="100%,460px"></x-import>
+</div>
+</section>
+<section id="services" style="background:var(--surface-sunken);padding-block:88px">
+<div style="max-width:1160px;margin-inline:auto;padding-inline:24px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.SectionHeading" eyebrow="What we do" title="One number for every job around the property" lead="Trades and professional services under one roof, so you're not chasing four different people." hint-size="100%,120px"></x-import>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px">
+<sc-for list="{{ services }}" as="s" hint-placeholder-count="4">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.ServiceCard" icon="{{ s.icon }}" title="{{ s.title }}" description="{{ s.description }}" price="{{ s.price }}" href="#services" cta="See details" hint-size="100%,220px"></x-import>
+</sc-for>
+</div>
+</div>
+</section>
+<section style="padding-block:88px">
+<div style="max-width:1160px;margin-inline:auto;padding-inline:24px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.StatBlock" stats="{{ stats }}" bordered="{{ yes }}" hint-size="100%,120px"></x-import>
+</div>
+</section>
+<section style="background:var(--surface-sunken);padding-block:88px">
+<div style="max-width:1160px;margin-inline:auto;padding-inline:24px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.SectionHeading" eyebrow="Reviews" title="What people in the county say" align="center" hint-size="100%,90px"></x-import>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px">
+<sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.TestimonialCard" quote="{{ r.quote }}" name="{{ r.name }}" meta="{{ r.meta }}" hint-size="100%,220px"></x-import>
+</sc-for>
+</div>
+</div>
+</section>
+<section style="padding-block:88px">
+<div style="max-width:1160px;margin-inline:auto;padding-inline:24px;display:grid;grid-template-columns:.8fr 1.2fr;gap:96px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.SectionHeading" eyebrow="Questions" title="Before you book" lead="Anything else, just ask when you call." hint-size="100%,140px"></x-import>
+<div>
+<sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.FAQItem" question="{{ f.q }}" answer="{{ f.a }}" hint-size="100%,68px"></x-import>
+</sc-for>
+</div>
+</div>
+</section>
+<div style="max-width:1160px;margin-inline:auto;padding:0 24px 88px">
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.CTABanner" tone="{{ ctaTone }}" title="Need someone today?" lead="Tell us what's wrong and we'll call you back within the hour." primary-label="Get a free quote" secondary-label="{{ callLabel }}" secondary-href="{{ telHref }}" hint-size="100%,200px"></x-import>
+</div>
+<x-import component-from-global-scope="MainstayDesignSystem_eaeaf9.SiteFooter" brand="{{ brandFirst }}" brand-accent="{{ brandSecond }}" phone="{{ phone }}" columns="{{ footerColumns }}" licence="Gas Safe 448201 · NICEIC approved" hint-size="100%,380px"></x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;businessName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Mainstay&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Business&quot;},&quot;phone&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;(555) 018 2244&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Business&quot;},&quot;splitBrandColour&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Business&quot;},&quot;closingBannerTone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ink&quot;,&quot;sunken&quot;,&quot;accent&quot;],&quot;default&quot;:&quot;ink&quot;,&quot;tsType&quot;:&quot;\&quot;ink\&quot; | \&quot;sunken\&quot; | \&quot;accent\&quot;&quot;,&quot;section&quot;:&quot;Layout&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props;
+    const brand = p.businessName ?? "Mainstay";
+    const phone = p.phone ?? "(555) 018 2244";
+    const services = [
+      { icon: "droplets", title: "Plumbing", description: "Leaks, blockages, tap and bathroom fits.", price: "From $89" },
+      { icon: "thermometer", title: "Heating & boilers", description: "Repairs, servicing and gas safety checks.", price: "From $120" },
+      { icon: "plug-zap", title: "Electrical", description: "Faults, rewires, sockets and EV chargers.", price: "From $95" },
+      { icon: "hammer", title: "Carpentry & repairs", description: "Doors, decking, flooring, general joinery.", price: "From $75" }
+    ];
+    return {
+      brandFirst: brand.slice(0, Math.ceil(brand.length / 2)),
+      brandSecond: p.splitBrandColour === false ? "" : brand.slice(Math.ceil(brand.length / 2)),
+      phone,
+      telHref: "tel:" + phone.replace(/[^0-9+]/g, ""),
+      callLabel: "Call " + phone,
+      ctaTone: p.closingBannerTone ?? "ink",
+      five: 5,
+      yes: true,
+      starSize: 18,
+      links: [
+        { label: "Services", href: "#services" },
+        { label: "Pricing", href: "#pricing" },
+        { label: "Reviews", href: "#reviews" },
+        { label: "Contact", href: "#contact" }
+      ],
+      trust: [
+        { label: "Licensed & insured", icon: "shield-check" },
+        { label: "No call-out fee", icon: "circle-check" },
+        { label: "Family-run since 2009", icon: "badge-check" }
+      ],
+      services,
+      serviceNames: ["Emergency repair", "Installation", "Servicing & maintenance", "Something else"],
+      stats: [
+        { value: "17 yrs", label: "Trading in the county" },
+        { value: "6,400+", label: "Jobs completed" },
+        { value: "62 min", label: "Average response time" },
+        { value: "4.9★", label: "312 verified reviews" }
+      ],
+      reviews: [
+        { quote: "Called at nine, fixed by noon, and the price was the price. No fuss.", name: "Dana R.", meta: "Ashbourne · Boiler repair" },
+        { quote: "They quoted three jobs, did two the same week and booked the third around my shifts.", name: "Marcus O.", meta: "Redhill · Electrical" },
+        { quote: "Turned up when they said. Cleaned up after. That's all I want from a trade.", name: "Priya S.", meta: "Kingsmoor · Bathroom fit" }
+      ],
+      faqs: [
+        { q: "Do you charge a call-out fee?", a: "No. Quotes are free, and the price we agree before starting is the price you pay." },
+        { q: "How quickly can you come out?", a: "Most jobs booked before 11am are done the same day. Emergencies are prioritised." },
+        { q: "Are you licensed and insured?", a: "Yes — fully licensed trades, $2m public liability, and every engineer is DBS checked." },
+        { q: "Which areas do you cover?", a: "Ashbourne, Redhill, Carlow, Kingsmoor and everywhere within about 20 miles." }
+      ],
+      footerColumns: [
+        { title: "Services", links: [{ label: "Plumbing" }, { label: "Heating & boilers" }, { label: "Electrical" }, { label: "Carpentry" }] },
+        { title: "Company", links: [{ label: "About us" }, { label: "Our engineers" }, { label: "Reviews" }, { label: "Careers" }] },
+        { title: "Areas", links: [{ label: "Ashbourne" }, { label: "Redhill" }, { label: "Carlow" }, { label: "Kingsmoor" }] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

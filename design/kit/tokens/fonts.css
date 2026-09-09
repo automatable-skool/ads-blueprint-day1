@@ -1,0 +1,7 @@
+/* Archivo — served from Google Fonts. No vendor font binaries were provided with this
+   brief, so the family is loaded from the Google CDN rather than self-hosted files.
+   If you have licensed webfont files, drop them in assets/fonts/ and replace this
+   @import with @font-face rules pointing at them. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+
+:root{--font-core:"Archivo","Helvetica Neue",Arial,sans-serif;--font-mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace}

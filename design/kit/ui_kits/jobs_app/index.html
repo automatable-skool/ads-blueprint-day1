@@ -1,0 +1,44 @@
+<!-- @dsCard group="Dispatch app" viewport="1440x900" name="Dispatch app" subtitle="Sidebar, schedule, job detail and quote builder" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Northside Dispatch — Goodwork app kit</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0}#root{position:relative;min-height:100vh;min-width:1360px}.toastwrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" src="AppShell.jsx"></script>
+<script type="text/babel" src="Screens.jsx"></script>
+<script type="text/babel">
+const { Dialog, Button, Field, Input, Select, RadioGroup, Toast, Icon } = window.GoodworkDesignSystem_fee824;
+function App(){
+  const [view,setView]=React.useState("schedule");
+  const [tab,setTab]=React.useState("today");
+  const [selected,setSelected]=React.useState("J-1042");
+  const [newJob,setNewJob]=React.useState(false);
+  const [confirmSend,setConfirmSend]=React.useState(false);
+  const [toast,setToast]=React.useState(null);
+  return (<React.Fragment>
+    <AppShell view={view} onView={setView} onNew={()=>setNewJob(true)}>
+      {view==="schedule" ? <Schedule tab={tab} onTab={setTab} selected={selected} onSelect={setSelected}/>
+      : view==="quotes" ? <QuoteBuilder onSend={()=>setConfirmSend(true)}/>
+      : <Placeholder view={view.charAt(0).toUpperCase()+view.slice(1)}/>}
+    </AppShell>
+    <Dialog open={newJob} title="New job" description="Enough to dispatch — the rest gets filled on site." width={520} onClose={()=>setNewJob(false)}
+      footer={<><Button variant="secondary" onClick={()=>setNewJob(false)}>Cancel</Button>
+      <Button variant="accent" onClick={()=>{setNewJob(false);setToast("Job J-1047 booked for Friday, 8–10am.");}}>Book job</Button></>}>
+      <div style={{display:"grid",gap:"var(--space-5)"}}>
+        <Field label="Customer" required><Input placeholder="Search or add a name"/></Field>
+        <Field label="Job type"><Select options={["Furnace repair","AC repair","Tune-up","Install quote"]}/></Field>
+        <Field label="Window"><RadioGroup name="win" value="Morning (8–10)" onChange={()=>{}} direction="horizontal" options={["Morning (8–10)","Afternoon (12–2)"]}/></Field>
+        <Field label="Assign to"><Select options={["Kenny M.","James P.","Leave unassigned"]}/></Field>
+      </div>
+    </Dialog>
+    <Dialog open={confirmSend} title="Send quote Q-2291 to Ben?" description="He'll get a text and an email with a one-tap accept." width={420} onClose={()=>setConfirmSend(false)}
+      footer={<><Button variant="secondary" onClick={()=>setConfirmSend(false)}>Back</Button>
+      <Button variant="accent" onClick={()=>{setConfirmSend(false);setToast("Quote sent to Ben Whitlock.");}} iconLeft={<Icon name="mail" size={16}/>}>Send it</Button></>}/>
+    {toast ? <div className="toastwrap"><Toast message={toast} onClose={()=>setToast(null)}/></div> : null}
+  </React.Fragment>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script></body></html>

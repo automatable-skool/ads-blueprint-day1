@@ -1,0 +1,33 @@
+:root{
+--space-0:0;
+--space-1:2px;
+--space-2:4px;
+--space-3:8px;
+--space-4:12px;
+--space-5:16px;
+--space-6:20px;
+--space-7:24px;
+--space-8:32px;
+--space-9:40px;
+--space-10:48px;
+--space-11:64px;
+--space-12:80px;
+--space-13:96px;
+--space-14:128px;
+/* Layout */
+--container-max:1160px; /* @kind spacing */
+--container-narrow:720px; /* @kind spacing */
+--gutter:24px; /* @kind spacing */
+--section-y:clamp(56px,7vw,104px); /* @kind spacing */
+--stack-tight:var(--space-4); /* @kind spacing */
+--stack:var(--space-6); /* @kind spacing */
+--stack-loose:var(--space-8); /* @kind spacing */
+/* Control sizing */
+--control-h-sm:36px; /* @kind spacing */
+--control-h-md:44px; /* @kind spacing */
+--control-h-lg:52px; /* @kind spacing */
+--control-px-sm:14px; /* @kind spacing */
+--control-px-md:20px; /* @kind spacing */
+--control-px-lg:26px; /* @kind spacing */
+--tap-min:44px; /* @kind spacing */
+}

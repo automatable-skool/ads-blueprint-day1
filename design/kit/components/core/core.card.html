@@ -1,0 +1,37 @@
+<!-- @dsCard group="Components" viewport="700x250" name="Core" subtitle="Buttons, icon buttons, badges, tags, cards" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Core</title><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:18px 20px;background:var(--surface-page)}.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.stack{display:grid;gap:12px}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, IconButton, Badge, Tag, Card, Icon } = window.GoodworkDesignSystem_fee824;
+function Demo(){return(<div className="stack">
+<div className="row">
+<Button variant="accent" iconLeft={<Icon name="phone" size={17}/>}>Call now</Button>
+<Button variant="primary">Book a visit</Button>
+<Button variant="secondary">See our work</Button>
+<Button variant="ghost" iconRight={<Icon name="arrow-right" size={16}/>}>All services</Button>
+<Button variant="danger" size="sm">Cancel job</Button>
+<Button variant="primary" size="sm" disabled>Disabled</Button>
+</div>
+<div className="row">
+<Button size="lg" variant="accent">Large</Button>
+<Button size="md" variant="primary">Medium</Button>
+<Button size="sm" variant="secondary">Small</Button>
+<IconButton name="menu" label="Menu"/><IconButton name="search" label="Search" variant="ghost"/><IconButton name="plus" label="Add" variant="brand"/>
+</div>
+<div className="row">
+<Badge tone="positive" dot>Available today</Badge><Badge tone="accent">24/7</Badge><Badge tone="brand">Licensed</Badge>
+<Badge tone="caution">Awaiting parts</Badge><Badge tone="critical">Overdue</Badge><Badge tone="info">Quoted</Badge>
+<Tag icon="map-pin">Burlington</Tag><Tag onRemove={()=>{}}>Drain clearing</Tag>
+</div>
+<div className="row" style={{alignItems:"stretch"}}>
+<Card padding="sm" style={{width:200}}><strong style={{font:"var(--type-h4)",fontWeight:600}}>Standard card</strong><p style={{font:"var(--type-body-sm)",color:"var(--text-muted)",margin:"4px 0 0"}}>Hairline + shadow-sm</p></Card>
+<Card padding="sm" accent style={{width:200}}><strong style={{font:"var(--type-h4)",fontWeight:600}}>Accent card</strong><p style={{font:"var(--type-body-sm)",color:"var(--text-muted)",margin:"4px 0 0"}}>One per set</p></Card>
+</div>
+</div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>

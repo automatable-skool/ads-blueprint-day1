@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Google Ads audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  :root { --canvas:#f5f4ed; --ivory:#faf9f5; --sand:#e8e6dc; --ink:#141413; --body:#5e5d59; --muted:#87867f; --hairline:#f0eee6; --hairline-soft:#e8e6dc; --ring:#d1cfc5;
+    --terracotta:#c96442; --terracotta-active:#b05538; --coral:#d97757;
+    --good:#3d7a4a; --good-bg:rgba(61,122,74,.08); --good-ring:rgba(61,122,74,.25);
+    --warn:#d4a017; --warn-bg:rgba(212,160,23,.10); --warn-ring:rgba(212,160,23,.30);
+    --bad:#b53333; --bad-bg:rgba(181,51,51,.07); --bad-ring:rgba(181,51,51,.22);
+    --dark:#141413; --on-dark:#faf9f5; --on-dark-soft:#b0aea5; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--canvas); color:var(--ink); font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .display { font-family:"Tiempos Text",Georgia,serif; font-weight:500; }
+  .mono, .kicker, .k, .tag { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; }
+  .kicker { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--coral); }
+  .rail { max-width:1160px; margin:0 auto; padding:0 32px; }
+  .shell { display:block; }
+  .nav { border-bottom:1px solid var(--hairline); background:var(--canvas); position:sticky; top:0; z-index:5; }
+  .nav .rail { display:flex; align-items:center; justify-content:space-between; padding-top:14px; padding-bottom:14px; }
+  .wordmark { display:inline-flex; align-items:center; gap:8px; font-size:22px; letter-spacing:-.3px; }
+  .wordmark svg { color:var(--terracotta); }
+  .jump { display:flex; gap:4px; flex-wrap:wrap; }
+  .jump a { font-size:12px; font-weight:500; color:var(--body); text-decoration:none; padding:6px 10px; border-radius:8px; }
+  .jump a:hover { background:var(--sand); color:var(--ink); }
+  .chip { display:inline-flex; align-items:center; gap:6px; border-radius:999px; border:1px solid var(--hairline-soft); background:var(--ivory); padding:4px 12px; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--body); }
+  .btn { display:inline-flex; align-items:center; padding:10px 18px; border-radius:12px; font-size:14px; font-weight:500; background:var(--terracotta); color:var(--on-dark); text-decoration:none; }
+  header.hero { padding:48px 0 8px; }
+  header.hero h1 { font-size:52px; line-height:1.05; letter-spacing:-1px; margin-top:14px; }
+  header.hero .meta { display:flex; flex-wrap:wrap; gap:8px 20px; align-items:center; margin-top:14px; }
+  header.hero .meta a { color:var(--coral); text-decoration:none; font-size:14px; font-weight:500; }
+  header.hero .meta .stamp { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; }
+  section { padding:36px 0; scroll-margin-top:70px; }
+  section.band { background:#fff; border-top:1px solid var(--hairline-soft); border-bottom:1px solid var(--hairline-soft); }
+  .sh { display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .sh h2 { font-size:26px; line-height:1.2; letter-spacing:-.5px; width:100%; }
+  .sh h3 { font-size:17px; letter-spacing:-.2px; margin:22px 0 10px; }
+  .sh p.lead { color:var(--body); font-size:14px; max-width:680px; width:100%; margin-top:-6px; }
+  h3.sub { font-size:17px; letter-spacing:-.2px; margin:26px 0 10px; }
+  .card { background:var(--ivory); border:1px solid var(--hairline); border-radius:16px; box-shadow:rgba(0,0,0,.04) 0 4px 24px; }
+  .score { width:84px; height:56px; border-radius:14px; border:1px solid; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; }
+  .score .v { font-family:"Tiempos Text",Georgia,serif; font-weight:500; font-size:24px; letter-spacing:-1px; line-height:1; }
+  .score .u { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:8px; letter-spacing:1px; opacity:.7; margin-top:2px; }
+  .score.sm { width:64px; height:44px; border-radius:10px; } .score.sm .v { font-size:18px; }
+  .score.good { color:var(--good); background:var(--good-bg); border-color:var(--good-ring); }
+  .score.warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-ring); }
+  .score.bad { color:var(--bad); background:var(--bad-bg); border-color:var(--bad-ring); }
+  /* report card */
+  .scorecard { display:grid; grid-template-columns:1fr auto 1fr; gap:24px; align-items:center; padding:30px 40px; }
+  .dial { display:flex; flex-direction:column; align-items:center; gap:10px; } .dial svg { width:180px; height:180px; }
+  .dial .lbl { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; } .dial .sub { font-size:13px; color:var(--body); }
+  .arrowcol { display:flex; flex-direction:column; align-items:center; gap:8px; } .arrowcol .brag { font-size:18px; white-space:nowrap; } .arrowcol .runs { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--hairline); } .stat { padding:20px 28px; border-right:1px solid var(--hairline); } .stat:last-child { border-right:0; }
+  .stat .v { font-family:"Tiempos Text",Georgia,serif; font-weight:500; font-size:44px; letter-spacing:-1.5px; line-height:1.05; } .stat .k { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:var(--ink); margin-top:6px; }
+  .stat .sub { font-size:11.5px; color:var(--body); margin-top:6px; line-height:1.45; }
+  /* checklist */
+  .groups { display:grid; grid-template-columns:1fr 1fr; gap:0 32px; padding:8px 24px 16px; }
+  .grp { padding:14px 0; border-bottom:1px solid var(--hairline); break-inside:avoid; }
+  .grp h4 { display:flex; justify-content:space-between; align-items:baseline; font-size:13px; font-weight:500; margin-bottom:6px; }
+  .grp h4 .k { font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; }
+  .chk { display:flex; gap:10px; align-items:flex-start; padding:5px 0; font-size:13px; color:var(--ink); line-height:1.4; }
+  .chk .dot { flex-shrink:0; width:16px; height:16px; border-radius:5px; margin-top:1px; display:flex; align-items:center; justify-content:center; }
+  .chk .dot.pass { background:var(--good); } .chk .dot.fail { background:var(--bad-bg); border:1.5px solid var(--bad); } .chk .dot.routed { background:var(--warn-bg); border:1.5px solid var(--warn); } .chk .dot.na { border:1.5px dashed var(--ring); }
+  .chk .tag { font-size:9px; text-transform:uppercase; letter-spacing:1.2px; padding:1px 6px; border-radius:999px; margin-left:6px; vertical-align:middle; }
+  .tag.fixed { background:var(--good-bg); color:var(--good); border:1px solid var(--good-ring); }
+  .chk.quiet { display:none; } .grp.open .chk.quiet { display:flex; }
+  .showpass { font:inherit; font-size:12px; font-weight:500; color:var(--terracotta); background:none; border:0; cursor:pointer; padding:4px 0; }
+  .showpass:hover { text-decoration:underline; }
+  /* tables */
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; text-align:left; padding:12px 16px; border-bottom:1px solid var(--hairline-soft); font-weight:500; }
+  td { padding:12px 16px; border-bottom:1px solid var(--hairline); vertical-align:middle; } tr:last-child td { border-bottom:0; }
+  td .dot { display:inline-flex; width:16px; height:16px; border-radius:5px; align-items:center; justify-content:center; }
+  .dot.pass { background:var(--good); } .dot.fail { background:var(--bad-bg); border:1.5px solid var(--bad); } .dot.routed { background:var(--warn-bg); border:1.5px solid var(--warn); } .dot.na { border:1.5px dashed var(--ring); }
+  tr.flag td { background:var(--bad-bg); } tr.win td { background:var(--good-bg); }
+  .k { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; color:#6e6d66; }
+  /* findings */
+  .leak { display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; padding:16px 20px; border-bottom:1px solid var(--hairline); }
+  .leak:last-child { border-bottom:0; }
+  .leak .nm { font-size:15px; font-weight:600; }
+  .leak .dt { font-size:12.5px; color:var(--body); margin-top:4px; line-height:1.5; }
+  .leak .ev { font-family:"JetBrains Mono",ui-monospace,Menlo,monospace; font-size:11px; color:var(--muted); margin-top:6px; }
+  .leak .fx { font-size:12.5px; margin-top:8px; }
+  .leak .fx b { font-weight:600; }
+  .leak .amt { font-family:"Tiempos Text",Georgia,serif; font-size:24px; letter-spacing:-1px; text-align:right; white-space:nowrap; }
+  .leak .amt .per { display:block; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; letter-spacing:1px; color:var(--muted); text-transform:uppercase; }
+  .leak.stopped .amt { color:var(--good); } .leak.open .amt { color:var(--bad); }
+  .leak .st { display:inline-block; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1px; padding:2px 8px; border-radius:99px; margin-left:8px; vertical-align:2px; }
+  .st.stopped { background:var(--good-bg); color:var(--good); box-shadow:inset 0 0 0 1px var(--good-ring); }
+  .st.open { background:var(--bad-bg); color:var(--bad); box-shadow:inset 0 0 0 1px var(--bad-ring); }
+  .st.settings { background:var(--sand); color:var(--body); }
+  .totalrow { display:flex; justify-content:space-between; align-items:baseline; padding:16px 20px; background:var(--sand); }
+  .totalrow .t { font-size:12px; text-transform:uppercase; letter-spacing:2px; font-family:"JetBrains Mono",ui-monospace,monospace; color:var(--body); }
+  .totalrow .v { font-family:"Tiempos Text",Georgia,serif; font-size:26px; letter-spacing:-1px; }
+  /* fix-first index */
+  .fx1 { display:grid; grid-template-columns:28px 36px 1fr auto auto; gap:14px; align-items:center; padding:11px 16px; border-bottom:1px solid var(--hairline); text-decoration:none; color:inherit; }
+  .fx1:last-child { border-bottom:0; } .fx1:hover { background:#fff; }
+  .fx1 .r { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12px; color:#6e6d66; }
+  .fx1 .i { font-size:14px; font-weight:500; }
+  .fx1 .w { font-size:11px; color:var(--body); font-family:"JetBrains Mono",ui-monospace,monospace; }
+  .fx1 .c { font-family:"Tiempos Text",Georgia,serif; font-weight:500; font-size:17px; color:var(--bad); white-space:nowrap; }
+  .fx1 .c.set { color:var(--muted); font-size:12px; font-family:"JetBrains Mono",ui-monospace,monospace; text-transform:uppercase; letter-spacing:1px; }
+  /* distribution bars */
+  .dist { margin:10px 0 4px; }
+  .dist .dh { display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; }
+  .dist .dh b { font-weight:600; }
+  .dist .bar { display:flex; height:12px; border-radius:6px; overflow:hidden; background:var(--sand); }
+  .dist .bar i { display:block; height:100%; }
+  .dist .bar .lo { background:var(--bad); } .dist .bar .md { background:var(--ring); } .dist .bar .hi { background:var(--good); }
+  .dist .dk { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10.5px; color:var(--body); margin-top:4px; }
+  /* tabs */
+  .tabs { display:flex; gap:4px; padding:12px 16px 0; border-bottom:1px solid var(--hairline); }
+  .tabs button { font:inherit; font-size:12.5px; font-weight:500; color:var(--body); background:none; border:0; border-bottom:2px solid transparent; cursor:pointer; padding:8px 12px; }
+  .tabs button.on { color:var(--ink); border-bottom-color:var(--terracotta); }
+  .tabpane { display:none; } .tabpane.on { display:block; }
+  /* capped scrolling list */
+  .scrolllist { max-height:430px; overflow-y:auto; }
+  .st.urgent { background:var(--bad); color:#fff; padding:3px 10px; }
+  tr.warn td { background:var(--warn-bg); }
+  .qm { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid var(--ring); color:var(--muted); font-size:10px; margin-left:5px; cursor:help; vertical-align:1px; }
+  .qm:hover { background:var(--sand); color:var(--ink); }
+  #tipbox { position:fixed; z-index:50; max-width:320px; background:var(--dark); color:var(--on-dark); font-size:13.5px; line-height:1.5; padding:10px 14px; border-radius:10px; box-shadow:rgba(0,0,0,.25) 0 6px 24px; display:none; pointer-events:none; }
+  .sev { width:36px; height:36px; flex-shrink:0; } .sev svg { width:36px; height:36px; display:block; }
+  /* collapsible blocks */
+  details.fold { border-top:1px solid var(--hairline); }
+  details.fold summary { cursor:pointer; list-style:none; padding:12px 20px; font-size:13px; font-weight:500; color:var(--terracotta); }
+  details.fold summary::-webkit-details-marker { display:none; }
+  details.fold summary:hover { background:var(--sand); }
+  .nm-list li { list-style:none; padding:10px 0; border-bottom:1px solid var(--hairline); font-size:14px; color:var(--body); } .nm-list li:last-child { border-bottom:0; }
+  .cta { margin-top:24px; padding:40px; border-radius:16px; background:var(--terracotta); color:var(--on-dark); display:flex; align-items:center; justify-content:space-between; gap:24px; } .cta h3 { font-size:28px; letter-spacing:-.5px; } .cta .btn { background:var(--ivory); color:var(--ink); }
+  .note { font-size:12px; color:var(--muted); padding:8px 24px 16px; }
+  footer { background:var(--dark); color:var(--on-dark-soft); padding:40px 0; font-size:13px; } footer .rail { display:flex; justify-content:space-between; align-items:center; } footer .wordmark { color:var(--on-dark); font-size:18px; }
+  .hide { display:none !important; }
+  @media (max-width:960px) { .scorecard{grid-template-columns:1fr} .groups{grid-template-columns:1fr} header.hero h1{font-size:38px} .cta{flex-direction:column;align-items:flex-start} .jump{display:none} .fx1{grid-template-columns:28px 36px 1fr auto} .fx1 .w{display:none} }
+</style>
+<script id="audit-data" type="application/json">
+{
+ "mode": "owner",
+ "business": "Dave's Plumbing",
+ "account": "482-931-7740",
+ "domain": "davesplumbing.ca",
+ "date": "31 August 2026",
+ "window": "1 - 30 August 2026",
+ "spend": 8420,
+ "currency": "CAD",
+ "before": 38,
+ "after": 86,
+ "projectedAfter": 90,
+ "issuesBefore": 31,
+ "issuesAfter": 4,
+ "passes": 3,
+ "minutes": 52,
+ "avgCpl": 294,
+ "atRisk": {
+  "total": 3240,
+  "summary": "Spend that got a fair test and returned nothing, plus spend landing on pages that break the ad's promise. Never more than you actually spent."
+ },
+ "benchmark": {
+  "category": "Home & home improvement",
+  "ctr": 6.47,
+  "cpc": 8.33,
+  "cvr": 8.05,
+  "cpl": 90.92
+ },
+ "trend": {
+  "window": "1-30 Aug 2026",
+  "previous": "1-31 Jul 2026",
+  "cpl": {
+   "now": 294,
+   "then": 248
+  },
+  "cvr": {
+   "now": 10.1,
+   "then": 11.4
+  },
+  "ctr": {
+   "now": 4.2,
+   "then": 4.4
+  },
+  "spend": {
+   "now": 8420,
+   "then": 7980
+  },
+  "conv": {
+   "now": 29,
+   "then": 32
+  }
+ },
+ "trust": {
+  "verdict": "partly blind",
+  "notCounted": "Every phone call. Three call actions are primary and all three record zero, while the pages carry a tap-to-call number above the fold.",
+  "cvrCaveat": "The conversion rate counts form leads only, so it is understated. Findings marked 'not yet conclusive' may already be conclusive.",
+  "hiddenSearchTermShare": 38,
+  "cvrUsed": 10.1
+ },
+ "economics": {
+  "jobValue": 2400,
+  "closeRate": 35,
+  "leadValue": 840,
+  "breakEven": 840,
+  "target": 300,
+  "confidence": "estimated"
+ },
+ "gbp": {
+  "linked": false,
+  "autoGoalsSecondary": null,
+  "note": "Not linked, so location assets and the Maps surface are off."
+ },
+ "settings": {
+  "groups": [
+   {
+    "name": "Conversion tracking",
+    "checks": [
+     {
+      "t": "Call reporting on at account level",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Calls from ads counted as a conversion",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Website calls counted (the number swaps for ad visitors)",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Form submissions fire on a distinct thank-you URL",
+      "b": "pass",
+      "a": "pass"
+     },
+     {
+      "t": "Exactly one primary action per money event",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Enhanced Conversions on",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Auto-tagging on",
+      "b": "pass",
+      "a": "pass"
+     }
+    ]
+   },
+   {
+    "name": "Google's autopilot",
+    "checks": [
+     {
+      "t": "Auto-apply recommendations off (both bundles)",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Auto-created assets off",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Text customization inside AI Max off",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Seller ratings left on (harmless)",
+      "b": "pass",
+      "a": "pass"
+     }
+    ]
+   },
+   {
+    "name": "Networks and location",
+    "checks": [
+     {
+      "t": "Search Partners off",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Display Expansion off inside Search",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Location set to Presence, not presence-or-interest",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Excluded regions the business does not serve",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Ad schedule matches answered hours",
+      "b": "fail",
+      "a": "fail"
+     }
+    ]
+   }
+  ]
+ },
+ "keywords": {
+  "groups": [
+   {
+    "name": "Match types",
+    "checks": [
+     {
+      "t": "No broad match without a conversion history to justify it",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Phrase match on single-word terms",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Brand terms in their own campaign",
+      "b": "pass",
+      "a": "pass"
+     },
+     {
+      "t": "No competitor names in ad text",
+      "b": "pass",
+      "a": "pass"
+     }
+    ]
+   },
+   {
+    "name": "Negatives",
+    "checks": [
+     {
+      "t": "Account-level negative list attached",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Universal blocks present (jobs, DIY, courses, free)",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Cross-group negatives enforce the structure",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "No brand or high-intent modifier blocked by mistake",
+      "b": "pass",
+      "a": "pass"
+     },
+     {
+      "t": "Search terms reviewed inside the last 7 days",
+      "b": "fail",
+      "a": "pass"
+     }
+    ]
+   }
+  ]
+ },
+ "creative": {
+  "groups": [
+   {
+    "name": "The ads",
+    "checks": [
+     {
+      "t": "Two ads per ad group",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Fifteen headlines used",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "No pinning beyond position 1",
+      "b": "pass",
+      "a": "pass"
+     },
+     {
+      "t": "Every claim traceable to real proof",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "No phone number in ad text",
+      "b": "pass",
+      "a": "pass"
+     }
+    ]
+   },
+   {
+    "name": "Assets",
+    "checks": [
+     {
+      "t": "Call asset attached and scheduled to answered hours",
+      "b": "fail",
+      "a": "fail"
+     },
+     {
+      "t": "Six sitelinks on intent pages, not About or Contact",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Every sitelink URL returns 200",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Ten callouts, none repeating the ad text",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Structured snippet header is a real Google header",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Business name and logo (needs Advertiser Verification)",
+      "b": "fail",
+      "a": "fail"
+     }
+    ]
+   }
+  ]
+ },
+ "pages": {
+  "groups": [
+   {
+    "name": "Where the click lands",
+    "checks": [
+     {
+      "t": "Ad lands on a matched page, not the homepage",
+      "b": "fail",
+      "a": "fail"
+     },
+     {
+      "t": "Page headline keeps the ad's promise",
+      "b": "fail",
+      "a": "fail"
+     },
+     {
+      "t": "Tap-to-call above the fold on mobile",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Form is four fields or fewer",
+      "b": "pass",
+      "a": "pass"
+     },
+     {
+      "t": "One clear call to action",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Mobile loads in under three seconds",
+      "b": "fail",
+      "a": "fail"
+     },
+     {
+      "t": "No entry or timed popup",
+      "b": "pass",
+      "a": "pass"
+     }
+    ]
+   }
+  ]
+ },
+ "structure": {
+  "groups": [
+   {
+    "name": "Campaigns and ad groups",
+    "checks": [
+     {
+      "t": "One theme per ad group",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Three to eight keywords per group",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Campaigns split by service, not by city",
+      "b": "pass",
+      "a": "pass"
+     },
+     {
+      "t": "No campaign competing with itself on the same term",
+      "b": "fail",
+      "a": "pass"
+     }
+    ]
+   },
+   {
+    "name": "Bidding and budget",
+    "checks": [
+     {
+      "t": "Bid strategy left alone for the first 14 days",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Target CPA set from the last 30 days, not aspirationally",
+      "b": "fail",
+      "a": "pass"
+     },
+     {
+      "t": "Budget concentrated enough to reach a verdict",
+      "b": "fail",
+      "a": "fail"
+     },
+     {
+      "t": "Shared budgets not hiding a starved campaign",
+      "b": "pass",
+      "a": "pass"
+     }
+    ]
+   }
+  ]
+ },
+ "quality": {
+  "rated": 30,
+  "components": {
+   "expectedCtr": {
+    "below": 11,
+    "avg": 14,
+    "above": 5
+   },
+   "adRelevance": {
+    "below": 4,
+    "avg": 18,
+    "above": 8
+   },
+   "landingPage": {
+    "below": 30,
+    "avg": 0,
+    "above": 0
+   }
+  },
+  "worstAdGroups": [
+   "Water heater install",
+   "Emergency | Toronto"
+  ]
+ },
+ "campaigns": [
+  {
+   "name": "Plumbing (Generic)",
+   "status": "Enabled",
+   "spend": 4120,
+   "conv": 14,
+   "cpl": 294,
+   "checks": {
+    "budget": "warn",
+    "tracking": "ok",
+    "ads": "bad",
+    "assets": "warn",
+    "page": "bad",
+    "structure": "bad",
+    "settings": "bad"
+   },
+   "issues": [
+    {
+     "cat": "settings",
+     "level": "bad",
+     "what": "broad match on 41 keywords with Display Expansion still on",
+     "cost": 610
+    },
+    {
+     "cat": "page",
+     "level": "bad",
+     "what": "ads land on the homepage, not a matched page",
+     "cost": 840
+    },
+    {
+     "cat": "structure",
+     "level": "bad",
+     "what": "drain cleaning duplicated across 4 ad groups - unpredictable which ad serves"
+    },
+    {
+     "cat": "ads",
+     "level": "bad",
+     "what": "one ad in 2 of 4 ad groups, so nothing is being tested there"
+    },
+    {
+     "cat": "assets",
+     "level": "warn",
+     "what": "no call asset - a trades account with no phone button"
+    },
+    {
+     "cat": "budget",
+     "level": "warn",
+     "what": "18% impression share lost to budget while hitting target"
+    }
+   ]
+  },
+  {
+   "name": "Emergency",
+   "status": "Enabled",
+   "spend": 2890,
+   "conv": 9,
+   "cpl": 321,
+   "checks": {
+    "budget": "bad",
+    "tracking": "ok",
+    "ads": "warn",
+    "assets": "bad",
+    "page": "warn",
+    "structure": "ok",
+    "settings": "warn"
+   },
+   "issues": [
+    {
+     "cat": "budget",
+     "level": "bad",
+     "what": "31% impression share lost to budget at a cost per lead beating target",
+     "cost": 260
+    },
+    {
+     "cat": "assets",
+     "level": "bad",
+     "what": "no call asset on an emergency campaign"
+    },
+    {
+     "cat": "settings",
+     "level": "warn",
+     "what": "no ad schedule - runs overnight into voicemail",
+     "cost": 260
+    }
+   ]
+  },
+  {
+   "name": "Brand",
+   "status": "Enabled",
+   "spend": 230,
+   "conv": 6,
+   "cpl": 38,
+   "checks": {
+    "budget": "warn",
+    "tracking": "ok",
+    "ads": "ok",
+    "assets": "ok",
+    "page": "ok",
+    "structure": "ok",
+    "settings": "ok"
+   },
+   "issues": [
+    {
+     "cat": "budget",
+     "level": "warn",
+     "what": "best cost per lead in the account and capped - the clearest place to spend more"
+    }
+   ]
+  }
+ ],
+ "spendBreakdown": {
+  "byCampaign": [
+   {
+    "name": "Plumbing (Generic)",
+    "spend": 4120,
+    "share": 49,
+    "conv": 14,
+    "cpl": 294
+   },
+   {
+    "name": "Emergency",
+    "spend": 2890,
+    "share": 34,
+    "conv": 9,
+    "cpl": 321
+   },
+   {
+    "name": "Brand",
+    "spend": 230,
+    "share": 3,
+    "conv": 6,
+    "cpl": 38
+   }
+  ],
+  "byAdGroup": [
+   {
+    "name": "Drain cleaning | Toronto",
+    "spend": 1640,
+    "share": 19,
+    "conv": 6,
+    "cpl": 273
+   },
+   {
+    "name": "Emergency | Toronto",
+    "spend": 1480,
+    "share": 18,
+    "conv": 5,
+    "cpl": 296
+   }
+  ],
+  "byLocation": [
+   {
+    "name": "Toronto",
+    "spend": 5210,
+    "share": 62,
+    "conv": 19,
+    "cpl": 274
+   },
+   {
+    "name": "Outside service area",
+    "spend": 580,
+    "share": 7,
+    "conv": 0,
+    "cpl": null
+   }
+  ],
+  "byDevice": [
+   {
+    "name": "Mobile",
+    "spend": 5890,
+    "share": 70,
+    "conv": 16,
+    "cpl": 368
+   },
+   {
+    "name": "Desktop",
+    "spend": 2110,
+    "share": 25,
+    "conv": 12,
+    "cpl": 176
+   }
+  ]
+ },
+ "adPerformance": {
+  "accountCtr": 4.2,
+  "accountCvr": 10.1,
+  "ctrBenchmark": 6.1,
+  "cvrBenchmark": 8.5,
+  "outliers": [
+   {
+    "adGroup": "Water heater install",
+    "issue": "CTR 41% below account average",
+    "ctr": 2.5,
+    "cvr": 0,
+    "spend": 1180
+   },
+   {
+    "adGroup": "Emergency | Toronto",
+    "issue": "Good CTR, poor conversion rate - the page is the problem",
+    "ctr": 6.8,
+    "cvr": 3.1,
+    "spend": 1480
+   }
+  ]
+ },
+ "splitTests": {
+  "experiments": "none running",
+  "oldestTestDays": 74,
+  "adGroups": [
+   {
+    "name": "Drain cleaning | Toronto",
+    "ads": 2,
+    "spend": 1640
+   },
+   {
+    "name": "Water heater install",
+    "ads": 1,
+    "spend": 1180
+   },
+   {
+    "name": "Leak repair | Toronto",
+    "ads": 1,
+    "spend": 980
+   }
+  ]
+ },
+ "working": {
+  "keywords": [
+   {
+    "t": "drain cleaning toronto",
+    "conv": 6,
+    "cpl": 218
+   },
+   {
+    "t": "emergency plumber toronto",
+    "conv": 5,
+    "cpl": 244
+   }
+  ],
+  "terms": [
+   {
+    "t": "drain cleaning near me",
+    "conv": 5,
+    "cpl": 205
+   }
+  ],
+  "bestCampaign": {
+   "name": "Brand",
+   "cpl": 38,
+   "capped": true
+  },
+  "note": "Every winner is a drain term inside Toronto proper. That is the intent and the geography to spend more on."
+ },
+ "negatives": {
+  "ready": [
+   {
+    "term": "plumber jobs",
+    "match": "phrase",
+    "level": "account",
+    "why": "job seekers"
+   },
+   {
+    "term": "plumbing courses",
+    "match": "phrase",
+    "level": "account",
+    "why": "students"
+   },
+   {
+    "term": "how to fix",
+    "match": "phrase",
+    "level": "account",
+    "why": "DIY"
+   }
+  ],
+  "askFirst": [
+   {
+    "term": "cheap",
+    "why": "Blocks price shoppers but also real buyers searching cheap drain cleaning - your call"
+   }
+  ],
+  "coverage": {
+   "existing": 384,
+   "universalCovered": 47,
+   "universalTotal": 58,
+   "universalMissing": [
+    "apprentice",
+    "wholesale",
+    "training"
+   ],
+   "note": "The rows above are only what THIS window's traffic newly justifies."
+  }
+ },
+ "leaks": [
+  {
+   "name": "Search terms that never convert",
+   "section": "keywords",
+   "monthly": 1180,
+   "status": "stopped",
+   "certainty": "measured",
+   "detail": "312 clicks went to searches like \"plumber jobs\" and \"how to fix a tap\". None became a lead.",
+   "evidence": "312 clicks · $1,180 · 0 conversions · 30 days",
+   "fix": "146 negatives added across 4 campaigns, phrase match on single words.",
+   "who": "Claude pushes it",
+   "time": "10 min",
+   "itemUnit": "search terms",
+   "itemsTotal": 12,
+   "items": [
+    {
+     "name": "plumber jobs toronto",
+     "spend": 180,
+     "clicks": 34,
+     "conv": 0
+    },
+    {
+     "name": "plumbing courses near me",
+     "spend": 142,
+     "clicks": 26,
+     "conv": 0
+    },
+    {
+     "name": "how to fix a leaking tap",
+     "spend": 118,
+     "clicks": 31,
+     "conv": 0
+    }
+   ],
+   "severity": 8
+  },
+  {
+   "name": "Ads land on the homepage",
+   "section": "pages",
+   "monthly": 840,
+   "status": "open",
+   "certainty": "measured",
+   "detail": "Location setting and page routing send paid clicks to a page that never repeats the ad's promise.",
+   "evidence": "$840 · 214 clicks · 0 conversions",
+   "fix": "One matched page per ad group. Run /landing-page.",
+   "who": "you and Claude together",
+   "time": "half a day",
+   "itemUnit": "pages",
+   "itemsTotal": 3,
+   "items": [
+    {
+     "name": "/ (homepage)",
+     "spend": 840,
+     "clicks": 214,
+     "conv": 0
+    }
+   ],
+   "severity": 9
+  },
+  {
+   "name": "Calls are not being counted",
+   "section": "account",
+   "monthly": null,
+   "status": "settings",
+   "certainty": "measured",
+   "detail": "Call reporting was off at account level, so no call has ever counted. Every bidding decision has been made blind to the phone.",
+   "evidence": "settings only - flagged, never priced",
+   "fix": "Call reporting on, both call conversions created at the 1 second minimum.",
+   "who": "Claude pushes it",
+   "time": "10 min",
+   "itemUnit": "call actions",
+   "itemsTotal": 3,
+   "items": [
+    {
+     "name": "Calls from ads",
+     "note": "primary, 0 recorded in 90 days"
+    }
+   ],
+   "severity": 9
+  }
+ ],
+ "waived": [
+  {
+   "type": "owner decision",
+   "item": "Keep the Water Heaters campaign running at a loss",
+   "reason": "Seasonal - owner wants it live before winter"
+  }
+ ],
+ "rawAfter": 84
+}
+</script>
+</head>
+<body>
+<div class="nav"><div class="rail">
+  <span class="wordmark display"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z"/></svg>Automatable</span>
+  <nav class="jump" id="jump"></nav>
+  <span class="chip" id="modechip"></span>
+</div></div>
+
+<div class="shell">
+<main>
+<header class="hero"><div class="rail">
+  <div class="kicker">Google Ads audit</div>
+  <h1 class="display" id="business"></h1>
+  <div class="meta"><a id="domain" target="_blank" rel="noreferrer"></a><span class="stamp" id="stamp"></span></div>
+</div></header>
+
+<!-- 01 report card: score, spend, at-risk, benchmark. Each number appears here ONCE and nowhere else. -->
+<section id="card"><div class="rail">
+  <div class="card">
+    <div class="scorecard" id="scorecard">
+      <div class="dial"><div id="dialBefore"></div><span class="lbl">Today</span><span class="sub" id="beforeSub"></span></div>
+      <div class="arrowcol"><span class="brag display" id="brag"></span><span class="runs" id="runs"></span></div>
+      <div class="dial"><div id="dialAfter"></div><span class="lbl" id="afterLbl">After the fixes</span><span class="sub" id="afterSub"></span></div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div class="card" style="margin-top:20px"><table id="benchTable"></table><div class="note" id="benchNote"></div></div>
+</div></section>
+
+<!-- 02 what to fix first: a ranked index only. The full findings live inside their sections below. -->
+<section class="band" id="fixfirst"><div class="rail">
+  <div class="sh"><span class="kicker">Worst first</span><h2 class="display">What to fix first</h2></div>
+  <div class="card" id="fixIndex"></div>
+</div></section>
+
+<!-- 03 the account -->
+<section id="account"><div class="rail">
+  <div class="sh"><span class="kicker">Section 1</span><span class="aside" id="accountScore"></span><h2 class="display">The account</h2></div>
+  <div class="card"><div class="groups" id="accountGroups"></div><div class="note" id="trustNote"></div></div>
+  <div id="accountFindings"></div>
+</div></section>
+
+<!-- 04 campaigns and ad groups -->
+<section class="band" id="campaigns"><div class="rail">
+  <div class="sh"><span class="kicker">Section 2</span><span class="aside" id="structureScore"></span><h2 class="display">The campaigns and ad groups</h2></div>
+  <div class="card" style="overflow-x:auto"><table id="campTable"></table><div class="note">One row per campaign: the money and the seven health checks together. Green row = beating your average, red row = well above it. Dots: green looks right &#183; yellow partly right &#183; red broken. Hover any ? for what a column means.</div></div>
+  <h3 class="sub display">Every campaign and ad group issue, one list</h3>
+  <div class="card"><div class="scrolllist" style="padding:8px 24px" id="campDetail"></div></div>
+  <div class="card" style="margin-top:14px"><div class="groups" id="structureGroups"></div></div>
+  <h3 class="sub display">Where the money went</h3>
+  <div class="card">
+    <div class="tabs" id="spendTabs">
+      <button data-t="spendGroup" class="on">By ad group</button>
+      <button data-t="spendLoc">By location</button>
+      <button data-t="spendDevice">By device</button>
+    </div>
+    <div class="tabpane on" id="pane-spendGroup"><table id="spendGroup"></table></div>
+    <div class="tabpane" id="pane-spendLoc"><table id="spendLoc"></table></div>
+    <div class="tabpane" id="pane-spendDevice"><table id="spendDevice"></table></div>
+  </div>
+  <div id="campaignsFindings"></div>
+</div></section>
+
+<!-- 05 the ads -->
+<section id="ads"><div class="rail">
+  <div class="sh"><span class="kicker">Section 3</span><span class="aside" id="creativeScore"></span><h2 class="display">The ads</h2></div>
+  <div class="card"><div class="groups" id="creativeGroups"></div></div>
+  <div id="adsIssues"></div>
+  <h3 class="sub display">How Google grades the ads</h3>
+  <div class="card" id="qualityAds"></div>
+  <h3 class="sub display">Is anything being tested?</h3>
+  <div class="card" id="testCard"></div>
+  <div class="card" style="margin-top:14px"><table id="perfTable"></table><div class="note" id="perfHead"></div></div>
+  <div id="adsFindings"></div>
+</div></section>
+
+<!-- 06 the landing pages -->
+<section class="band" id="pages"><div class="rail">
+  <div class="sh"><span class="kicker">Section 4</span><span class="aside" id="pagesScore"></span><h2 class="display">The landing pages</h2></div>
+  <div class="note" style="padding:0 0 12px" id="pagesVerdict"></div>
+  <div class="card"><div class="groups" id="pagesGroups"></div></div>
+  <div id="pagesIssues"></div>
+  <h3 class="sub display">How Google grades the pages</h3>
+  <div class="card" id="qualityPages"></div>
+  <div id="pagesFindings"></div>
+</div></section>
+
+<!-- 07 keywords and search terms -->
+<section id="keywords"><div class="rail">
+  <div class="sh"><span class="kicker">Section 5</span><span class="aside" id="keywordsScore"></span><h2 class="display">The keywords and search terms</h2></div>
+  <div class="card"><div class="groups" id="keywordsGroups"></div></div>
+  <h3 class="sub display">What is winning</h3>
+  <div class="card"><table id="workTable"></table><div class="note" id="workNote"></div></div>
+  <h3 class="sub display">Searches to block</h3>
+  <div class="card"><table id="negTable"></table><div id="negCoverage"></div><div id="askFirst"></div></div>
+  <div id="keywordsFindings"></div>
+</div></section>
+
+<section id="costs" class="hide"><div class="rail">
+  <div class="cta"><div><div class="kicker" style="color:rgba(250,249,245,.7);margin-bottom:8px">The next step</div><h3 class="display">Want me to fix all of it?</h3></div><a class="btn" id="ctaBtn" href="#">Book the call</a></div>
+</div></section>
+
+</main>
+</div>
+<footer><div class="rail"><span class="wordmark display"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z"/></svg>Automatable</span><span id="foot"></span></div></footer>
+
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('audit-data').textContent);
+  const P = D.mode === 'prospect';
+  const $ = id => document.getElementById(id) || { set innerHTML(v){}, set textContent(v){}, classList:{add(){},remove(){}}, style:{}, replaceWith(){} };
+  const band = s => s===null||s===undefined ? 'bad' : s>=80?'good':s>=50?'warn':'bad';
+  const col = { good:'#3d7a4a', warn:'#d4a017', bad:'#b53333' };
+  const money = n => (n===null||n===undefined) ? '-' : '$' + Number(n).toLocaleString('en-US');
+  const esc = s => String(s===null||s===undefined?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const scoreChip = (s, sm) => s===null||s===undefined ? ''
+    : `<div class="score ${band(s)}${sm?' sm':''}"><span class="v">${s}</span><span class="u">/100</span></div>`;
+  const tick = '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6.5l2.5 2.5L10 3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function dial(score, label){
+    const r=86, c=2*Math.PI*r, pct=score==null?0:score/100, b=band(score);
+    return `<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${r}" fill="none" stroke="#e8e6dc" stroke-width="14"/><circle cx="100" cy="100" r="${r}" fill="none" stroke="${col[b]}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${c*pct} ${c}" transform="rotate(-90 100 100)"${label?' stroke-dasharray="'+(c*pct)+' '+c+'"':''}/><text x="100" y="118" text-anchor="middle" font-family="Tiempos Text, Georgia, serif" font-weight="500" font-size="60" letter-spacing="-2" fill="#141413">${score==null?'':score}</text></svg>`;
+  }
+
+  const AVG = D.avgCpl || null;
+  function vsAvg(cpl, conv, share){
+    if (cpl == null) return { cls: (!conv && share>=10) ? 'flag' : '', txt: '<span class="k">no leads</span>' };
+    if (!AVG) return { cls:'', txt:'' };
+    const x = cpl / AVG;
+    if (x >= 1.5) return { cls:'flag',  txt:`<b style="color:#b53333">${x.toFixed(1)}x worse</b>` };
+    if (x <= 0.7) return { cls:'win',   txt:`<b style="color:#3d7a4a">${(1/x).toFixed(1)}x better</b>` };
+    return { cls:'', txt:`<span class="k">about average</span>` };
+  }
+
+  // ---------- shared: checklist group with passed checks folded away ----------
+  let _uid = 0;
+  function renderGroup(g){
+    const total = g.checks.length;
+    const passNow = g.checks.filter(c => (P?c.b:c.a)==='pass').length;
+    const id = 'grp' + (++_uid);
+    const rows = g.checks.map(c => {
+      const now = P ? c.b : c.a;
+      const quiet = now==='pass';
+      const tag = (!P && c.b!=='pass' && c.a==='pass') ? '<span class="tag fixed">fixed</span>' : '';
+      return `<div class="chk${quiet?' quiet':''}"><span class="dot ${now==='pass'?'pass':'fail'}">${now==='pass'?tick:''}</span><span>${esc(c.t)}${c.tip?qm(c.tip):''}${tag}</span></div>`;
+    }).join('');
+    const toggle = passNow ? `<button class="showpass" onclick="var g=document.getElementById('${id}');g.classList.toggle('open');this.textContent=g.classList.contains('open')?'Hide the ${passNow} that pass':'Show the ${passNow} that pass'">Show the ${passNow} that pass</button>` : '';
+    return `<div class="grp" id="${id}"><h4><span>${esc(g.name)}</span><span class="k">${passNow} / ${total} pass</span></h4>${rows}${toggle}</div>`;
+  }
+  function renderGroups(el, groups){
+    const host = $(el);
+    host.innerHTML = (groups && groups.length) ? groups.map(renderGroup).join('')
+      : '<div class="grp"><div class="chk"><span class="dot na"></span><span>Not read this run.</span></div></div>';
+  }
+  function score(keys){
+    let tot=0, ok=0;
+    keys.forEach(k => ((D[k]||{}).groups||[]).forEach(g => g.checks.forEach(c => { tot++; if ((P?c.b:c.a)==='pass') ok++; })));
+    return tot ? Math.round(ok/tot*100) : null;
+  }
+
+  // ---------- header ----------
+  document.title = 'Google Ads audit · ' + D.business;
+  $('modechip').textContent = P ? 'Report only' : 'Report + fix';
+  $('business').textContent = D.business;
+  $('domain').textContent = D.domain; $('domain').href = 'https://' + D.domain;
+  $('stamp').textContent = D.date + ' · account ' + D.account + ' · ' + D.window;
+
+  // ---------- 01 report card ----------
+  // The after dial is REAL only once fixes have actually shipped (after exists and moved).
+  // Before that - prospect mode OR an owner run where nothing has been fixed yet - it is
+  // the PROJECTED score. Never a question mark, and never before == after pretending to
+  // be a result: if there is nothing real and nothing to project, the scorecard is dropped.
+  const fixedYet = !P && D.after != null && D.after !== D.before;
+  const afterScore = fixedYet ? D.after : (D.projectedAfter != null ? D.projectedAfter : null);
+  if (D.before==null || afterScore==null) { $('scorecard').style.display='none'; }
+  else {
+    $('dialBefore').innerHTML = dial(D.before);
+    $('dialAfter').innerHTML  = dial(afterScore);
+    $('beforeSub').textContent = D.issuesBefore!=null ? D.issuesBefore + ' open issues' : '';
+    $('afterLbl').textContent = fixedYet ? 'After the fixes' : 'Projected after the fixes';
+    $('afterSub').textContent = fixedYet ? (D.issuesAfter!=null ? D.issuesAfter + ' issues left' : '') : 'every fixable item fixed';
+    $('brag').textContent = '+' + (afterScore - D.before);
+    $('runs').textContent = fixedYet ? (D.passes!=null ? D.passes + ' passes · ' + D.minutes + ' minutes' : '') : 'projected';
+  }
+  const AR = D.atRisk || {};
+  const TD = D.trend || {};
+  const cplSub = (TD.cpl && TD.cpl.then!=null && AVG!=null)
+    ? (AVG < TD.cpl.then ? 'down from ' : 'up from ') + money(TD.cpl.then) + ' the month before' : '';
+  $('stats').innerHTML = [
+    ['Spend in window', money(D.spend), ''],
+    ['Money at risk / month', money(AR.total), esc(AR.summary || '')],
+    ['Cost per lead', AVG==null?'-':money(AVG), cplSub]
+  ].map(([k,v,s])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('');
+
+  // benchmark + trend, at the top - the one place these numbers appear
+  const B = D.benchmark, AP = D.adPerformance || {};
+  function cmp(now, then, lowerBetter){
+    if (now == null || then == null) return '<span class="k">-</span>';
+    const d = ((now - then)/then)*100, good = lowerBetter ? d < 0 : d > 0;
+    return `<b style="color:${Math.abs(d)<3?'var(--muted)':(good?'var(--good)':'var(--bad)')}">${d>0?'+':''}${d.toFixed(0)}%</b>`;
+  }
+  const brows = [['Cost per lead', AVG, B&&B.cpl, TD.cpl, true],
+                 ['Conversion rate', AP.accountCvr, B&&B.cvr, TD.cvr, false],
+                 ['Click-through rate', AP.accountCtr, B&&B.ctr, TD.ctr, false]];
+  // whole row colored by how it sits vs the benchmark: green better, red worse, yellow within 3%
+  $('benchTable').innerHTML = `<thead><tr><th>Measure</th><th>You</th><th>${B?esc(B.category)+' median':'Benchmark'}</th><th>vs benchmark</th><th>vs last period</th></tr></thead><tbody>` +
+    brows.map(function(r){
+      const pct = r[0] !== 'Cost per lead';
+      const fmt = v => v==null ? '-' : (pct ? v+'%' : money(v));
+      let cls = '';
+      if (r[1]!=null && r[2]!=null) {
+        const dv = ((r[1]-r[2])/r[2])*100, good = r[4] ? dv < 0 : dv > 0;
+        cls = Math.abs(dv) < 3 ? ' class="warn"' : good ? ' class="win"' : ' class="flag"';
+      }
+      return `<tr${cls}><td>${r[0]}</td><td><b>${fmt(r[1])}</b></td><td>${fmt(r[2])}</td>` +
+        `<td>${(r[2]==null||r[1]==null)?'<span class="k">-</span>':cmp(r[1],r[2],r[4])}</td>` +
+        `<td>${r[3]?cmp(r[3].now,r[3].then,r[4]):'<span class="k">no previous window</span>'}</td></tr>`;
+    }).join('') + `</tbody>`;
+  $('benchNote').textContent = 'Benchmarks are someone else’s client base in US dollars - a prompt, not a scorecard.';
+
+  // ---------- findings, routed into their sections ----------
+  const SECT = { account:'accountFindings', campaigns:'campaignsFindings', ads:'adsFindings', pages:'pagesFindings', keywords:'keywordsFindings' };
+  const leaks = (D.leaks||[]).slice().sort((a,b)=> (b.severity||0)-(a.severity||0) || (b.urgent?1:0)-(a.urgent?1:0) || (b.monthly||0)-(a.monthly||0));
+  // 1-10 urgency ring, same language as the big dials: 8-10 red, 5-7 yellow, 1-4 green
+  function sevDial(s){
+    if (s==null) return '<span class="sev"></span>';
+    const r=14, c=2*Math.PI*r, pct=s/10, b = s>=8?'bad':s>=5?'warn':'good';
+    return `<span class="sev"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="${r}" fill="none" stroke="#e8e6dc" stroke-width="3.5"/><circle cx="18" cy="18" r="${r}" fill="none" stroke="${col[b]}" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="${c*pct} ${c}" transform="rotate(-90 18 18)"/><text x="18" y="23" text-anchor="middle" font-family="Tiempos Text, Georgia, serif" font-weight="500" font-size="14" fill="#141413">${s}</text></svg></span>`;
+  }
+  function itemFold(l){
+    if (!l.items || !l.items.length) return '';
+    const n = l.itemsTotal || l.items.length;
+    const row = it => `<div class="chk"><span class="dot na"></span><span>${esc(it.name)}` +
+      (it.spend!=null?` <span class="k">${money(it.spend)}</span>`:'') +
+      (it.clicks!=null?` <span class="k">${it.clicks} clicks</span>`:'') +
+      (it.conv!=null?` <span class="k">${it.conv} leads</span>`:'') +
+      (it.note?` <span class="k">${esc(it.note)}</span>`:'') + `</span></div>`;
+    return `<details class="fold" style="border-top:0;margin-top:6px"><summary style="padding:4px 0">The ${esc(l.itemUnit||'items')} - ${n} in total</summary>` +
+      l.items.slice(0,10).map(row).join('') +
+      (n > Math.min(l.items.length,10) ? `<div class="chk"><span class="k">the full list of ${n} is in audit-report.md</span></div>` : '') + `</details>`;
+  }
+  function findingCard(l, i){
+    return `<div class="leak ${l.status}" id="leak${i}">
+      <div>
+        <div class="nm">${esc(l.name)}${l.urgent?'<span class="st urgent">urgent</span>':''}<span class="st ${l.status}">${l.status==='settings'?'settings':(l.status==='stopped'&&!P)?'stopped':'open'}</span></div>
+        <div class="dt"><b>What:</b> ${esc(l.detail)}</div>
+        <div class="fx"><b>The fix:</b> ${esc(l.fix)}${l.who?` <span class="k">${esc(l.who)}${l.time?' · '+esc(l.time):''}</span>`:''}</div>
+        <div class="ev">${esc(l.evidence||'')}</div>
+        ${itemFold(l)}
+      </div>
+      <div class="amt">${l.monthly==null?'&#8212;':money(l.monthly)}<span class="per">${l.monthly==null?(l.status==='settings'?'settings':'not priced'):'per month'}</span></div>
+    </div>`;
+  }
+  // A finding renders a card ONLY when it says more than a section block already says.
+  // Account findings never card (the checklist row is their statement), and any leak marked
+  // noCard is indexed but not carded - use it when a section block (the split-test card, a
+  // checklist group) already tells the story. One statement per fact, everywhere.
+  const skipCard = l => l.section === 'account' || l.noCard;
+  const bySection = {};
+  leaks.forEach((l,i) => { const s = SECT[l.section] ? l.section : 'campaigns'; (bySection[s]=bySection[s]||[]).push([l,i]); });
+  Object.keys(SECT).forEach(s => {
+    const list = (bySection[s]||[]).filter(([l])=>!skipCard(l));
+    if (!list.length) return;
+    $(SECT[s]).innerHTML = `<h3 class="sub display">Found in this section</h3><div class="card">` +
+      list.map(([l,i])=>findingCard(l,i)).join('') + `</div>`;
+  });
+
+  // fix-first index: one line per finding, dollars ranked, linking down to the card
+  const SECTLBL = { account:'account', campaigns:'campaigns', ads:'ads', pages:'landing pages', keywords:'keywords' };
+  $('fixIndex').innerHTML = leaks.map((l,i) =>
+    `<a class="fx1" href="${skipCard(l)?'#'+(SECT[l.section]?l.section:'campaigns'):'#leak'+i}"><span class="r">${i+1}</span>${sevDial(l.severity)}<span class="i">${esc(l.name)}${l.urgent?' <span class="st urgent">urgent</span>':''}</span><span class="w">${esc(SECTLBL[l.section]||'')}${l.who?' · '+esc(l.who):''}</span><span class="c${l.monthly==null?' set':''}">${l.monthly==null?(l.status==='settings'?'settings':'not priced'):money(l.monthly)+'/mo'}</span></a>`).join('');
+  // no total row here - the money-at-risk figure at the top is the ONE place a total appears,
+  // and per-finding dollars can overlap so summing them would overstate.
+
+  // ---------- 03 the account ----------
+  // ONE grid of groups: tracking first, then the rest of settings, then the economics as its
+  // own group in the same shape. GBP and GA4 live as check rows inside these groups - never
+  // a second Integrations block repeating them.
+  const sGroups = ((D.settings||{}).groups || []).slice();
+  const isTracking = g => /conversion|tracking|call/i.test(g.name);
+  sGroups.sort((a,b)=> (isTracking(b)?1:0)-(isTracking(a)?1:0));
+  const E = D.economics;
+  const econGroup = (!E || E.jobValue == null)
+    ? { name:'The economics', checks:[
+        { t:'Average job value on file - needed to price any lead', b:'fail', a:'fail' },
+        { t:'Close rate on file - needed for break-even', b:'fail', a:'fail' } ] }
+    : { name:'The economics', checks:[
+        { t:`A job is worth ${money(E.jobValue)} and ${E.closeRate}% of leads close - a lead is worth ${money(E.leadValue)}`, b:'pass', a:'pass' },
+        { t:`Break-even is ${money(E.breakEven)} a lead${AVG!=null?' and you pay '+money(AVG):''}`,
+          b:(AVG!=null&&E.breakEven!=null&&AVG>E.breakEven)?'fail':'pass',
+          a:(AVG!=null&&E.breakEven!=null&&AVG>E.breakEven)?'fail':'pass' } ] };
+  renderGroups('accountGroups', sGroups.concat([econGroup]));
+  $('accountScore').innerHTML = scoreChip(score(['settings']), true);
+
+  // The tracking story is told ONCE: the checklist above plus this one note. The full
+  // finding (if tracking is broken) is a card under "Found in this section" - nowhere else.
+  const TR = D.trust || {};
+  const trustBits = [];
+  if (TR.verdict && TR.verdict !== 'healthy') trustBits.push('Tracking is ' + TR.verdict + '.');
+  if (TR.hiddenSearchTermShare != null) trustBits.push(TR.hiddenSearchTermShare + '% of search-term spend is hidden by Google.');
+  if (TR.cvrCaveat) trustBits.push(TR.cvrCaveat);
+  $('trustNote').textContent = trustBits.join(' ');
+
+  // ---------- 04 campaigns ----------
+  const camps = D.campaigns||[];
+  // every check column explains itself on hover, in 15-year-old words
+  const CATS = [
+    ['budget','Budget','Is the daily budget right - not starving a winner, not feeding a loser?'],
+    ['tracking','Tracking','Are this campaign’s leads being counted properly? Yellow means partly - forms count but phone calls do not.'],
+    ['ads','Ads','Does every ad group have two full ads competing against each other?'],
+    ['assets','Assets','The extras on the ad - sitelinks, callouts, snippets, call button, logo - attached and correct at the ad-group level.'],
+    ['page','Landing page','Does the page the click lands on repeat what the ad promised?'],
+    ['structure','Structure','One theme per ad group, and no keyword living in more than one group.'],
+    ['settings','Settings','The campaign’s switches - networks, locations, schedule, bid targets.']
+  ];
+  const cell = (v, tip) => {
+    const t = tip ? ` data-tip="${esc(tip)}"` : '';
+    if (v == null) return `<span class="dot na"${t}></span>`;
+    if (v === 'ok')   return `<span class="dot pass"${t}>${tick}</span>`;
+    if (v === 'warn') return `<span class="dot routed"${t}></span>`;
+    return `<span class="dot fail"${t}></span>`;
+  };
+  const qm = tip => `<span class="qm" data-tip="${esc(tip)}">?</span>`;
+  const STATE = { ok:'looks right', warn:'partly right', bad:'broken' };
+  $('campTable').innerHTML =
+    `<thead><tr><th>Campaign</th><th>Spend</th><th>Share of spend${qm('Its slice of everything spent this month.')}</th><th>Leads</th><th>Cost / lead</th>` +
+    CATS.map(([,l,tip])=>`<th style="text-align:center">${l}${qm(tip)}</th>`).join('') + `</tr></thead><tbody>` +
+    camps.map(c => {
+      const ch = c.checks || {}; const v = vsAvg(c.cpl, c.conv, 0);
+      const share = (D.spend && c.spend!=null) ? Math.round(c.spend/D.spend*100) + '%' : '-';
+      return `<tr${v.cls?' class="'+v.cls+'"':''}${c.status==='Paused'?' style="opacity:.55"':''}>` +
+        `<td>${esc(c.name)}${c.status==='Paused'?' <span class="k">paused</span>':''}</td>` +
+        `<td>${money(c.spend)}</td><td>${share}</td><td>${c.conv!=null?c.conv:'-'}</td><td>${c.cpl==null?'-':money(c.cpl)} ${v.txt||''}</td>` +
+        CATS.map(([k,l])=>`<td style="text-align:center">${cell(ch[k], l+': '+(ch[k]==null?'not checked':STATE[ch[k]]||ch[k]))}</td>`).join('') + `</tr>`;
+    }).join('') + `</tbody>`;
+  // one flat list per SECTION, routed by category. Campaign/ad-group issues stay here
+  // (budget, structure, settings, assets - assets are an ad-group thing); `ads` rows render
+  // in the ads section, `page` rows in the landing-pages section, and `tracking` rows are
+  // never listed per campaign - the account section says tracking once.
+  const allIssues = [];
+  camps.forEach(c => (c.issues||[]).forEach(is => allIssues.push([c.name, is])));
+  allIssues.sort((a,b)=> ((b[1].level!=='warn')?1:0)-((a[1].level!=='warn')?1:0) || (b[1].cost||0)-(a[1].cost||0));
+  const issueRow = ([cn,is]) => {
+    const lab = (CATS.find(x=>x[0]===is.cat)||[null,is.cat])[1];
+    return `<div class="chk"><span class="dot ${is.level==='warn'?'routed':'fail'}"></span><span><b>${esc(cn)}</b> &#183; ${esc(lab)} &#183; ${esc(is.what)}${is.cost?` <span class="k">${money(is.cost)}/mo</span>`:''}</span></div>`;
+  };
+  const CAMP_CATS = ['budget','structure','settings','assets'];
+  const campRows = allIssues.filter(([,is]) => CAMP_CATS.includes(is.cat));
+  $('campDetail').innerHTML = campRows.length ? campRows.map(issueRow).join('')
+    : '<div class="chk"><span class="dot pass">'+tick+'</span><span>No campaign has an open issue.</span></div>';
+  const adsRows = allIssues.filter(([,is]) => is.cat === 'ads');
+  if (adsRows.length) $('adsIssues').innerHTML =
+    `<h3 class="sub display">Ad issues by ad group</h3><div class="card"><div class="scrolllist" style="padding:8px 24px">${adsRows.map(issueRow).join('')}</div></div>`;
+  const pageRows = allIssues.filter(([,is]) => is.cat === 'page');
+  if (pageRows.length) $('pagesIssues').innerHTML =
+    `<h3 class="sub display">Page issues by campaign</h3><div class="card"><div class="scrolllist" style="padding:8px 24px">${pageRows.map(issueRow).join('')}</div></div>`;
+  renderGroups('structureGroups', (D.structure||{}).groups);
+  $('structureScore').innerHTML = scoreChip(score(['structure']), true);
+
+  function spendTable(rows, label){
+    if (!rows || !rows.length) return `<tbody><tr><td class="k">Not measured.</td></tr></tbody>`;
+    return `<thead><tr><th>${label}</th><th>Spend</th><th>Share</th><th>Leads</th><th>Cost / lead</th><th>vs avg${AVG?' ('+money(AVG)+')':''}</th></tr></thead><tbody>` +
+      rows.map(r=>{ const v=vsAvg(r.cpl, r.conv, r.share);
+        return `<tr${v.cls?' class="'+v.cls+'"':''}><td>${esc(r.name)}</td><td>${money(r.spend)}</td><td>${r.share}%</td><td>${r.conv}</td><td>${r.cpl==null?'-':money(r.cpl)}</td><td>${v.txt}</td></tr>`;
+      }).join('') + `</tbody>`;
+  }
+  // by-campaign money lives IN the campaign table above; the tabs cover the other three cuts
+  const sb = D.spendBreakdown||{};
+  $('spendGroup').innerHTML = spendTable(sb.byAdGroup,'Ad group');
+  $('spendLoc').innerHTML   = spendTable(sb.byLocation,'Location');
+  $('spendDevice').innerHTML = spendTable(sb.byDevice,'Device');
+  (function(){
+    const tabs = document.getElementById('spendTabs');
+    if (tabs) tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
+      ['spendGroup','spendLoc','spendDevice'].forEach(t => document.getElementById('pane-'+t).classList.toggle('on', t===b.dataset.t));
+    }));
+  })();
+
+  // ---------- 05 the ads ----------
+  renderGroups('creativeGroups', (D.creative||{}).groups);
+  $('creativeScore').innerHTML = scoreChip(score(['creative']), true);
+
+  // Quality Score components live INSIDE the sections they describe, as full distributions -
+  // "27 below average" always appears next to how many are average and above.
+  const Q = D.quality || null;
+  function distRow(label, d, rated, tip){
+    if (!d) return '';
+    const lo = d.below||0, md = d.avg!=null?d.avg:Math.max(rated-lo-(d.above||0),0), hi = d.above||0;
+    const w = n => rated ? Math.round(n/rated*100) : 0;
+    return `<div class="dist"><div class="dh"><b>${label}</b>${tip?qm(tip):''}<span class="k" style="margin-left:auto">${lo} below · ${md} average · ${hi} above</span></div>
+      <div class="bar"><i class="lo" style="width:${w(lo)}%"></i><i class="md" style="width:${w(md)}%"></i><i class="hi" style="width:${w(hi)}%"></i></div></div>`;
+  }
+  function qComponents(){
+    if (!Q) return null;
+    if (Q.components) return Q.components;
+    const b = Q.belowAvg || {};
+    const mk = n => n==null?null:{ below:n, avg:null, above:null };
+    return { expectedCtr:mk(b.expectedCtr), adRelevance:mk(b.adRelevance), landingPage:mk(b.landingPage) };
+  }
+  const QC = qComponents();
+  // each bar's tooltip names the fix that moves it above average - the audit's job is to
+  // move every keyword out of the red segment
+  $('qualityAds').innerHTML = !QC
+    ? '<div class="chk" style="padding:14px 20px"><span class="dot na"></span><span>Quality Score components were not read this run.</span></div>'
+    : `<div style="padding:14px 20px">${distRow('Expected click-through rate', QC.expectedCtr, Q.rated,
+        'Moved up by better headlines: the keyword in headline 1, a number, a real offer. The ad rebuild in /write-ads targets exactly this.')}${distRow('Ad relevance', QC.adRelevance, Q.rated,
+        'Moved up by tighter ad groups - one theme per group, so the ad can repeat the keyword. The recluster in /keywords stag fixes this.')}
+       <div class="dist dk">${Q.rated} keywords rated · Google says Quality Score is a diagnostic, not an auction input</div></div>`;
+  $('qualityPages').innerHTML = !QC
+    ? '<div class="chk" style="padding:14px 20px"><span class="dot na"></span><span>Not read this run.</span></div>'
+    : `<div style="padding:14px 20px">${distRow('Landing page experience', QC.landingPage, Q.rated,
+        'Moved up when the page repeats the search - name the service and the city at the top. The /landing-page fix targets this.')}
+       ${Q.worstAdGroups&&Q.worstAdGroups.length?`<div class="dist dk">worst: ${Q.worstAdGroups.map(esc).join(' · ')}</div>`:''}</div>`;
+
+  const T = D.splitTests || {};
+  const tg = T.adGroups || [];
+  const testing = tg.filter(g => g.ads >= 2).length;
+  let tHtml = '';
+  if (!tg.length) tHtml = '<div class="chk" style="padding:14px 20px"><span class="dot na"></span><span>Ad counts were not read this run.</span></div>';
+  else {
+    const solo = tg.filter(g => g.ads < 2);
+    tHtml = `<div class="leak ${solo.length?'open':'stopped'}"><div>
+      <div class="nm">${testing} of ${tg.length} ad groups are testing</div>
+      <div class="dt">${solo.length ? 'The rest run a single ad, so nothing is being learned in them. Judge tests on conversions, never on Ad Strength.' : 'Every ad group with traffic has a champion and a challenger.'}</div>
+      ${T.oldestTestDays!=null?`<div class="ev">oldest test running ${T.oldestTestDays} days${T.oldestTestDays>60?' - long enough to call':''}</div>`:''}</div>
+      <div class="amt">${testing}/${tg.length}<span class="per">testing</span></div></div>`;
+    if (solo.length) tHtml += `<details class="fold"><summary>The ${solo.length} single-ad groups</summary>` +
+      solo.map(g=>`<div class="chk" style="padding-left:20px"><span class="dot fail"></span><span>${esc(g.name)} <span class="k">${money(g.spend)} spent</span></span></div>`).join('') + `</details>`;
+  }
+  $('testCard').innerHTML = tHtml;
+  const outs = (D.adPerformance||{}).outliers||[];
+  $('perfTable').innerHTML = outs.length
+    ? `<thead><tr><th>Ad group</th><th>What is wrong</th><th>CTR</th><th>Conv rate</th><th>Spend</th></tr></thead><tbody>` +
+      outs.map(o=>`<tr><td>${esc(o.adGroup)}</td><td>${esc(o.issue)}</td><td>${o.ctr}%</td><td>${o.cvr==null?'-':o.cvr+'%'}</td><td>${money(o.spend)}</td></tr>`).join('') + `</tbody>`
+    : `<tbody><tr><td class="k">No ad group is an outlier against the account average.</td></tr></tbody>`;
+  $('perfHead').textContent = '';
+
+  // ---------- 06 the landing pages ----------
+  // The verdict on a page is its conversion rate and cost per lead - the checklist below is
+  // leverage for pushing those further, never a grade that overrules good performance.
+  renderGroups('pagesGroups', (D.pages||{}).groups);
+  $('pagesScore').innerHTML = scoreChip(score(['pages']), true);
+  (function(){
+    const bits = [];
+    if (AP.accountCvr!=null) bits.push(`Conversion rate ${AP.accountCvr}%${(B&&B.cvr!=null)?(AP.accountCvr>=B.cvr?' - above':' - under')+' the '+B.cvr+'% median':''}${TR.cvrCaveat?' (understated - see Tracking)':''}`);
+    if (AVG!=null && B && B.cpl!=null) bits.push(`cost per lead ${money(AVG)} against the ${money(B.cpl)} median`);
+    if (bits.length) $('pagesVerdict').textContent = bits.join(' · ') + '. That is the verdict - the checklist below is how to push it further, not a grade.';
+  })();
+
+  // ---------- 07 keywords and search terms ----------
+  renderGroups('keywordsGroups', (D.keywords||{}).groups);
+  $('keywordsScore').innerHTML = scoreChip(score(['keywords']), true);
+
+  const wk = D.working||{};
+  const wrows = [].concat((wk.keywords||[]).map(k=>['Keyword',k]), (wk.terms||[]).map(k=>['Search term',k]));
+  wrows.sort((a,b)=> (a[1].cpl||1e9) - (b[1].cpl||1e9));
+  $('workTable').innerHTML = wrows.length
+    ? `<thead><tr><th>Winner</th><th>Kind</th><th>Leads</th><th>Cost / lead</th><th>Verdict</th></tr></thead><tbody>` +
+      wrows.map(([kind,k])=>{
+        const x = (AVG && k.cpl) ? k.cpl/AVG : null;
+        const worse = x !== null && x > 1;
+        const verdict = x === null ? '<span class="k">no average to compare</span>'
+          : worse ? '<b style="color:#b53333">volume, not efficiency - do not scale yet</b>'
+                  : '<b style="color:#3d7a4a">protect it - feed its campaign’s budget</b>';
+        return `<tr${worse?' class="flag"':''}><td>${esc(k.t)}</td><td><span class="k">${kind}</span></td><td>${k.conv}</td><td>${money(k.cpl)}</td><td>${verdict}</td></tr>`;
+      }).join('') + `</tbody>`
+    : `<tbody><tr><td class="k">No converting keywords yet.</td></tr></tbody>`;
+  const bc = wk.bestCampaign;
+  $('workNote').textContent = [
+    (AVG && wk.note) ? wk.note : '',
+    bc ? `Best campaign: ${bc.name} at ${money(bc.cpl)} a lead${bc.capped?' - budget-capped, the clearest place to spend more':''}.` : ''
+  ].filter(Boolean).join(' ');
+
+  const ng = D.negatives||{};
+  const ready = (ng.ready||[]).slice(0,100);
+  const readyMore = (ng.ready||[]).length - ready.length;
+  $('negTable').innerHTML = ready.length
+    ? `<thead><tr><th>Negative</th><th>Match</th><th>Add at</th><th>Why</th></tr></thead><tbody>` +
+      ready.map(n=>`<tr><td>${esc(n.term)}</td><td><span class="k">${esc(n.match)}</span></td><td><span class="k">${esc(n.level)}</span></td><td><span class="k">${esc(n.why||'')}</span></td></tr>`).join('') +
+      (readyMore>0?`<tr><td colspan="4" class="k">+ ${readyMore} more in audit-report.md</td></tr>`:'') + `</tbody>`
+    : `<tbody><tr><td class="k">Nothing new to block from the traffic seen this window.</td></tr></tbody>`;
+  if (ng.coverage) {
+    const c = ng.coverage;
+    $('negCoverage').innerHTML = `<div class="note">These ${ready.length} are what is NEW, not the whole list - already in the account: ${c.existing} negatives · universal list ${c.universalCovered} of ${c.universalTotal} covered${c.universalMissing&&c.universalMissing.length?` · still missing: ${c.universalMissing.map(esc).join(', ')}`:''}</div>`;
+  }
+  const af = ng.askFirst||[];
+  $('askFirst').innerHTML = af.length
+    ? `<div style="padding:0 20px 14px"><div class="grp" style="border-bottom:0"><h4><span>Ask first</span><span class="k">${af.length} need your call</span></h4>` +
+      af.map(a=>`<div class="chk"><span class="dot routed"></span><span>${esc(a.term)} - ${esc(a.why)}</span></div>`).join('') + `</div></div>`
+    : '';
+  if (P) $('costs').classList.remove('hide');
+
+  // ---------- instant tooltips ----------
+  // native title waits seconds and opens under the cursor; this opens immediately, to the
+  // RIGHT of the trigger, flipping left only when it would leave the screen
+  const tipbox = document.createElement('div'); tipbox.id = 'tipbox'; document.body.appendChild(tipbox);
+  document.addEventListener('mouseover', e => {
+    const el = e.target.closest('[data-tip]');
+    if (!el) { tipbox.style.display = 'none'; return; }
+    tipbox.textContent = el.getAttribute('data-tip');
+    tipbox.style.display = 'block';
+    const r = el.getBoundingClientRect(), tw = tipbox.offsetWidth, th = tipbox.offsetHeight;
+    let x = r.right + 10, y = r.top + r.height/2 - th/2;
+    if (x + tw > window.innerWidth - 12) x = r.left - tw - 10;
+    y = Math.max(8, Math.min(y, window.innerHeight - th - 8));
+    tipbox.style.left = x + 'px'; tipbox.style.top = y + 'px';
+  });
+  document.addEventListener('scroll', () => { tipbox.style.display = 'none'; }, true);
+
+  // ---------- jump nav ----------
+  const secs = [...document.querySelectorAll('section[id]')].filter(s=>!s.classList.contains('hide'))
+    .map(s=>[s.id, (s.querySelector('h2')||{}).textContent || '']).filter(x=>x[1]);
+  $('jump').innerHTML = secs.map(([id,t])=>`<a href="#${id}">${esc(t).split(' ').slice(0,3).join(' ')}</a>`).join('');
+})();
+</script>
+
+</body>
+</html>

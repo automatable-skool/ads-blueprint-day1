@@ -1,0 +1,44 @@
+.env
+.env.*
+!.env.example
+credentials.json
+token.json
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+
+# script caches (raw API pulls, staged negatives, ad-test plans)
+code/cache/
+.next/
+.vercel/
+out/
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# ── THE MEMBER'S WORK. Never tracked, so `git pull` never conflicts. ──
+# The repo ships empty starters in starters/ and website-starter/. Setup copies
+# them into place once, and from then on these are the member's files alone.
+# Without this split, the first update you push collides with a month of their
+# work and they stop pulling - which quietly turns a living repo into a snapshot.
+website/
+context/
+keyword-list.md
+keyword-list.html
+ad-library.md
+ads-pending.md
+ads-live.md
+audit-report.md
+audit-report.html
+landing-pages.md
+negatives-staged.md
+negatives-log.md
+ad-tests-log.md
+proposals-log.md
+scale-log.md
+search-terms-plan.md
+search-terms-report.html
+transcript-proof-candidates.md
+competitor-pages/
+screenshots/

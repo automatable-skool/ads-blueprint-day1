@@ -1,0 +1,47 @@
+:root{
+/* --- Neutrals: warm-leaning greys, the backbone of the system --- */
+--n-0:#FFFFFF;--n-50:#FAFAF9;--n-100:#F4F4F2;--n-200:#E8E8E5;--n-300:#D6D6D2;--n-400:#B3B3AE;--n-500:#8A8A85;--n-600:#6B6B66;--n-700:#4D4D49;--n-800:#2E2E2B;--n-900:#1A1A18;--n-950:#111312;
+/* --- Accent: clay. The only chromatic brand colour. --- */
+--accent-50:#FDF4F0;--accent-100:#FAE4DB;--accent-200:#F2C7B6;--accent-300:#E4A188;--accent-400:#D3764F;--accent-500:#C1552F;--accent-600:#A9451F;--accent-700:#8B3616;--accent-800:#6B2911;
+/* --- Semantic status hues: muted, used only for state --- */
+--green-500:#1E7A4C;--green-50:#EDF7F1;--amber-500:#B7791F;--amber-50:#FBF5E9;--red-500:#B3261E;--red-50:#FBEDEC;--blue-500:#2A5D8F;--blue-50:#EDF2F8;
+
+/* ================= Semantic aliases ================= */
+/* Surfaces */
+--surface-page:var(--n-0);
+--surface-sunken:var(--n-50);
+--surface-card:var(--n-0);
+--surface-muted:var(--n-100);
+--surface-inverse:var(--n-950);
+--surface-accent-soft:var(--accent-50);
+/* Text */
+--text-strong:var(--n-950);
+--text-body:var(--n-700);
+--text-muted:var(--n-500);
+--text-inverse:var(--n-0);
+--text-accent:var(--accent-600);
+--text-link:var(--accent-600);
+--text-link-hover:var(--accent-700);
+/* Borders */
+--border-subtle:var(--n-200);
+--border-default:var(--n-300);
+--border-strong:var(--n-400);
+--border-accent:var(--accent-500);
+--border-inverse:rgba(255,255,255,.16);
+/* Interactive */
+--action-primary:var(--accent-500);
+--action-primary-hover:var(--accent-600);
+--action-primary-press:var(--accent-700);
+--action-primary-text:var(--n-0);
+--action-secondary:var(--n-950);
+--action-secondary-hover:var(--n-800);
+--action-quiet-hover:var(--n-100);
+--focus-ring:rgba(193,85,47,.28);
+/* Status */
+--status-success:var(--green-500);--status-success-soft:var(--green-50);
+--status-warning:var(--amber-500);--status-warning-soft:var(--amber-50);
+--status-danger:var(--red-500);--status-danger-soft:var(--red-50);
+--status-info:var(--blue-500);--status-info-soft:var(--blue-50);
+/* Rating / trust */
+--star-filled:var(--accent-500);--star-empty:var(--n-300);
+}

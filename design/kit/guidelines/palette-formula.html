@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Palette formula</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Archivo",system-ui,sans-serif;background:#fff;color:#111}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 60px}
+.lead{max-width:70ch}
+h1{font-size:34px;font-weight:900;letter-spacing:-.035em;margin:0 0 10px}
+h2{font-size:22px;font-weight:900;letter-spacing:-.03em;margin:44px 0 6px}
+p{font-size:15px;line-height:1.6;color:#3c4a5c;margin:0 0 10px}
+code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:#f1f4f8;padding:1px 5px;border-radius:4px}
+.eyebrow{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#647990;margin-bottom:18px}
+.ladder{display:flex;border-radius:10px;overflow:hidden;margin:14px 0 6px}
+.ladder div{flex:1;height:74px;display:flex;align-items:flex-end;padding:7px 8px;font-size:10.5px;font-weight:800}
+.note{font-size:12.5px;color:#647990;margin:0}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #e0e8f1}
+th{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#647990}
+td code{background:none;padding:0}
+.hues{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:18px}
+.mini{border:1px solid var(--l);border-radius:14px;overflow:hidden}
+.mini .hero{background:var(--b600);padding:16px 14px}
+.mini .pill{display:inline-block;background:var(--acc);color:var(--accFg);font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px}
+.mini h3{font-size:16px;font-weight:900;letter-spacing:-.03em;color:#fff;margin:9px 0 5px;line-height:1.05}
+.mini .sub{font-size:11px;color:var(--b100);margin:0 0 11px;line-height:1.4}
+.mini .btn{display:inline-block;background:var(--acc);color:var(--accFg);font-size:10.5px;font-weight:800;padding:7px 13px;border-radius:999px}
+.mini .btn2{display:inline-block;background:#fff;color:var(--b700);font-size:10.5px;font-weight:800;padding:7px 13px;border-radius:999px;margin-left:5px}
+.mini .body{padding:13px 14px;background:#fff}
+.mini .row{display:flex;gap:6px;margin-bottom:10px}
+.mini .stat{flex:1}
+.mini .stat b{display:block;font-size:15px;font-weight:900;color:var(--b700);letter-spacing:-.02em}
+.mini .stat span{font-size:9px;color:#647990}
+.mini .card{border:1px solid var(--l);border-radius:9px;padding:9px;box-shadow:0 1px 2px rgba(16,24,40,.06)}
+.mini .card .ph{height:34px;border-radius:6px;background:var(--b100);margin-bottom:7px}
+.mini .card strong{display:block;font-size:11.5px;font-weight:800;color:#0b1c33}
+.mini .card em{font-style:normal;font-size:10px;font-weight:800;color:var(--b700)}
+.mini .name{padding:9px 14px;background:var(--b50);font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--b700)}
+.acc{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+.accCard{border:1px solid #e0e8f1;border-radius:14px;overflow:hidden}
+.accCard .top{padding:15px;background:var(--ab)}
+.accCard .top .l1{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#fff;opacity:.8}
+.accCard .top .btn{display:inline-block;margin-top:10px;background:var(--aa);color:var(--aaFg);font-size:11px;font-weight:800;padding:8px 15px;border-radius:999px}
+.accCard .bot{padding:13px 15px}
+.accCard h4{margin:0 0 4px;font-size:14px;font-weight:900;letter-spacing:-.02em}
+.accCard p{font-size:12.5px;margin:0;color:#647990}
+.bar{display:flex;height:30px;border-radius:6px;overflow:hidden;margin-top:11px}
+.bar div{flex:1}
+</style></head><body>
+<div class="wrap">
+<div class="eyebrow">Goodwork · palette formula</div>
+<h1>One hue in, a whole palette out</h1>
+<div class="lead">
+<p>The template can't ship <em>a</em> colour — it ships a <strong>rule</strong>. Every business sets one value, <code>--brand-hue</code>, and the eleven blues below are generated from it at fixed lightness and chroma. Nothing else changes: contrast, hover steps, tints and text pairings hold automatically, because they were never hand-picked per colour.</p>
+<p>Written in OKLCH, so equal lightness steps look equally light to the eye — the reason a green and a violet built this way feel like siblings rather than two unrelated brands.</p>
+</div>
+
+<h2>The ladder</h2>
+<p>Fixed lightness and chroma. <code>H</code> is the only variable.</p>
+<div class="ladder">
+<div style="background:oklch(30% .09 250);color:#fff">900 · L30</div>
+<div style="background:oklch(38% .12 250);color:#fff">800 · L38</div>
+<div style="background:oklch(48% .16 250);color:#fff">700 · L48</div>
+<div style="background:oklch(58% .19 250);color:#fff">600 · L58</div>
+<div style="background:oklch(67% .17 250);color:#0b1c33">500 · L67</div>
+<div style="background:oklch(76% .13 250);color:#0b1c33">400 · L76</div>
+<div style="background:oklch(84% .09 250);color:#0b1c33">300 · L84</div>
+<div style="background:oklch(90% .055 250);color:#0b1c33">200 · L90</div>
+<div style="background:oklch(95% .028 250);color:#0b1c33">100 · L95</div>
+<div style="background:oklch(98% .012 250);color:#0b1c33">50 · L98</div>
+</div>
+<p class="note">Chroma tapers as lightness rises, so the pale steps read as tints rather than pastels.</p>
+
+<table>
+<thead><tr><th>Step</th><th>Job</th><th>Guaranteed</th></tr></thead>
+<tbody>
+<tr><td><code>900</code></td><td>Footer, app sidebar</td><td>White text ≥ 12:1</td></tr>
+<tr><td><code>700</code></td><td>Secondary band, brand text on white</td><td>White text ≥ 6:1 · on white ≥ 5:1</td></tr>
+<tr><td><code>600</code></td><td>Hero, primary button, links</td><td>White text ≥ 4.5:1</td></tr>
+<tr><td><code>500</code></td><td>Hover step for 600</td><td>One perceptual step lighter</td></tr>
+<tr><td><code>200</code></td><td>Borders on tinted panels, photo slots</td><td>—</td></tr>
+<tr><td><code>100</code> / <code>50</code></td><td>Tinted sections, icon tiles</td><td>Body text ≥ 8:1</td></tr>
+</tbody>
+</table>
+
+<h2>The proof: same page, five hues, zero hand-tuning</h2>
+<p>Each of these is the identical markup with one number changed. If the formula is right, none of them needs rescuing.</p>
+<div class="hues">
+<div class="mini" style="--b600:oklch(58% .19 250);--b700:oklch(48% .16 250);--b100:oklch(95% .028 250);--b50:oklch(98% .012 250);--l:#e0e8f1;--acc:oklch(72% .17 70);--accFg:#26170a">
+  <div class="hero"><span class="pill">2,500+ reviews</span><h3>Winter doesn't quit.</h3><p class="sub">Same-day service, upfront pricing.</p><span class="btn">Book now</span><span class="btn2">Services</span></div>
+  <div class="body"><div class="row"><span class="stat"><b>14+</b><span>Years</span></span><span class="stat"><b>1,400+</b><span>Jobs</span></span><span class="stat"><b>4.9</b><span>Rating</span></span></div>
+  <div class="card"><div class="ph"></div><strong>Furnace repair</strong><em>From $185</em></div></div>
+  <div class="name">Hue 250 · plumber</div>
+</div>
+<div class="mini" style="--b600:oklch(58% .19 195);--b700:oklch(48% .16 195);--b100:oklch(95% .028 195);--b50:oklch(98% .012 195);--l:#dfeaec;--acc:oklch(72% .17 15);--accFg:#fff">
+  <div class="hero"><span class="pill">2,500+ reviews</span><h3>Winter doesn't quit.</h3><p class="sub">Same-day service, upfront pricing.</p><span class="btn">Book now</span><span class="btn2">Services</span></div>
+  <div class="body"><div class="row"><span class="stat"><b>14+</b><span>Years</span></span><span class="stat"><b>1,400+</b><span>Jobs</span></span><span class="stat"><b>4.9</b><span>Rating</span></span></div>
+  <div class="card"><div class="ph"></div><strong>Drain clearing</strong><em>From $149</em></div></div>
+  <div class="name">Hue 195 · cleaner</div>
+</div>
+<div class="mini" style="--b600:oklch(58% .19 150);--b700:oklch(48% .16 150);--b100:oklch(95% .028 150);--b50:oklch(98% .012 150);--l:#e1eae2;--acc:oklch(72% .17 330);--accFg:#fff">
+  <div class="hero"><span class="pill">2,500+ reviews</span><h3>Winter doesn't quit.</h3><p class="sub">Same-day service, upfront pricing.</p><span class="btn">Book now</span><span class="btn2">Services</span></div>
+  <div class="body"><div class="row"><span class="stat"><b>14+</b><span>Years</span></span><span class="stat"><b>1,400+</b><span>Jobs</span></span><span class="stat"><b>4.9</b><span>Rating</span></span></div>
+  <div class="card"><div class="ph"></div><strong>Lawn &amp; hedges</strong><em>From $95</em></div></div>
+  <div class="name">Hue 150 · landscaper</div>
+</div>
+<div class="mini" style="--b600:oklch(58% .19 300);--b700:oklch(48% .16 300);--b100:oklch(95% .028 300);--b50:oklch(98% .012 300);--l:#e8e2ec;--acc:oklch(72% .17 120);--accFg:#0f2410">
+  <div class="hero"><span class="pill">2,500+ reviews</span><h3>Winter doesn't quit.</h3><p class="sub">Same-day service, upfront pricing.</p><span class="btn">Book now</span><span class="btn2">Services</span></div>
+  <div class="body"><div class="row"><span class="stat"><b>14+</b><span>Years</span></span><span class="stat"><b>1,400+</b><span>Jobs</span></span><span class="stat"><b>4.9</b><span>Rating</span></span></div>
+  <div class="card"><div class="ph"></div><strong>Wedding day</strong><em>From $2,400</em></div></div>
+  <div class="name">Hue 300 · photographer</div>
+</div>
+<div class="mini" style="--b600:oklch(58% .19 30);--b700:oklch(48% .16 30);--b100:oklch(95% .028 30);--b50:oklch(98% .012 30);--l:#eee3e0;--acc:oklch(72% .17 210);--accFg:#04202a">
+  <div class="hero"><span class="pill">2,500+ reviews</span><h3>Winter doesn't quit.</h3><p class="sub">Same-day service, upfront pricing.</p><span class="btn">Book now</span><span class="btn2">Services</span></div>
+  <div class="body"><div class="row"><span class="stat"><b>14+</b><span>Years</span></span><span class="stat"><b>1,400+</b><span>Jobs</span></span><span class="stat"><b>4.9</b><span>Rating</span></span></div>
+  <div class="card"><div class="ph"></div><strong>Roof repair</strong><em>From $320</em></div></div>
+  <div class="name">Hue 30 · roofer</div>
+</div>
+</div>
+
+<h2>The accent: three candidate rules</h2>
+<p>You said one accent. The question isn't <em>which colour</em> — it's <strong>which rule</strong>, so it survives a hue change. All three below are the same blue with a different accent rule applied.</p>
+<div class="acc">
+<div class="accCard" style="--ab:oklch(58% .19 250);--aa:oklch(72% .17 70);--aaFg:#26170a">
+  <div class="top"><div class="l1">Rule A · complement</div><span class="btn">Book instantly</span></div>
+  <div class="bot"><h4>Hue + 180°</h4><p>Maximum pop; the CTA can't be missed. Risk: on some hues the pair reads as a sports team.</p>
+  <div class="bar"><div style="background:oklch(58% .19 250)"></div><div style="background:oklch(72% .17 70)"></div><div style="background:oklch(95% .028 250)"></div></div></div>
+</div>
+<div class="accCard" style="--ab:oklch(58% .19 250);--aa:oklch(74% .16 175);--aaFg:#052a26">
+  <div class="top"><div class="l1">Rule B · near-analogous</div><span class="btn">Book instantly</span></div>
+  <div class="bot"><h4>Hue − 75°</h4><p>Related but distinct — a lift rather than a clash. Calmer, and it never fights the brand.</p>
+  <div class="bar"><div style="background:oklch(58% .19 250)"></div><div style="background:oklch(74% .16 175)"></div><div style="background:oklch(95% .028 250)"></div></div></div>
+</div>
+<div class="accCard" style="--ab:oklch(58% .19 250);--aa:#fff;--aaFg:oklch(48% .16 250)">
+  <div class="top"><div class="l1">Rule C · monochrome</div><span class="btn">Book instantly</span></div>
+  <div class="bot"><h4>No second hue</h4><p>White and dark brand steps only. Cleanest, works for every trade, but the CTA shouts less.</p>
+  <div class="bar"><div style="background:oklch(58% .19 250)"></div><div style="background:#fff;box-shadow:inset 0 0 0 1px #e0e8f1"></div><div style="background:oklch(30% .09 250)"></div></div></div>
+</div>
+</div>
+
+<h2>What I need from you</h2>
+<p>Two decisions, and the palette is locked for good: <strong>the default hue</strong> (the shipped starting point — you said you don't mind blue, so 250 unless you'd rather 195 or 210), and <strong>the accent rule</strong> — A, B or C above. Everything else is arithmetic.</p>
+</div>
+</body></html>

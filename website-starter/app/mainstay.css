@@ -1,0 +1,83 @@
+/* Mainstay theme layer.
+ *
+ * The landing-page components are written against the Goodwork token vocabulary. Rather than
+ * rewrite every component, this file loads Mainstay's tokens and then ALIASES the Goodwork names
+ * onto them inside `.mainstay`. Same markup, same structure, different design system.
+ * (Jono, 2 September 2026 - "keep the structure, switch to this kit".)
+ *
+ * Anything Mainstay has no equivalent for is derived from its own ramps, never invented:
+ *   brand      -> clay accent      (Goodwork's brand blue has no counterpart; clay is the one hue)
+ *   ink ramp   -> the warm --n-*   (Goodwork's --ink-* was a cool grey)
+ *   tint band  -> --n-50           (Mainstay allows exactly two page backgrounds: white and n-50)
+ */
+@import "./mainstay-tokens.css";
+@import "./mainstay-components.css";
+
+.mainstay {
+  /* Goodwork's ds.css defines these at :root, so they win unless the theme restates them.
+     Missing this left the page on Archivo with Goodwork's cool-grey body ink. */
+  --font-core: "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --surface-page: var(--n-0);
+  --surface-card: var(--n-0);
+  --surface-sunken: var(--n-50);
+  --text-strong: var(--n-950);
+  --text-body: var(--n-700);
+  --text-muted: var(--n-500);
+
+  /* type roles Goodwork has and Mainstay names differently */
+  --type-display-xl: var(--fw-bold) var(--fs-display-1)/var(--lh-tight) var(--font-core);
+  --type-h4: var(--fw-semibold) var(--fs-h4)/1.3 var(--font-core);
+  --type-body-lg: var(--type-lead);
+  --type-body-sm: var(--type-small);
+  --type-caption: var(--fw-regular) var(--fs-caption)/1.4 var(--font-core);
+  --type-label: var(--type-eyebrow);
+  --type-phone: var(--fw-bold) var(--fs-h3)/1.1 var(--font-core);
+
+  --track-display: -0.03em;
+  --track-heading: -0.018em;
+  --track-label: 0.08em;
+
+  /* surfaces - Mainstay allows white and n-50, nothing else */
+  --surface-tint: var(--n-50);
+  --surface-alternate: var(--n-50);
+  --surface-brand: var(--accent-500);
+  --surface-brand-deep: var(--accent-600);
+  --surface-brand-soft: var(--accent-50);
+  --surface-accent: var(--n-950);
+  --surface-overlay: rgba(17, 19, 18, .42);
+
+  /* ink - warm, per Mainstay's neutral ramp */
+  --white: var(--n-0);
+  --ink-100: var(--n-100); --ink-200: var(--n-200); --ink-300: var(--n-300);
+  --ink-500: var(--n-500); --ink-600: var(--n-600); --ink-700: var(--n-700);
+  --ink-800: var(--n-800); --ink-900: var(--n-950);
+  --blue-100: var(--accent-100);
+
+  --text-brand: var(--accent-600);
+  --text-inverse: var(--n-0);
+  --text-faint: var(--n-400);
+  --text-on-accent: var(--n-0);
+  --text-accent: var(--accent-600);
+
+  /* lines, radii, shadows, controls */
+  --line-hairline: var(--n-200);
+  --line-strong: var(--n-300);
+  --border-hairline: 1px;
+  --radius-input: var(--radius-md);
+  --radius-media: var(--radius-lg);
+  --shadow-brand: var(--shadow-md);
+  --control-h: var(--control-h-md);
+  --pad-card: var(--space-7);
+  --pad-control: 0 var(--space-6);
+  --container-text: var(--container-narrow);
+  --section-y-sm: var(--space-11);
+
+  /* the rating star is the accent, per Mainstay's colour rules */
+  --star-filled: var(--accent-500);
+  --star-empty: var(--n-300);
+  --status-caution: var(--amber-500);
+
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-core);
+}

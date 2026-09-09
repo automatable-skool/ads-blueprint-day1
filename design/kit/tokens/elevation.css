@@ -1,0 +1,13 @@
+:root{
+/* Shadows are soft, cool-tinted and low-opacity — bright and airy, never heavy. */
+--shadow-none:none;
+--shadow-xs:0 1px 2px rgba(16,24,40,.05);
+--shadow-sm:0 1px 3px rgba(16,24,40,.07),0 1px 2px rgba(16,24,40,.04);
+--shadow-md:0 2px 10px rgba(16,24,40,.08),0 1px 3px rgba(16,24,40,.05);
+--shadow-lg:0 12px 32px rgba(16,24,40,.12),0 3px 8px rgba(16,24,40,.06);
+--shadow-brand:0 6px 18px rgba(27,93,209,.18);
+--shadow-inset-press:inset 0 2px 0 rgba(16,24,40,.10);
+--ring-focus:0 0 0 var(--border-focus) var(--blue-600),0 0 0 4px var(--blue-200);
+--scrim-media:linear-gradient(to top,rgba(26,26,25,.76) 0%,rgba(26,26,25,.28) 45%,rgba(26,26,25,0) 100%);/* @kind other */
+--overlay-blur:saturate(1.05) blur(8px);/* @kind other */
+}

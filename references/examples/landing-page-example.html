@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Emergency Plumbing Toronto — 24/7 Help, On-Site Within the Hour</title>
+<meta name="description" content="Burst pipe? Backup? No hot water? We answer in under 75 seconds and we're at your Toronto door within the hour. Flat-rate pricing, licensed, 5-star rated."/>
+<!-- AD/LANDING PAGE: no header/footer nav by design (cro.md component #14) -->
+<style>
+  /* ===== Apex design tokens (mirrors the homepage style) ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+  :root{
+    --indigo:#5B3CFF;--indigo-600:#4A2EE0;--indigo-50:#EFEBFF;--indigo-700:#3A22B0;
+    --navy:#0F1633;--navy-700:#161A3D;--navy-800:#11143A;
+    --cream:#FBFAF7;--paper:#F7F7FB;--white:#fff;--line:#E6E7EF;--line-strong:#D5D7E3;
+    --fg:#0F1633;--fg-muted:#4A5070;--fg-subtle:#8A90AE;
+    --success-bg:#E6F4EA;--success-fg:#2E7D4E;
+    --font-display:'Inter Tight','Inter',system-ui,sans-serif;--font-body:'Inter',system-ui,sans-serif;
+    --r-md:12px;--r-lg:16px;--r-xl:20px;--r-2xl:28px;--r-pill:999px;
+    --shadow-sm:0 2px 8px rgba(15,22,51,.05),0 1px 2px rgba(15,22,51,.04);
+    --shadow-md:0 8px 24px rgba(15,22,51,.07),0 2px 6px rgba(15,22,51,.04);
+    --shadow-lg:0 20px 48px rgba(15,22,51,.10),0 4px 10px rgba(15,22,51,.05);
+    --shadow-btn:0 6px 16px -4px rgba(91,60,255,.40);
+    --container:1120px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--font-body);color:var(--fg);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:var(--font-display);color:var(--fg);letter-spacing:-.018em;line-height:1.12;margin:0 0 14px}
+  h1{font-size:clamp(34px,5vw,60px);font-weight:600}
+  h2{font-size:clamp(28px,3.4vw,40px);font-weight:600}
+  h3{font-size:22px;font-weight:600}
+  p{color:var(--fg-muted);margin:0 0 14px}
+  a{color:var(--indigo);text-decoration:none}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 24px}
+  .section{padding:72px 0}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:var(--r-pill);padding:6px 14px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--indigo);box-shadow:var(--shadow-sm)}
+  .center{text-align:center}
+  .lead{font-size:18px;color:var(--fg-muted);max-width:620px}
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-body);font-weight:600;font-size:16px;border:0;border-radius:var(--r-pill);padding:15px 28px;cursor:pointer;transition:all .15s ease;text-decoration:none}
+  .btn-primary{background:var(--indigo);color:#fff;box-shadow:var(--shadow-btn)}
+  .btn-primary:hover{background:var(--indigo-600);transform:translateY(-1px)}
+  .btn-call{background:var(--navy);color:#fff}
+  .btn-call:hover{background:#000028;transform:translateY(-1px)}
+  .btn-lg{padding:18px 34px;font-size:17px}
+  .btn-block{display:flex;width:100%}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  /* hero */
+  .hero{background:linear-gradient(180deg,#fff 0%,var(--cream) 100%);padding:48px 0 64px;position:relative;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+  .hero h1 em{font-style:normal;color:var(--indigo)}
+  .bullets{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 26px;padding:0;list-style:none}
+  .bullets li{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:var(--r-pill);padding:8px 14px;font-size:14px;font-weight:600;color:var(--fg)}
+  .bullets li::before{content:"\2713";color:var(--success-fg);font-weight:700}
+  .resp{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--fg-muted);margin-top:14px}
+  .resp b{color:var(--fg)}
+  .pulse{width:9px;height:9px;border-radius:50%;background:#3FB36F;box-shadow:0 0 0 0 rgba(63,179,111,.5);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(63,179,111,.5)}70%{box-shadow:0 0 0 10px rgba(63,179,111,0)}100%{box-shadow:0 0 0 0 rgba(63,179,111,0)}}
+  /* founder video */
+  .video{position:relative;background:var(--navy);border-radius:var(--r-2xl);aspect-ratio:4/3;display:grid;place-items:center;box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid var(--line)}
+  .video .play{width:74px;height:74px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow-md)}
+  .video .play::after{content:"";border-left:22px solid var(--indigo);border-top:13px solid transparent;border-bottom:13px solid transparent;margin-left:5px}
+  .video .ph-label{position:absolute;bottom:16px;left:16px;color:rgba(255,255,255,.85);font-size:13px;font-weight:500}
+  /* logo wall */
+  .logos{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:26px}
+  .logo-ph{height:38px;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);display:grid;place-items:center;color:var(--fg-subtle);font-weight:600;font-size:13px;letter-spacing:.04em}
+  /* scale strip */
+  .strip{background:var(--navy);color:#fff;text-align:center;padding:22px 0}
+  .strip .wrap{display:flex;gap:36px;justify-content:center;flex-wrap:wrap;align-items:center}
+  .strip b{font-family:var(--font-display);font-size:26px;font-weight:600;color:#fff}
+  .strip span{color:rgba(255,255,255,.7);font-size:14px}
+  .strip-item{display:flex;flex-direction:column}
+  /* selling point blocks */
+  .sp{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+  .sp.flip .sp-media{order:-1}
+  .sp-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-2xl);padding:30px;box-shadow:var(--shadow-md)}
+  .checklist{list-style:none;padding:0;margin:0 0 22px}
+  .checklist li{position:relative;padding:9px 0 9px 32px;color:var(--fg);font-size:16px;border-bottom:1px solid var(--line)}
+  .checklist li:last-child{border-bottom:0}
+  .checklist li::before{content:"\2713";position:absolute;left:0;top:9px;width:20px;height:20px;background:var(--indigo-50);color:var(--indigo-700);border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700}
+  .sp-media{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2xl);aspect-ratio:1/1;display:grid;place-items:center;color:var(--fg-subtle);font-weight:600}
+  /* testimonials */
+  .vid-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .vid-ph{position:relative;background:var(--navy);border-radius:var(--r-lg);aspect-ratio:9/12;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}
+  .vid-ph .play{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.95);display:grid;place-items:center}
+  .vid-ph .play::after{content:"";border-left:14px solid var(--indigo);border-top:8px solid transparent;border-bottom:8px solid transparent;margin-left:3px}
+  .vid-ph .who{position:absolute;bottom:10px;left:10px;color:#fff;font-size:12px;font-weight:600}
+  .written{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+  .t-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm)}
+  .t-card .stars{color:#F5A623;font-size:14px;letter-spacing:2px}
+  .t-card p{font-size:14.5px;color:var(--fg);margin:8px 0 12px}
+  .t-meta{display:flex;align-items:center;gap:10px}
+  .t-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7459FF,#4A2EE0);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px}
+  .t-name{font-size:13px;font-weight:600;color:var(--fg)}
+  .t-date{font-size:12px;color:var(--fg-subtle)}
+  /* proof badges */
+  .badges{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:26px}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:var(--r-pill);padding:10px 18px;font-weight:600;font-size:14px;box-shadow:var(--shadow-sm)}
+  .badge .stars{color:#F5A623;letter-spacing:1px}
+  /* form */
+  .formwrap{background:var(--navy);border-radius:var(--r-2xl);padding:40px;color:#fff;box-shadow:var(--shadow-lg)}
+  .formwrap h2{color:#fff}
+  .formwrap p{color:rgba(255,255,255,.72)}
+  .form-card{background:#fff;border-radius:var(--r-xl);padding:24px;margin-top:18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--fg);margin-bottom:6px}
+  .field input,.field select{width:100%;padding:13px 14px;border:1px solid var(--line-strong);border-radius:var(--r-md);font:inherit;font-size:15px;color:var(--fg);outline:none;background:#fff}
+  .field input:focus,.field select:focus{border-color:var(--indigo);box-shadow:0 0 0 4px rgba(91,60,255,.12)}
+  .magnet{display:flex;gap:12px;align-items:center;background:var(--indigo-50);border:1px solid #DCD3FF;border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px}
+  .magnet .gift{width:38px;height:38px;border-radius:10px;background:var(--indigo);color:#fff;display:grid;place-items:center;font-size:18px;flex:none}
+  .magnet b{color:var(--fg);font-size:14px}
+  .magnet span{color:var(--fg-muted);font-size:13px}
+  /* urgency / objection */
+  .urgency{background:var(--navy-700);color:#fff;text-align:center}
+  .urgency h2{color:#fff}
+  .urgency p{color:rgba(255,255,255,.75);max-width:620px;margin:0 auto 22px}
+  .objection .o-card{background:#fff;border:1px solid var(--line);border-left:4px solid var(--indigo);border-radius:var(--r-lg);padding:26px;box-shadow:var(--shadow-sm);max-width:760px;margin:0 auto}
+  /* faq */
+  .faq details{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:2px 20px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+  .faq summary{cursor:pointer;list-style:none;font-family:var(--font-display);font-weight:600;font-size:17px;color:var(--fg);padding:16px 0}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";float:right;color:var(--indigo);font-weight:700}
+  .faq details[open] summary::after{content:"\2013"}
+  .faq details p{margin:0 0 16px}
+  .faq .soft{font-size:14px;font-weight:600}
+  /* sticky mobile CTA */
+  .sticky{display:none}
+  /* email popup */
+  .modal-bg{position:fixed;inset:0;background:rgba(15,22,51,.55);display:none;place-items:center;z-index:200;padding:20px}
+  .modal-bg.show{display:grid}
+  .modal{background:#fff;border-radius:var(--r-xl);max-width:420px;width:100%;padding:30px;box-shadow:var(--shadow-lg);position:relative;text-align:center}
+  .modal h3{margin-bottom:6px}
+  .modal .x{position:absolute;top:14px;right:16px;cursor:pointer;color:var(--fg-subtle);font-size:22px;line-height:1}
+  .secnum{font-size:13px;color:var(--fg-subtle);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  @media(max-width:880px){
+    .hero-grid,.sp,.sp.flip{grid-template-columns:1fr}
+    .sp.flip .sp-media{order:0}
+    .vid-grid{grid-template-columns:repeat(2,1fr)}
+    .written{grid-template-columns:1fr}
+    .formwrap{padding:26px}
+    body{padding-bottom:76px}
+    .sticky{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:150;background:#fff;border-top:1px solid var(--line);padding:12px 16px;gap:10px;box-shadow:0 -6px 20px rgba(15,22,51,.10)}
+    .sticky .btn{flex:1;padding:14px}
+    .section{padding:52px 0}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 1. HERO (above the fold) ============ -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">⏱ 24/7 Emergency Plumbing · Toronto &amp; GTA</span>
+      <h1 style="margin-top:16px">We'll Take Care Of <em>Everything</em></h1>
+      <!-- OFFER (cro.md #4, Option B emotional): remove the fear, flat-rate, fast -->
+      <p class="lead">Burst pipe, backup, or no hot water? We answer in under <b>75 seconds</b> and we're at your door <b>within the hour</b> — flat-rate pricing, no surprise fees. You panic; we fix. <b>The price we quote is the price you pay.</b></p>
+      <!-- 3 credibility bullets (cro.md #2) -->
+      <ul class="bullets">
+        <li>Flat-Rate Pricing</li>
+        <li>5-Star Rated</li>
+        <li>10,000+ jobs/year</li>
+      </ul>
+      <!-- primary click-to-call + secondary CTA (cro.md #3, #17) -->
+      <div class="cta-row">
+        <a class="btn btn-call btn-lg" href="tel:+18001234567">📞 Call Now: (800) 123-4567</a>
+        <a class="btn btn-primary btn-lg" href="#quote">Get Help Now</a>
+      </div>
+      <div class="resp"><span class="pulse"></span> <b>3 plumbers available now</b> · avg. response under 75 seconds</div>
+    </div>
+    <!-- Founder video (cro.md #1) -->
+    <div>
+      <div class="video">
+        <div class="play" aria-label="Play founder video"></div>
+        <div class="ph-label">[ Founder video — 45s: "Here's exactly what we'll do when you call." ]</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 2. LOGO WALL (cro.md #5) ============ -->
+<section class="section" style="padding-top:40px;padding-bottom:8px">
+  <div class="wrap center">
+    <p class="secnum">Trusted by property managers, builders &amp; 10,000+ GTA homeowners</p>
+    <div class="logos">
+      <div class="logo-ph">[ LOGO ]</div><div class="logo-ph">[ LOGO ]</div>
+      <div class="logo-ph">[ LOGO ]</div><div class="logo-ph">[ LOGO ]</div>
+      <div class="logo-ph">[ LOGO ]</div><div class="logo-ph">[ LOGO ]</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. SCALE STRIP (cro.md #3 reach) ============ -->
+<section class="strip">
+  <div class="wrap">
+    <div class="strip-item"><b>25</b><span>GTA municipalities covered</span></div>
+    <div class="strip-item"><b>10,000+</b><span>jobs completed / year</span></div>
+    <div class="strip-item"><b>&lt;75s</b><span>average response time</span></div>
+    <div class="strip-item"><b>4.9★</b><span>across 6,000+ reviews</span></div>
+  </div>
+</section>
+
+<!-- ============ 4. WHY US / VETTING — Selling Point #1: SPEED ============ -->
+<section class="section">
+  <div class="wrap sp">
+    <div>
+      <span class="eyebrow">Selling point #1 · Speed</span>
+      <h2 style="margin-top:14px">Finding a fast, honest plumber is hard. So we became one.</h2>
+      <p>Most "24/7" plumbers go to voicemail. We don't. A licensed plumber picks up in under 75 seconds, and we're rolling to your door within the hour — because at 2 a.m., every minute is more drywall.</p>
+      <ul class="checklist">
+        <li>Live person answers in <b>under 75 seconds</b> — day or night</li>
+        <li>On-site <b>within the hour</b> across Toronto &amp; the GTA</li>
+        <li>Every plumber is licensed, insured &amp; background-checked</li>
+        <li>Drop below 5 stars and they're off our team — no exceptions</li>
+      </ul>
+      <a class="btn btn-primary" href="#quote">Get Help Now — under 75s response</a>
+    </div>
+    <div class="sp-media">[ Photo: plumber arriving, van, on-site ]</div>
+  </div>
+</section>
+
+<!-- ============ 5. CUSTOMER SERVICE — Selling Point #2 ============ -->
+<section class="section" style="background:var(--paper)">
+  <div class="wrap sp flip">
+    <div class="sp-media">[ Photo: dispatcher / friendly team on the phone ]</div>
+    <div>
+      <span class="eyebrow">Selling point #2 · Customer service</span>
+      <h2 style="margin-top:14px">The gold standard for "they actually called me back"</h2>
+      <ul class="checklist">
+        <li>Fastest response times in the GTA — stated and guaranteed</li>
+        <li>One dedicated coordinator from first call to dry floor</li>
+        <li>We handle the insurance paperwork &amp; photos for you</li>
+        <li>Text updates so you're never left wondering</li>
+        <li>5-star track record across 6,000+ reviews</li>
+      </ul>
+      <a class="btn btn-primary" href="#quote">Talk to a plumber now</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. ALL-IN-ONE — Selling Point #3: flat-rate, everything handled ============ -->
+<section class="section">
+  <div class="wrap sp">
+    <div>
+      <span class="eyebrow">Selling point #3 · Everything handled</span>
+      <h2 style="margin-top:14px">One call. Flat price. We handle the rest.</h2>
+      <p>No itemized mystery bills, no "we found another thing" at checkout. You get one upfront flat rate and a plumber who fixes it start to finish.</p>
+      <ul class="checklist">
+        <li>Burst &amp; frozen pipe repair</li>
+        <li>Sewer &amp; drain backups (and backwater valves)</li>
+        <li>Water heaters — repair or same-day replace</li>
+        <li>Toilets, faucets, leaks &amp; shut-offs</li>
+        <li>Upfront flat-rate quote — the price we say is the price you pay</li>
+      </ul>
+      <a class="btn btn-primary" href="#quote">Get my flat-rate quote</a>
+    </div>
+    <div class="sp-media">[ Photo: finished, clean repair / dry basement ]</div>
+  </div>
+</section>
+
+<!-- ============ 7. TESTIMONIALS (cro.md #6, #10) ============ -->
+<section class="section" style="background:var(--paper)">
+  <div class="wrap center">
+    <span class="eyebrow">Real Toronto homeowners</span>
+    <h2 style="margin-top:14px">6,000+ five-star reviews. Here are a few.</h2>
+    <p class="lead center" style="margin:0 auto 28px">The single biggest reason people call us back — and refer their neighbours.</p>
+    <!-- 9 video testimonials -->
+    <div class="vid-grid">
+      <div class="vid-ph"><div class="play"></div><div class="who">Sarah · North York</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Mike · Etobicoke</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Priya · Markham</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Dave · Scarborough</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Elena · Mississauga</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Tom · Vaughan</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Aisha · Brampton</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Rob · Oakville</div></div>
+      <div class="vid-ph"><div class="play"></div><div class="who">Lina · Richmond Hill</div></div>
+    </div>
+    <!-- written testimonials (real first name + date + specifics) -->
+    <div class="written">
+      <div class="t-card"><div class="stars">★★★★★</div><p>"Pipe burst at 1am. They answered immediately and James was here in 40 minutes. Flat price, no games. Saved our hardwood."</p><div class="t-meta"><div class="t-av">SK</div><div><div class="t-name">Sarah K.</div><div class="t-date">Mar 2026 · North York</div></div></div></div>
+      <div class="t-card"><div class="stars">★★★★★</div><p>"Basement backup on a Sunday. Priya's crew cleared it and installed a backwater valve. Quoted $X, charged exactly $X."</p><div class="t-meta"><div class="t-av">MD</div><div><div class="t-name">Mike D.</div><div class="t-date">Feb 2026 · Etobicoke</div></div></div></div>
+      <div class="t-card"><div class="stars">★★★★★</div><p>"No hot water in January with two kids. Same-day water heater swap. They handled the insurance photos too. Lifesavers."</p><div class="t-meta"><div class="t-av">PT</div><div><div class="t-name">Priya T.</div><div class="t-date">Jan 2026 · Markham</div></div></div></div>
+    </div>
+    <!-- proof badges (cro.md #13) -->
+    <div class="badges">
+      <span class="badge"><span class="stars">★★★★★</span> Google 4.9</span>
+      <span class="badge"><span class="stars">★★★★★</span> HomeStars</span>
+      <span class="badge"><span class="stars">★★★★★</span> Yelp</span>
+      <span class="badge"><span class="stars">★★★★★</span> Facebook</span>
+      <span class="badge">✓ Licensed &amp; Insured</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. LEAD MAGNET + FORM (cro.md #8, #11, #12) ============ -->
+<section class="section" id="quote">
+  <div class="wrap" style="max-width:640px">
+    <div class="formwrap">
+      <h2 class="center">Get Help Now</h2>
+      <p class="center"><b style="color:#fff">Our average response time is under 75 seconds.</b> Have your phone ready.</p>
+      <div class="form-card">
+        <div class="magnet">
+          <div class="gift">★</div>
+          <div><b>Free:</b> <span>"7 Things to Do in the First 5 Minutes of a Plumbing Emergency" — sent instantly.</span></div>
+        </div>
+        <form onsubmit="return submitLead(event)">
+          <div class="field"><label>Name</label><input required placeholder="Your name"/></div>
+          <div class="field"><label>Phone</label><input required type="tel" placeholder="(416) 000-0000"/></div>
+          <div class="field"><label>What's happening?</label>
+            <select required>
+              <option value="">Select your emergency…</option>
+              <option>Burst / leaking pipe</option>
+              <option>Sewer / drain backup</option>
+              <option>No hot water / water heater</option>
+              <option>Overflowing toilet</option>
+              <option>No water at all</option>
+              <option>Other / not sure</option>
+            </select>
+          </div>
+          <div class="field"><label>City</label><input required placeholder="Toronto, Mississauga, Vaughan…"/></div>
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Yes! I Want Help Now →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. URGENCY / SCARCITY CLOSE (cro.md #9) ============ -->
+<section class="section urgency">
+  <div class="wrap">
+    <span class="eyebrow" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff">Don't wait on water</span>
+    <h2 style="margin-top:14px">Every minute of standing water costs more than the call</h2>
+    <p>A $300 emergency visit beats a $30,000 flood remediation. We keep crews on standby 24/7 across all 25 GTA municipalities precisely so you never have to gamble on "it'll probably be fine till morning."</p>
+    <a class="btn btn-primary btn-lg" href="#quote">Get Help Now</a>
+  </div>
+</section>
+
+<!-- ============ 10. OBJECTION HANDLING (cro.md #10) ============ -->
+<section class="section objection">
+  <div class="wrap">
+    <div class="o-card">
+      <span class="eyebrow">The #1 mistake homeowners make</span>
+      <h3 style="margin-top:14px">"I'll just wait and see if it gets worse."</h3>
+      <p>It gets worse. Water finds drywall, then subfloor, then the ceiling below. Waiting turns a same-day flat-rate fix into a multi-week, multi-trade renovation — and your insurance company will ask why you delayed. Calling now is the cheap option, every single time.</p>
+      <a class="btn btn-call" href="tel:+18001234567">📞 Call (800) 123-4567 now</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ (cro.md optional polish) ============ -->
+<section class="section faq" style="background:var(--paper)">
+  <div class="wrap" style="max-width:760px">
+    <h2 class="center" style="margin-bottom:26px">Quick answers</h2>
+    <details open><summary>How fast can you actually get here?</summary><p>We answer in under 75 seconds and target on-site within the hour across Toronto and the GTA. <a class="soft" href="#quote">Tell us your address →</a></p></details>
+    <details><summary>How much does an emergency call cost?</summary><p>A flat-rate call-out of $150–$350 plus the job — quoted upfront before any work starts. The price we say is the price you pay. <a class="soft" href="#quote">Get your flat quote →</a></p></details>
+    <details><summary>Are you really available 24/7?</summary><p>Yes — nights, weekends, holidays, snowstorms. A licensed plumber, not a voicemail. <a class="soft" href="tel:+18001234567">Call now →</a></p></details>
+    <details><summary>Which areas do you cover?</summary><p>All 25 GTA municipalities — Toronto, Mississauga, Brampton, Markham, Vaughan, Oshawa, Oakville, Burlington and more. <a class="soft" href="#quote">Check your city →</a></p></details>
+  </div>
+</section>
+
+<!-- ============ 11. SECOND FORM (cro.md #11) ============ -->
+<section class="section" style="padding-top:20px">
+  <div class="wrap" style="max-width:640px">
+    <div class="formwrap">
+      <h2 class="center">Still here? Your pipe isn't waiting.</h2>
+      <p class="center"><b style="color:#fff">Under 75-second response.</b> Drop your number and we'll call you right now.</p>
+      <div class="form-card">
+        <form onsubmit="return submitLead(event)">
+          <div class="field"><label>Phone</label><input required type="tel" placeholder="(416) 000-0000"/></div>
+          <div class="field"><label>City</label><input required placeholder="Your city"/></div>
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Yes! Call Me Now →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STICKY MOBILE CTA (cro.md #17) ============ -->
+<div class="sticky">
+  <a class="btn btn-call" href="tel:+18001234567">📞 Call</a>
+  <a class="btn btn-primary" href="#quote">Get Help Now</a>
+</div>
+
+<!-- ============ 12. EMAIL-CAPTURE POPUP (cro.md #12) ============ -->
+<div class="modal-bg" id="popup">
+  <div class="modal">
+    <span class="x" onclick="closePopup()">×</span>
+    <span class="eyebrow">Before you go</span>
+    <h3 style="margin-top:12px">Want our free emergency checklist?</h3>
+    <p>Drop your email and we'll send "7 Things to Do in the First 5 Minutes" — so you're ready if it happens again.</p>
+    <form onsubmit="return submitLead(event)">
+      <div class="field"><input required type="email" placeholder="you@email.com"/></div>
+      <button class="btn btn-primary btn-block" type="submit">Send me the checklist →</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Email-capture popup: exit-intent (desktop) + 25s fallback
+  var shown=false;
+  function showPopup(){ if(!shown){ document.getElementById('popup').classList.add('show'); shown=true; } }
+  function closePopup(){ document.getElementById('popup').classList.remove('show'); }
+  document.addEventListener('mouseout',function(e){ if(e.clientY<=0) showPopup(); });
+  setTimeout(showPopup, 25000);
+  // Form handler (placeholder — wire to your CRM/Make webhook). cro.md #13 thank-you flow.
+  function submitLead(e){
+    e.preventDefault();
+    alert("You're the best! A plumber will call you in under 75 seconds. Keep your phone handy.");
+    // window.location = "/thank-you";  // cro.md #13 confirmation page
+    return false;
+  }
+</script>
+</body>
+</html>
