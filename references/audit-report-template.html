@@ -1,3 +1,14 @@
+<!--
+  audit-report-template.html · rewritten 12 Sep 2026 after the DJNorth.ca fix pass (Jono's rulings):
+  - leaks[].progress: fixed · partly fixed · click needed · bigger build · website access · your proof · your number
+    (never "no action" - those rows stay in audit-report.md). Legend renders above the fix-first index.
+  - byHand[]: {title, why, path, done, verify} - one recipe card each, rendered under the index.
+  - Each section is ONE masonry grid: its checks, a "By campaign / By ad group" box from campaigns[].issues,
+    and a "Findings in this section" box with one checkbox row per finding (id leak<i>, the index links to it).
+    Fixed rows fold ("Show the N fixed"); the fix is the sub line, the detail sits behind a "why" toggle.
+  - campaigns[].issues[].done = true ticks an issue row. checks[].tag adds a progress pill to a check row.
+  Replace ONLY the JSON below. Do not touch markup, CSS or script.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,10 +147,59 @@
   .note { font-size:12px; color:var(--muted); padding:8px 24px 16px; }
   footer { background:var(--dark); color:var(--on-dark-soft); padding:40px 0; font-size:13px; } footer .rail { display:flex; justify-content:space-between; align-items:center; } footer .wordmark { color:var(--on-dark); font-size:18px; }
   .hide { display:none !important; }
-  @media (max-width:960px) { .scorecard{grid-template-columns:1fr} .groups{grid-template-columns:1fr} header.hero h1{font-size:38px} .cta{flex-direction:column;align-items:flex-start} .jump{display:none} .fx1{grid-template-columns:28px 36px 1fr auto} .fx1 .w{display:none} }
+  @media (max-width:960px) { .scorecard{grid-template-columns:1fr} .groups{columns:1} header.hero h1{font-size:38px} .cta{flex-direction:column;align-items:flex-start} .jump{display:none} .fx1{grid-template-columns:28px 36px 1fr auto} .fx1 .w{display:none} }
+
+  /* fix-pass progress pills (added 11 Sep 2026) */
+  .st.prog { margin-left:8px; }
+  .st.pfixed { background:var(--good-bg); color:var(--good); box-shadow:inset 0 0 0 1px var(--good-ring); }
+  .st.ppartly { background:var(--warn-bg); color:#8a6a0c; box-shadow:inset 0 0 0 1px var(--warn-ring); }
+  .st.phands { background:var(--bad-bg); color:var(--bad); box-shadow:inset 0 0 0 1px var(--bad-ring); }
+  .st.pyou { background:rgba(59,95,138,.08); color:#3b5f8a; box-shadow:inset 0 0 0 1px rgba(59,95,138,.25); }
+  .st.prouted, .st.pnone { background:rgba(110,109,102,.08); color:#6e6d66; box-shadow:inset 0 0 0 1px rgba(110,109,102,.25); }
+  .fx1.done .i { text-decoration:line-through; text-decoration-color:var(--good); color:var(--muted); }
+  .fx1.done .i .st { text-decoration:none; }
+.st.pbuild { background:rgba(59,95,138,.08); color:#3b5f8a; box-shadow:inset 0 0 0 1px rgba(59,95,138,.25); }
+  .st.psite { background:rgba(201,100,66,.10); color:#b05538; box-shadow:inset 0 0 0 1px rgba(201,100,66,.30); }
+  .legend { display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--body); margin:0 0 14px; line-height:1.9; }
+  .legend .st.prog { margin:0 2px 0 0; }
+.hands { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:14px; }
+  .recipe { padding:20px 22px; } .recipe h4 { font-size:16px; letter-spacing:-.2px; margin-bottom:6px; }
+  .recipe .why { color:var(--body); font-size:13px; margin-bottom:10px; line-height:1.45; }
+  .recipe dl { display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:13px; line-height:1.5; }
+  .recipe dt { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; padding-top:3px; }
+  /* masonry: boxes flow into balanced columns, short ones stack, long ones stand alone (Jono, 12 Sep) */
+  .groups { display:block; columns:3; column-gap:32px; column-fill:balance; }
+  .grp { break-inside:auto; } .grp h4 { break-after:avoid; break-inside:avoid; } .chk, .showpass { break-inside:avoid; }
+  .grp { display:block; width:100%; }
+  .chk { scroll-margin-top:84px; } .chk:target { background:var(--warn-bg); border-radius:8px; }
+  .chksub { font-size:12px; color:var(--body); margin-top:3px; line-height:1.45; }
+  .chk .st.prog { margin-left:6px; vertical-align:middle; }
+  .whyb { background:none; border:0; padding:0; margin-left:6px; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.2px; color:var(--coral); cursor:pointer; }
+  .chkwhy { font-size:12px; color:var(--body); margin-top:4px; line-height:1.45; padding:8px 10px; background:var(--sand); border-radius:8px; }
+  tr.neutral td { background:var(--warn-bg); }
+  td.open { font-size:12px; color:var(--body); max-width:360px; line-height:1.4; }
+  td.open .oi { display:block; padding:2px 0; }
+  .card[style*="overflow-x:auto"], .tabpane, #pageScores, .scrolllist { max-height:480px; overflow:auto; }
+  .tbl thead th { position:sticky; top:0; background:var(--ivory); z-index:1; }
+  .hund { display:flex; gap:22px; flex-wrap:wrap; align-items:flex-start; margin:8px 0 12px; }
+  .hcol { display:flex; gap:10px; align-items:center; }
+  .hgrid { display:grid; grid-template-columns:repeat(10,7px); gap:2px; }
+  .hgrid i { width:7px; height:7px; border-radius:2px; background:var(--good); display:block; }
+  .hgrid i.job { background:var(--terracotta); }
+  .hn { font-size:12px; color:var(--body); line-height:1.3; } .hn b { font-family:"Tiempos Text",Georgia,serif; font-weight:500; font-size:20px; color:var(--ink); display:block; letter-spacing:-.5px; }
+  .hn .k { display:block; font-size:10px; }
+  .hcol.money { flex-direction:column; align-items:flex-start; gap:6px; }
+  th.sortable { cursor:pointer; text-decoration:underline dotted; } th.sortable.on { color:var(--terracotta); }
+  ul.todo { margin:2px 0 0 14px; padding:0; font-size:12px; color:var(--body); line-height:1.4; } ul.todo li { margin:0; }
+  #adFilters select { font:inherit; font-size:12px; padding:3px 6px; border:1px solid var(--ring); border-radius:6px; background:var(--ivory); color:var(--ink); }
+  .subs { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:4px; font-size:12px; }
+  .subs .sub { white-space:nowrap; color:var(--body); } .subs .sub.ok { color:var(--good); } .subs .sub.no { color:var(--bad); } .subs .sub i { font-style:normal; color:var(--muted); font-size:10px; }
+  .groups.few { columns:3; }
+  .groups.few .grp { display:block; }
+  .subs .sub.more { color:var(--coral); cursor:pointer; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.2px; }
+  .subs span[hidden] { display:none; }
 </style>
-<script id="audit-data" type="application/json">
-{
+<script id="audit-data" type="application/json">{
  "mode": "owner",
  "business": "Dave's Plumbing",
  "account": "482-931-7740",
@@ -307,6 +367,65 @@
       "a": "fail"
      }
     ]
+   },
+   {
+    "name": "Ad types",
+    "checks": [
+     {
+      "t": "Search ads are running",
+      "b": "pass",
+      "a": "pass",
+      "certainty": "measured"
+     },
+     {
+      "t": "Maps ads are on: the Business Profile location set is attached to the account",
+      "b": "fail",
+      "a": "fail",
+      "certainty": "measured",
+      "tag": "click needed",
+      "sub": "The profile is linked but its location set is not attached, so no campaign shows on Maps. Tools, Data manager, Business Profile, attach to all campaigns."
+     },
+     {
+      "t": "Local Services Ads: eligible for this business in this country",
+      "b": "fail",
+      "a": "fail",
+      "certainty": "inferred",
+      "tag": "click needed",
+      "sub": "Plumbers are eligible in the US and the Google Ads API cannot see whether an LSA account exists. Confirm at ads.google.com/localservices; if none, run /lsa-setup."
+     }
+    ]
+   },
+   {
+    "name": "Retargeting",
+    "checks": [
+     {
+      "t": "Visitor and enquiry lists exist and are big enough to use",
+      "b": "pass",
+      "a": "pass",
+      "certainty": "measured"
+     },
+     {
+      "t": "Those lists are watched on every live search campaign",
+      "b": "fail",
+      "a": "fail",
+      "certainty": "measured",
+      "tag": "bigger build"
+     },
+     {
+      "t": "A retargeting campaign is live for people who started a quote and left",
+      "b": "fail",
+      "a": "fail",
+      "certainty": "measured",
+      "tag": "bigger build"
+     },
+     {
+      "t": "Past customers are excluded from the ads",
+      "b": "fail",
+      "a": "fail",
+      "certainty": "measured",
+      "tag": "bigger build"
+     }
+    ]
    }
   ]
  },
@@ -370,73 +489,7 @@
   ]
  },
  "creative": {
-  "groups": [
-   {
-    "name": "The ads",
-    "checks": [
-     {
-      "t": "Two ads per ad group",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "Fifteen headlines used",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "No pinning beyond position 1",
-      "b": "pass",
-      "a": "pass"
-     },
-     {
-      "t": "Every claim traceable to real proof",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "No phone number in ad text",
-      "b": "pass",
-      "a": "pass"
-     }
-    ]
-   },
-   {
-    "name": "Assets",
-    "checks": [
-     {
-      "t": "Call asset attached and scheduled to answered hours",
-      "b": "fail",
-      "a": "fail"
-     },
-     {
-      "t": "Six sitelinks on intent pages, not About or Contact",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "Every sitelink URL returns 200",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "Ten callouts, none repeating the ad text",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "Structured snippet header is a real Google header",
-      "b": "fail",
-      "a": "pass"
-     },
-     {
-      "t": "Business name and logo (needs Advertiser Verification)",
-      "b": "fail",
-      "a": "fail"
-     }
-    ]
-   }
-  ]
+  "groups": []
  },
  "pages": {
   "groups": [
@@ -477,6 +530,18 @@
       "t": "No entry or timed popup",
       "b": "pass",
       "a": "pass"
+     }
+    ]
+   },
+   {
+    "name": "Testing",
+    "checks": [
+     {
+      "t": "Landing pages are being split-tested (a testing script on the page, or two ads in one ad group landing on different pages)",
+      "b": "fail",
+      "a": "fail",
+      "certainty": "measured",
+      "sub": "Detected: Optimizely on /drain-cleaning."
      }
     ]
    }
@@ -595,19 +660,35 @@
      "what": "drain cleaning duplicated across 4 ad groups - unpredictable which ad serves"
     },
     {
-     "cat": "ads",
-     "level": "bad",
-     "what": "one ad in 2 of 4 ad groups, so nothing is being tested there"
+     "cat": "budget",
+     "level": "warn",
+     "what": "18% impression share lost to budget while hitting target"
     },
     {
      "cat": "assets",
      "level": "warn",
-     "what": "no call asset - a trades account with no phone button"
+     "what": "Sitelinks: on the campaign",
+     "ok": true
     },
     {
-     "cat": "budget",
+     "cat": "assets",
      "level": "warn",
-     "what": "18% impression share lost to budget while hitting target"
+     "what": "Call button: missing on this campaign",
+     "ok": false,
+     "tag": "bigger build"
+    },
+    {
+     "cat": "ads",
+     "level": "warn",
+     "what": "Main: split test running, 2 ads competing",
+     "ok": true
+    },
+    {
+     "cat": "ads",
+     "level": "warn",
+     "what": "Brides: no split test, 1 ad. Needs a second ad written from the owner's proof, lands paused.",
+     "ok": false,
+     "tag": "your proof"
     }
    ]
   },
@@ -634,15 +715,36 @@
      "cost": 260
     },
     {
-     "cat": "assets",
-     "level": "bad",
-     "what": "no call asset on an emergency campaign"
-    },
-    {
      "cat": "settings",
      "level": "warn",
      "what": "no ad schedule - runs overnight into voicemail",
      "cost": 260
+    },
+    {
+     "cat": "assets",
+     "level": "warn",
+     "what": "Sitelinks: on the campaign",
+     "ok": true
+    },
+    {
+     "cat": "assets",
+     "level": "warn",
+     "what": "Call button: missing on this campaign",
+     "ok": false,
+     "tag": "bigger build"
+    },
+    {
+     "cat": "ads",
+     "level": "warn",
+     "what": "Main: split test running, 2 ads competing",
+     "ok": true
+    },
+    {
+     "cat": "ads",
+     "level": "warn",
+     "what": "Brides: no split test, 1 ad. Needs a second ad written from the owner's proof, lands paused.",
+     "ok": false,
+     "tag": "your proof"
     }
    ]
   },
@@ -666,6 +768,32 @@
      "cat": "budget",
      "level": "warn",
      "what": "best cost per lead in the account and capped - the clearest place to spend more"
+    },
+    {
+     "cat": "assets",
+     "level": "warn",
+     "what": "Sitelinks: on the campaign",
+     "ok": true
+    },
+    {
+     "cat": "assets",
+     "level": "warn",
+     "what": "Call button: missing on this campaign",
+     "ok": false,
+     "tag": "bigger build"
+    },
+    {
+     "cat": "ads",
+     "level": "warn",
+     "what": "Main: split test running, 2 ads competing",
+     "ok": true
+    },
+    {
+     "cat": "ads",
+     "level": "warn",
+     "what": "Brides: no split test, 1 ad. Needs a second ad written from the owner's proof, lands paused.",
+     "ok": false,
+     "tag": "your proof"
     }
    ]
   }
@@ -886,7 +1014,8 @@
      "conv": 0
     }
    ],
-   "severity": 8
+   "severity": 8,
+   "progress": "fixed"
   },
   {
    "name": "Ads land on the homepage",
@@ -909,7 +1038,8 @@
      "conv": 0
     }
    ],
-   "severity": 9
+   "severity": 9,
+   "progress": "click needed"
   },
   {
    "name": "Calls are not being counted",
@@ -930,7 +1060,8 @@
      "note": "primary, 0 recorded in 90 days"
     }
    ],
-   "severity": 9
+   "severity": 9,
+   "progress": "website access"
   }
  ],
  "waived": [
@@ -940,9 +1071,431 @@
    "reason": "Seasonal - owner wants it live before winter"
   }
  ],
- "rawAfter": 84
-}
-</script>
+ "rawAfter": 84,
+ "byHand": [
+  {
+   "title": "Turn the last auto-apply boxes off",
+   "why": "Google is still allowed to rewrite keywords on its own; two types have no API name.",
+   "path": "ads.google.com → Admin (left sidebar, bottom) → Recommendations auto-apply → untick every box still ticked under both bundles → Save.",
+   "done": "Every checkbox empty, header reads Not applying.",
+   "verify": "pause_auto_apply.py reads 0 ENABLED."
+  }
+ ],
+ "assetTable": [
+  {
+   "name": "Sitelinks",
+   "need": "required",
+   "on": 3,
+   "of": 3,
+   "account": 6,
+   "impressions": 41200,
+   "clicks": 2210,
+   "conv": 118,
+   "status": "pass",
+   "note": "",
+   "tag": null
+  },
+  {
+   "name": "Call button",
+   "need": "required",
+   "on": 1,
+   "of": 3,
+   "account": 0,
+   "impressions": 900,
+   "clicks": 40,
+   "conv": 6,
+   "status": "fail",
+   "note": "Missing on Drain Cleaning, Water Heaters.",
+   "tag": "bigger build"
+  },
+  {
+   "name": "Images",
+   "need": "required",
+   "on": 0,
+   "of": 3,
+   "account": 0,
+   "impressions": 0,
+   "clicks": 0,
+   "conv": 0,
+   "status": "fail",
+   "note": "No image assets. Needs real photos from the owner.",
+   "tag": "your proof"
+  },
+  {
+   "name": "Business name",
+   "need": "required",
+   "on": 3,
+   "of": 3,
+   "account": 1,
+   "impressions": 38000,
+   "clicks": 1900,
+   "conv": 95,
+   "status": "pass",
+   "note": "",
+   "tag": null
+  },
+  {
+   "name": "Business logo",
+   "need": "required",
+   "on": 3,
+   "of": 3,
+   "account": 1,
+   "impressions": 20100,
+   "clicks": 1100,
+   "conv": 60,
+   "status": "pass",
+   "note": "",
+   "tag": null
+  },
+  {
+   "name": "Callouts",
+   "need": "required",
+   "on": 3,
+   "of": 3,
+   "account": 4,
+   "impressions": 30500,
+   "clicks": 1500,
+   "conv": 80,
+   "status": "pass",
+   "note": "",
+   "tag": null
+  },
+  {
+   "name": "Structured snippets",
+   "need": "required",
+   "on": 2,
+   "of": 3,
+   "account": 0,
+   "impressions": 2200,
+   "clicks": 80,
+   "conv": 4,
+   "status": "fail",
+   "note": "Missing on Water Heaters.",
+   "tag": "bigger build"
+  },
+  {
+   "name": "Location",
+   "need": "required",
+   "on": 3,
+   "of": 3,
+   "account": 0,
+   "impressions": 5100,
+   "clicks": 300,
+   "conv": 12,
+   "status": "pass",
+   "note": "",
+   "tag": null
+  },
+  {
+   "name": "Lead form",
+   "need": "required",
+   "on": 0,
+   "of": 3,
+   "account": 0,
+   "impressions": 0,
+   "clicks": 0,
+   "conv": 0,
+   "status": "fail",
+   "note": "Incomplete: not on every campaign.",
+   "tag": "bigger build"
+  },
+  {
+   "name": "Message",
+   "need": "required",
+   "on": 0,
+   "of": 3,
+   "account": 0,
+   "impressions": 0,
+   "clicks": 0,
+   "conv": 0,
+   "status": "fail",
+   "note": "Incomplete: not on every campaign.",
+   "tag": "bigger build"
+  },
+  {
+   "name": "Price",
+   "need": "optional",
+   "on": 0,
+   "of": 3,
+   "account": 0,
+   "impressions": 0,
+   "clicks": 0,
+   "conv": 0,
+   "status": "pass",
+   "note": "Optional, not set up.",
+   "tag": null
+  },
+  {
+   "name": "Promotion",
+   "need": "optional",
+   "on": 0,
+   "of": 3,
+   "account": 0,
+   "impressions": 0,
+   "clicks": 0,
+   "conv": 0,
+   "status": "pass",
+   "note": "Optional, not set up.",
+   "tag": null
+  },
+  {
+   "name": "App",
+   "need": "optional",
+   "on": 0,
+   "of": 3,
+   "account": 0,
+   "impressions": 0,
+   "clicks": 0,
+   "conv": 0,
+   "status": "pass",
+   "note": "Not relevant, not set up.",
+   "tag": null
+  }
+ ],
+ "adTable": {
+  "window": "12 Sep 2025 to 12 Sep 2026",
+  "avg": {
+   "ctr": 6.1,
+   "cvr": 9.4,
+   "cpl": 58.2
+  },
+  "ads": [
+   {
+    "campaign": "Drain Cleaning",
+    "ad_group": "Drain cleaning",
+    "ad_id": 1,
+    "headline": "Drain Cleaning Today",
+    "score": "Good",
+    "impressions": 9100,
+    "clicks": 610,
+    "conv": 71,
+    "cost": 3250
+   },
+   {
+    "campaign": "Water Heaters",
+    "ad_group": "Installs",
+    "ad_id": 2,
+    "headline": "Water Heater Install",
+    "score": "Excellent",
+    "impressions": 8200,
+    "clicks": 480,
+    "conv": 31,
+    "cost": 2900
+   },
+   {
+    "campaign": "Emergency",
+    "ad_group": "24 hour",
+    "ad_id": 3,
+    "headline": "24 Hour Plumber",
+    "score": "Excellent",
+    "impressions": 6100,
+    "clicks": 390,
+    "conv": 22,
+    "cost": 3100
+   },
+   {
+    "campaign": "Water Heaters",
+    "ad_group": "Repairs",
+    "ad_id": 4,
+    "headline": "Water Heater Repair",
+    "score": "Average",
+    "impressions": 1200,
+    "clicks": 20,
+    "conv": 2,
+    "cost": 140
+   }
+  ],
+  "recentFix": {
+   "Water Heaters": "its budget and negatives changed on the fix pass, so the old numbers no longer describe it"
+  },
+  "groupGrades": {
+   "Drain Cleaning Drain cleaning": {
+    "ctr": "",
+    "rel": ""
+   },
+   "Water Heaters Repairs": {
+    "ctr": "3 of 5 below",
+    "rel": "1 of 5 below"
+   }
+  }
+ },
+ "pageScores": [
+  {
+   "url": "https://davesplumbing.example/drain-cleaning",
+   "groups": [
+    "Drain Cleaning / Drain cleaning"
+   ],
+   "city": "dallas",
+   "h1": "Emergency Drain Cleaning Dallas",
+   "load_s": 1.4,
+   "score": 72,
+   "proof": "3/5",
+   "checks": [
+    {
+     "t": "Headline names the service",
+     "pass": true,
+     "kind": "match"
+    },
+    {
+     "t": "Headline names the city",
+     "pass": true,
+     "kind": "match"
+    },
+    {
+     "t": "Review stars with a count",
+     "pass": false,
+     "kind": "proof"
+    },
+    {
+     "t": "Guarantee stated",
+     "pass": false,
+     "kind": "proof"
+    },
+    {
+     "t": "Loads in under 2 seconds",
+     "pass": true,
+     "kind": "speed"
+    }
+   ],
+   "per100": {
+    "clicks": 610,
+    "leads": 11.6,
+    "jobs": 2.33,
+    "money": 2790,
+    "cost": 533,
+    "cpl": 45.77
+   }
+  }
+ ],
+ "adBuild": [
+  {
+   "campaign": "Water Heaters",
+   "what": "Repairs ad 4: city not in the pinned first headline; no 15 headlines",
+   "tag": "your proof",
+   "fails": [
+    "city in pinned headline 1",
+    "15 headlines"
+   ]
+  }
+ ],
+ "adBuildAll": [
+  {
+   "campaign": "Drain Cleaning",
+   "ad_group": "Drain cleaning",
+   "ad_id": 1,
+   "checks": {
+    "15 headlines": true,
+    "4 descriptions": true,
+    "city in pinned headline 1": true,
+    "pinned headline 1 exists": true,
+    "not over-pinned (3 or fewer pins)": true,
+    "keyword in a headline": true,
+    "dedicated landing page, not the homepage": true,
+    "page names the city": true,
+    "display path filled": true
+   }
+  },
+  {
+   "campaign": "Water Heaters",
+   "ad_group": "Repairs",
+   "ad_id": 4,
+   "checks": {
+    "15 headlines": false,
+    "4 descriptions": true,
+    "city in pinned headline 1": false,
+    "pinned headline 1 exists": true,
+    "not over-pinned (3 or fewer pins)": true,
+    "keyword in a headline": true,
+    "dedicated landing page, not the homepage": true,
+    "page names the city": true,
+    "display path filled": false
+   }
+  }
+ ],
+ "tightness": {
+  "themes": [
+   {
+    "t": "Drain Cleaning Drain cleaning",
+    "ok": true,
+    "done": false
+   },
+   {
+    "t": "Water Heaters Repairs",
+    "ok": false,
+    "done": false
+   }
+  ]
+ },
+ "googleGrades": {
+  "ctr": [
+   {
+    "t": "Drain Cleaning Drain cleaning",
+    "ok": true,
+    "done": false
+   },
+   {
+    "t": "Water Heaters Repairs (3 of 5 below)",
+    "ok": false,
+    "done": false
+   }
+  ],
+  "rel": [
+   {
+    "t": "Drain Cleaning Drain cleaning",
+    "ok": true,
+    "done": false
+   },
+   {
+    "t": "Water Heaters Repairs (1 of 5 below)",
+    "ok": false,
+    "done": false
+   }
+  ],
+  "lp": [],
+  "lp_pages": [
+   {
+    "t": "davesplumbing.example/drain-cleaning",
+    "ok": true,
+    "done": false
+   },
+   {
+    "t": "davesplumbing.example/water-heaters (5 of 5 keywords below)",
+    "ok": false,
+    "done": false
+   }
+  ]
+ },
+ "keywordCounts": [
+  {
+   "t": "Drain Cleaning Drain cleaning (9)",
+   "ok": true,
+   "done": false
+  },
+  {
+   "t": "Water Heaters Repairs (1)",
+   "ok": false,
+   "done": false
+  }
+ ],
+ "blockRows": [
+  {
+   "campaign": "Drain Cleaning",
+   "term": "drain cleaning jobs",
+   "clicks": 4,
+   "cost": 21.4,
+   "why": "jobs",
+   "status": "blocked 12 Sep"
+  },
+  {
+   "campaign": "Water Heaters",
+   "term": "water heater repair houston",
+   "clicks": 2,
+   "cost": 9.1,
+   "why": "houston",
+   "status": "held: how far do you travel?"
+  }
+ ]
+}</script>
 </head>
 <body>
 <div class="nav"><div class="rail">
@@ -988,21 +1541,20 @@
 <!-- 04 campaigns and ad groups -->
 <section class="band" id="campaigns"><div class="rail">
   <div class="sh"><span class="kicker">Section 2</span><span class="aside" id="structureScore"></span><h2 class="display">The campaigns and ad groups</h2></div>
-  <div class="card" style="overflow-x:auto"><table id="campTable"></table><div class="note">One row per campaign: the money and the seven health checks together. Green row = beating your average, red row = well above it. Dots: green looks right &#183; yellow partly right &#183; red broken. Hover any ? for what a column means.</div></div>
-  <h3 class="sub display">Every campaign and ad group issue, one list</h3>
-  <div class="card"><div class="scrolllist" style="padding:8px 24px" id="campDetail"></div></div>
-  <div class="card" style="margin-top:14px"><div class="groups" id="structureGroups"></div></div>
-  <h3 class="sub display">Where the money went</h3>
   <div class="card">
     <div class="tabs" id="spendTabs">
-      <button data-t="spendGroup" class="on">By ad group</button>
+      <button data-t="campTable" class="on">By campaign</button>
+      <button data-t="spendGroup">By ad group</button>
       <button data-t="spendLoc">By location</button>
       <button data-t="spendDevice">By device</button>
     </div>
-    <div class="tabpane on" id="pane-spendGroup"><table id="spendGroup"></table></div>
+    <div class="tabpane on" id="pane-campTable" style="overflow-x:auto"><table id="campTable"></table></div>
+    <div class="tabpane" id="pane-spendGroup"><table id="spendGroup"></table></div>
     <div class="tabpane" id="pane-spendLoc"><table id="spendLoc"></table></div>
     <div class="tabpane" id="pane-spendDevice"><table id="spendDevice"></table></div>
+    <div class="note">Best cost per lead first on every tab. Green = 15% or more cheaper than your average, yellow = about average, red = 25% or more dearer.</div>
   </div>
+  <div class="card" style="margin-top:14px"><div class="groups" id="structureGroups"></div></div>
   <div id="campaignsFindings"></div>
 </div></section>
 
@@ -1011,11 +1563,14 @@
   <div class="sh"><span class="kicker">Section 3</span><span class="aside" id="creativeScore"></span><h2 class="display">The ads</h2></div>
   <div class="card"><div class="groups" id="creativeGroups"></div></div>
   <div id="adsIssues"></div>
-  <h3 class="sub display">How Google grades the ads</h3>
-  <div class="card" id="qualityAds"></div>
-  <h3 class="sub display">Is anything being tested?</h3>
-  <div class="card" id="testCard"></div>
-  <div class="card" style="margin-top:14px"><table id="perfTable"></table><div class="note" id="perfHead"></div></div>
+  <div class="card">
+    <div class="tabs" id="adTabs">
+      <button data-t="adPane" class="on">Every live ad, best first</button>
+      <button data-t="assetPane">Asset performance</button>
+    </div>
+    <div class="tabpane on" id="pane-adPane" style="overflow:auto;max-height:520px"><div id="adFilters" style="padding:12px 14px 4px"></div><table id="adTable" class="tbl"></table><div class="note" id="adTableNote"></div></div>
+    <div class="tabpane" id="pane-assetPane" style="overflow:auto;max-height:520px"><table id="assetTable" class="tbl"></table><div class="note">What each asset type earned over the last year. Coverage and status live in the "Assets by campaign" box below.</div></div>
+  </div>
   <div id="adsFindings"></div>
 </div></section>
 
@@ -1025,8 +1580,8 @@
   <div class="note" style="padding:0 0 12px" id="pagesVerdict"></div>
   <div class="card"><div class="groups" id="pagesGroups"></div></div>
   <div id="pagesIssues"></div>
-  <h3 class="sub display">How Google grades the pages</h3>
-  <div class="card" id="qualityPages"></div>
+  <h3 class="sub display">Every landing page, best first</h3>
+  <div class="card" style="overflow:auto;max-height:520px"><table id="pageTable" class="tbl"></table><div class="note" id="pageTableNote"></div></div>
   <div id="pagesFindings"></div>
 </div></section>
 
@@ -1034,10 +1589,8 @@
 <section id="keywords"><div class="rail">
   <div class="sh"><span class="kicker">Section 5</span><span class="aside" id="keywordsScore"></span><h2 class="display">The keywords and search terms</h2></div>
   <div class="card"><div class="groups" id="keywordsGroups"></div></div>
-  <h3 class="sub display">What is winning</h3>
-  <div class="card"><table id="workTable"></table><div class="note" id="workNote"></div></div>
   <h3 class="sub display">Searches to block</h3>
-  <div class="card"><table id="negTable"></table><div id="negCoverage"></div><div id="askFirst"></div></div>
+  <div class="card" style="overflow:auto;max-height:520px"><div class="tabs" id="negTabs"></div><table id="negTable" class="tbl"></table><div id="negCoverage"></div></div>
   <div id="keywordsFindings"></div>
 </div></section>
 
@@ -1056,7 +1609,7 @@
   const $ = id => document.getElementById(id) || { set innerHTML(v){}, set textContent(v){}, classList:{add(){},remove(){}}, style:{}, replaceWith(){} };
   const band = s => s===null||s===undefined ? 'bad' : s>=80?'good':s>=50?'warn':'bad';
   const col = { good:'#3d7a4a', warn:'#d4a017', bad:'#b53333' };
-  const money = n => (n===null||n===undefined) ? '-' : '$' + Number(n).toLocaleString('en-US');
+  const money = n => (n===null||n===undefined) ? '-' : '$' + Number(n).toLocaleString('en-US', Number.isInteger(Number(n)) ? {} : {minimumFractionDigits:2, maximumFractionDigits:2});
   const esc = s => String(s===null||s===undefined?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const scoreChip = (s, sm) => s===null||s===undefined ? ''
     : `<div class="score ${band(s)}${sm?' sm':''}"><span class="v">${s}</span><span class="u">/100</span></div>`;
@@ -1072,11 +1625,28 @@
     if (cpl == null) return { cls: (!conv && share>=10) ? 'flag' : '', txt: '<span class="k">no leads</span>' };
     if (!AVG) return { cls:'', txt:'' };
     const x = cpl / AVG;
-    if (x >= 1.5) return { cls:'flag',  txt:`<b style="color:#b53333">${x.toFixed(1)}x worse</b>` };
-    if (x <= 0.7) return { cls:'win',   txt:`<b style="color:#3d7a4a">${(1/x).toFixed(1)}x better</b>` };
-    return { cls:'', txt:`<span class="k">about average</span>` };
+    // green = 15% better or more · red = 25% worse or more · yellow = about average (Jono, 12 Sep 2026)
+    if (x >= 1.25) return { cls:'flag',  txt:`<b style="color:#b53333">${x.toFixed(1)}x worse</b>` };
+    if (x <= 0.85) return { cls:'win',   txt:`<b style="color:#3d7a4a">${(1/x).toFixed(1)}x better</b>` };
+    return { cls:'neutral', txt:`<span class="k" style="color:#8a6a0c">about average</span>` };
   }
 
+
+  // ---------- searches to block, tabbed per campaign (Jono, 12 Sep 2026) ----------
+  (function(){
+    const rows = D.blockRows||[]; const host = document.getElementById('negTable'); const tabs = document.getElementById('negTabs'); if (!host || !tabs) return;
+    const camps = [...new Set(rows.map(r=>r.campaign))].sort();
+    let cur = 'All';
+    const draw = () => {
+      const rs = rows.filter(r => cur==='All' || r.campaign===cur).sort((a,b)=>(b.cost||0)-(a.cost||0));
+      tabs.innerHTML = ['All'].concat(camps).map(c => '<button class="' + (c===cur?'on':'') + '" data-c="' + esc(c) + '">' + esc(c) + '</button>').join('');
+      tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { cur = b.dataset.c; draw(); }));
+      host.innerHTML = rs.length ? '<thead><tr><th>Search</th><th>Campaign</th><th>Clicks</th><th>Spent</th><th>Why</th><th>Status</th></tr></thead><tbody>' +
+        rs.map(r => '<tr><td>' + esc(r.term) + '</td><td><span class="k">' + esc(r.campaign) + '</span></td><td>' + r.clicks + '</td><td>' + money(r.cost) + '</td><td><span class="k">' + esc(r.why) + '</span></td><td>' + (r.status.startsWith('blocked') ? '<span style="color:var(--good)">' + tick + ' ' + esc(r.status) + '</span>' : '<span style="color:#8a6a0c">' + esc(r.status) + '</span>') + '</td></tr>').join('') + '</tbody>'
+        : '<tbody><tr><td class="k">Nothing to block from the searches seen.</td></tr></tbody>';
+    };
+    draw();
+  })();
   // ---------- shared: checklist group with passed checks folded away ----------
   let _uid = 0;
   function renderGroup(g){
@@ -1085,15 +1655,32 @@
     const id = 'grp' + (++_uid);
     const rows = g.checks.map(c => {
       const now = P ? c.b : c.a;
-      const quiet = now==='pass';
-      const tag = (!P && c.b!=='pass' && c.a==='pass') ? '<span class="tag fixed">fixed</span>' : '';
-      return `<div class="chk${quiet?' quiet':''}"><span class="dot ${now==='pass'?'pass':'fail'}">${now==='pass'?tick:''}</span><span>${esc(c.t)}${c.tip?qm(c.tip):''}${tag}</span></div>`;
+      const quiet = now==='pass' && g.fold!==false;
+      const tag = c.tag ? `<span class="st prog ${progCls(c.tag)}">${esc(c.tag)}</span>`
+        : (!P && c.b!=='pass' && c.a==='pass') ? '<span class="tag fixed">fixed</span>' : '';
+      const cost = c.cost!=null ? ` <span class="k">${money(c.cost)}/mo</span>` : '';
+      const who = c.who ? ` <span class="k">${esc(c.who)}</span>` : '';
+      const why = c.why ? ` <button class="whyb" onclick="var w=this.parentNode.nextSibling;w.hidden=!w.hidden;this.textContent=w.hidden?'why':'hide'">why</button>` : '';
+      const sub = (c.sub||c.why) ? `<div class="chksub">${esc(c.sub||'')}${why}</div>${c.why?`<div class="chkwhy" hidden>${esc(c.why)}</div>`:''}` : (c.subhtml ? `<div class="subs">${c.subhtml}</div>` : '');
+      return `<div class="chk${quiet?' quiet':''}"${c.id?` id="${c.id}"`:''}><span class="dot ${now==='pass'?'pass':'fail'}">${now==='pass'?tick:''}</span><span>${esc(c.t)}${c.tip?qm(c.tip):''}${tag}${cost}${who}${sub}</span></div>`;
     }).join('');
-    const toggle = passNow ? `<button class="showpass" onclick="var g=document.getElementById('${id}');g.classList.toggle('open');this.textContent=g.classList.contains('open')?'Hide the ${passNow} that pass':'Show the ${passNow} that pass'">Show the ${passNow} that pass</button>` : '';
+    const toggle = (passNow && g.fold!==false) ? `<button class="showpass" onclick="var g=document.getElementById('${id}');g.classList.toggle('open');this.textContent=g.classList.contains('open')?'Hide the ${passNow} ${g.passLabel||'that pass'}':'Show the ${passNow} ${g.passLabel||'that pass'}'">Show the ${passNow} ${g.passLabel||'that pass'}</button>` : '';
     return `<div class="grp" id="${id}"><h4><span>${esc(g.name)}</span><span class="k">${passNow} / ${total} pass</span></h4>${rows}${toggle}</div>`;
+  }
+  // true masonry (Jono, 12 Sep 2026): three columns, each box goes into whichever column is shortest
+  function masonry(host){
+    const boxes = [...host.querySelectorAll(':scope > .grp')]; if (!boxes.length) return;
+    const n = Math.min(3, Math.max(1, boxes.length)); const cols = [];
+    for (let i = 0; i < n; i++) { const c = document.createElement('div'); c.className = 'mcol'; cols.push(c); }
+    // measure every box first, place the tallest first, each into the shortest column: columns come out even
+    const sized = boxes.map(b => ({ b, h: b.offsetHeight })).sort((x, y) => y.h - x.h);
+    const heights = cols.map(() => 0);
+    sized.forEach(({ b, h }) => { let i = 0; for (let k = 1; k < cols.length; k++) if (heights[k] < heights[i]) i = k; cols[i].appendChild(b); heights[i] += h; });
+    host.innerHTML = ''; cols.forEach(c => host.appendChild(c));
   }
   function renderGroups(el, groups){
     const host = $(el);
+    host.classList.toggle('few', !!(groups && groups.length && groups.length <= 3));   // 3 boxes or fewer sit side by side
     host.innerHTML = (groups && groups.length) ? groups.map(renderGroup).join('')
       : '<div class="grp"><div class="chk"><span class="dot na"></span><span>Not read this run.</span></div></div>';
   }
@@ -1184,10 +1771,81 @@
       l.items.slice(0,10).map(row).join('') +
       (n > Math.min(l.items.length,10) ? `<div class="chk"><span class="k">the full list of ${n} is in audit-report.md</span></div>` : '') + `</details>`;
   }
+  const progCls = p => (p==='fixed'?'pfixed':p==='bigger build'?'pbuild':p==='website access'?'psite':p.indexOf('click')>=0?'phands':p==='no action'?'pnone':'pyou');
+  const LEGEND = `<div class="legend"><span class="lg"><b>I can fix:</b> <span class="st prog pfixed">fixed</span> done and read back · <span class="st prog pbuild">bigger build</span> by API, needs your yes · <span class="st prog psite">website access</span> the moment I can edit ${esc(D.domain)}</span><span class="lg"><b>Out of my hands:</b> <span class="st prog phands">click needed</span> the API refuses, recipe in "Needs your hands" below · <span class="st prog pyou">your proof</span> needs your words or numbers</span></div>`;
+  // Every finding is ONE checkbox row inside its section's grid (Jono, 12 Sep 2026) - the
+  // index at the top links to that row. Fixed = ticked, never hidden.
+
+  // ---------- nested boxes (Jono, 12 Sep 2026): one line per thing, instances as a compact sub-line ----------
+  const short = n => String(n||'').replace(/ - Ads \d.*$/,'').replace(/^Weddings - /,'').replace(/^Leads-Performance-/,'PMax ');
+  function nestedGroup(name, parents){
+    parents = parents.filter(p => p.subs.length);
+    if (!parents.length) return null;
+    const rows = parents.map(p => {
+      const okN = p.subs.filter(s=>s.ok||s.done).length, n = p.subs.length;
+      const allOk = okN===n; const fixedN = p.subs.filter(s=>s.done).length;
+      return { t: p.t + (allOk ? '' : ': ' + (n-okN) + ' of ' + n + ' missing'), b: allOk && !fixedN ? 'pass':'fail', a: allOk ? 'pass':'fail',
+        tag: allOk ? null : (p.tag||null),
+        subhtml: (function(){ const miss = p.subs.filter(s=>!(s.ok||s.done)), pass = p.subs.filter(s=>(s.ok||s.done));
+          const row = s => '<span class="sub ' + ((s.ok||s.done)?'ok':'no') + '">' + ((s.ok||s.done)?tick:'&#10005;') + ' ' + esc(s.t) + '</span>';
+          const id = 'sp' + (++_uid);
+          return miss.map(row).join('') + (pass.length ? '<span class="sub more" onclick="var e=document.getElementById(\'' + id + '\');e.hidden=!e.hidden;this.textContent=e.hidden?\'+ ' + pass.length + ' pass\':\'hide\'">+ ' + pass.length + ' pass</span><span id="' + id + '" hidden>' + pass.map(row).join('') + '</span>' : ''); })() };
+    });
+    return { name, checks: rows };
+  }
+  function assetsNested(){
+    const by = {};
+    allIssues.filter(([,is]) => is.cat==='assets').forEach(([cn,is]) => { const k = is.what.split(':')[0]; (by[k]=by[k]||{t:k, tag:null, subs:[]}).subs.push({ t: short(cn), ok: !!is.ok, done: !!is.done }); if (!is.ok && !is.done && is.tag && is.tag!=='fixed') by[k].tag = is.tag; });
+    return nestedGroup('Assets by campaign', Object.values(by));
+  }
+  function adsNested(){
+    const by = {};
+    allIssues.filter(([,is]) => is.cat==='ads').forEach(([cn,is]) => { const k = short(cn); const g = is.what.split(':')[0]; (by[k]=by[k]||{t:k, tag:is.tag, subs:[]}).subs.push({ t: g, ok: !!is.ok, done: !!is.done }); });
+    Object.values(by).forEach(p => { p.t = p.t + ' - split tests'; });
+    return nestedGroup('Ads by ad group', Object.values(by));
+  }
+  function buildNested(){
+    const LBL = { 'city in pinned headline 1':'City pinned in headline 1', 'pinned headline 1 exists':'A pinned first headline', 'keyword in a headline':'Keyword in a headline', '15 headlines':'15 headlines', '4 descriptions':'4 descriptions', 'not over-pinned (3 or fewer pins)':'Not over-pinned', 'dedicated landing page, not the homepage':'Lands on a dedicated page, not the homepage', 'page names the city':'Page path names the city', 'display path filled':'Display path filled' };
+    const by = {};
+    if ((D.adBuildAll||[]).length) {
+      D.adBuildAll.forEach(a => Object.entries(a.checks||{}).forEach(([k,ok]) => { const lbl = LBL[k]||k; (by[lbl]=by[lbl]||{t:lbl, tag: (k==='15 headlines'||k==='4 descriptions')?'your proof':'bigger build', subs:[]}).subs.push({ t: short(a.campaign) + ' ' + a.ad_group, ok: !!ok, done:false }); }));
+    } else {
+      (D.adBuild||[]).forEach(b => (b.fails||[]).forEach(f => { const k = LBL[f]||f; (by[k]=by[k]||{t:k, tag: (f==='15 headlines'||f==='4 descriptions')?'your proof':'bigger build', subs:[]}).subs.push({ t: short(b.campaign) + ' ' + (b.what.split(' ad ')[0]||''), ok:false, done: !!b.done }); }));
+    }
+    return nestedGroup('Ad build, by ad', Object.values(by));
+  }
+  function tightnessNested(){
+    const T = D.tightness||{}; const Q = D.googleGrades||{};
+    return nestedGroup('Google\'s grades by ad group', [
+      { t:'Expected click-through: no keyword rated below average by Google', tag:'your proof', subs:(Q.ctr||[]) },
+      { t:'Ad relevance: no keyword rated below average by Google (a failing group needs a headline that says the keyword, or a tighter group)', tag:'bigger build', subs:(Q.rel||[]) } ]);
+  }
+  function lpNested(){
+    const Q = D.googleGrades||{}; if (!(Q.lp_pages||[]).length) return null;
+    return nestedGroup('Landing page experience, as Google grades it', [ { t:'No keyword landing here is rated below average', tag:'website access', subs:Q.lp_pages } ]);
+  }
+  function kwCountNested(){
+    const K = D.keywordCounts||[]; if (!K.length) return null;
+    return nestedGroup('Keywords per ad group', [ { t:'At least 5 keywords per ad group (one keyword is single-keyword debt; there is no upper limit, relevance is judged by Google\'s grade)', tag:'bigger build', subs:K } ]);
+  }
+  function findGroup(section){
+    const rows = leaks.map((l,i)=>[l,i]).filter(([l])=> (SECT[l.section]?l.section:'campaigns')===section);
+    if (!rows.length) return null;
+    return { name:'Findings in this section', passLabel:'fixed', checks: rows.map(([l,i])=>({
+      t:l.name, b:'fail', a:(l.progress==='fixed')?'pass':'fail', tag:l.progress||null, cost:l.monthly, who:l.who||null,
+      id:'leak'+i, sub:l.fix||'', why:l.detail||'' })) };
+  }
+  function issueGroup(cats, name){
+    const rows = allIssues.filter(([,is]) => cats.includes(is.cat));
+    if (!rows.length) return null;
+    return { name, checks: rows.map(([cn,is])=>({
+      t: cn.replace(/ - Ads \d.*$/,'') + ' · ' + is.what, b: is.ok?'pass':'fail', a: (is.ok||is.done)?'pass':'fail', cost: is.cost||null, tag: is.tag||null })) };
+  }
+  const withExtra = (groups, extra) => (groups||[]).concat(extra.filter(Boolean));
   function findingCard(l, i){
     return `<div class="leak ${l.status}" id="leak${i}">
       <div>
-        <div class="nm">${esc(l.name)}${l.urgent?'<span class="st urgent">urgent</span>':''}<span class="st ${l.status}">${l.status==='settings'?'settings':(l.status==='stopped'&&!P)?'stopped':'open'}</span></div>
+        <div class="nm">${esc(l.name)}${l.urgent?'<span class="st urgent">urgent</span>':''}<span class="st ${l.progress?'prog '+progCls(l.progress):l.status}">${l.progress?esc(l.progress):(l.status==='settings'?'settings':(l.status==='stopped'&&!P)?'stopped':'open')}</span></div>
         <div class="dt"><b>What:</b> ${esc(l.detail)}</div>
         <div class="fx"><b>The fix:</b> ${esc(l.fix)}${l.who?` <span class="k">${esc(l.who)}${l.time?' · '+esc(l.time):''}</span>`:''}</div>
         <div class="ev">${esc(l.evidence||'')}</div>
@@ -1203,17 +1861,17 @@
   const skipCard = l => l.section === 'account' || l.noCard;
   const bySection = {};
   leaks.forEach((l,i) => { const s = SECT[l.section] ? l.section : 'campaigns'; (bySection[s]=bySection[s]||[]).push([l,i]); });
-  Object.keys(SECT).forEach(s => {
-    const list = (bySection[s]||[]).filter(([l])=>!skipCard(l));
-    if (!list.length) return;
-    $(SECT[s]).innerHTML = `<h3 class="sub display">Found in this section</h3><div class="card">` +
-      list.map(([l,i])=>findingCard(l,i)).join('') + `</div>`;
-  });
+  // finding cards retired 12 Sep 2026 - each finding is a checkbox row in its section grid
 
   // fix-first index: one line per finding, dollars ranked, linking down to the card
   const SECTLBL = { account:'account', campaigns:'campaigns', ads:'ads', pages:'landing pages', keywords:'keywords' };
+  $('fixIndex').insertAdjacentHTML('beforebegin', LEGEND);
+  if ((D.byHand||[]).length) {
+    $('fixIndex').insertAdjacentHTML('afterend', `<div class="card" style="margin-top:22px;padding:18px 24px"><h3 class="sub display" style="margin:0 0 4px">${D.byHand.length} thing${D.byHand.length>1?'s':''} need${D.byHand.length>1?'':'s'} your hands</h3><p class="lead" style="color:var(--body);font-size:13.5px;margin:0 0 10px">The API cannot do these. Message Claude when you are ready and we walk through every step together, one at a time.</p>` +
+      D.byHand.map((h,i)=>`<div class="chk"><span class="dot fail"></span><span><b>${esc(h.title.replace(/^[A-Z]\. /,''))}</b><div class="chksub">${esc(h.path.split('→').slice(0,3).join('→'))}${h.path.split('→').length>3?' → …':''}</div></span></div>`).join('') + `</div>`);
+  }
   $('fixIndex').innerHTML = leaks.map((l,i) =>
-    `<a class="fx1" href="${skipCard(l)?'#'+(SECT[l.section]?l.section:'campaigns'):'#leak'+i}"><span class="r">${i+1}</span>${sevDial(l.severity)}<span class="i">${esc(l.name)}${l.urgent?' <span class="st urgent">urgent</span>':''}</span><span class="w">${esc(SECTLBL[l.section]||'')}${l.who?' · '+esc(l.who):''}</span><span class="c${l.monthly==null?' set':''}">${l.monthly==null?(l.status==='settings'?'settings':'not priced'):money(l.monthly)+'/mo'}</span></a>`).join('');
+    `<a class="fx1${l.progress==='fixed'?' done':''}" href="#leak${i}"><span class="r">${i+1}</span>${sevDial(l.severity)}<span class="i">${esc(l.name)}${l.urgent?' <span class="st urgent">urgent</span>':''}${l.progress?' <span class="st prog '+progCls(l.progress)+'">'+esc(l.progress)+'</span>':''}</span><span class="w">${esc(SECTLBL[l.section]||'')}${l.who?' · '+esc(l.who):''}</span><span class="c${l.monthly==null?' set':''}">${l.monthly==null?(l.status==='settings'?'settings':'not priced'):money(l.monthly)+'/mo'}</span></a>`).join('');
   // no total row here - the money-at-risk figure at the top is the ONE place a total appears,
   // and per-finding dollars can overlap so summing them would overstate.
 
@@ -1234,7 +1892,7 @@
         { t:`Break-even is ${money(E.breakEven)} a lead${AVG!=null?' and you pay '+money(AVG):''}`,
           b:(AVG!=null&&E.breakEven!=null&&AVG>E.breakEven)?'fail':'pass',
           a:(AVG!=null&&E.breakEven!=null&&AVG>E.breakEven)?'fail':'pass' } ] };
-  renderGroups('accountGroups', sGroups.concat([econGroup]));
+  renderGroups('accountGroups', withExtra(sGroups.concat([econGroup]), [findGroup('account')]));
   $('accountScore').innerHTML = scoreChip(score(['settings']), true);
 
   // The tracking story is told ONCE: the checklist above plus this one note. The full
@@ -1251,7 +1909,6 @@
   // every check column explains itself on hover, in 15-year-old words
   const CATS = [
     ['budget','Budget','Is the daily budget right - not starving a winner, not feeding a loser?'],
-    ['tracking','Tracking','Are this campaign’s leads being counted properly? Yellow means partly - forms count but phone calls do not.'],
     ['ads','Ads','Does every ad group have two full ads competing against each other?'],
     ['assets','Assets','The extras on the ad - sitelinks, callouts, snippets, call button, logo - attached and correct at the ad-group level.'],
     ['page','Landing page','Does the page the click lands on repeat what the ad promised?'],
@@ -1267,16 +1924,21 @@
   };
   const qm = tip => `<span class="qm" data-tip="${esc(tip)}">?</span>`;
   const STATE = { ok:'looks right', warn:'partly right', bad:'broken' };
+  const shortWhat = w => { const s = String(w||'').replace(/^(Bleeding|Cheap):\s*/,''); const i = s.indexOf('. '); return i>0 && i<90 ? s.slice(0,i) : s.slice(0,90); };
+  const openNow = c => {
+    const items = (c.issues||[]).filter(is => !is.done && is.level!=='good').map(is => shortWhat(is.what));
+    return items.length ? items.map(t=>`<span class="oi">${esc(t)}</span>`).join('') : '<span class="k" style="color:var(--good)">nothing</span>';
+  };
   $('campTable').innerHTML =
     `<thead><tr><th>Campaign</th><th>Spend</th><th>Share of spend${qm('Its slice of everything spent this month.')}</th><th>Leads</th><th>Cost / lead</th>` +
-    CATS.map(([,l,tip])=>`<th style="text-align:center">${l}${qm(tip)}</th>`).join('') + `</tr></thead><tbody>` +
-    camps.map(c => {
+    `</tr></thead><tbody>` +
+    camps.slice().sort((a,b)=> (a.cpl==null?1e9:a.cpl) - (b.cpl==null?1e9:b.cpl)).map(c => {  // best cost per lead first (Jono, 12 Sep 2026)
       const ch = c.checks || {}; const v = vsAvg(c.cpl, c.conv, 0);
       const share = (D.spend && c.spend!=null) ? Math.round(c.spend/D.spend*100) + '%' : '-';
       return `<tr${v.cls?' class="'+v.cls+'"':''}${c.status==='Paused'?' style="opacity:.55"':''}>` +
         `<td>${esc(c.name)}${c.status==='Paused'?' <span class="k">paused</span>':''}</td>` +
         `<td>${money(c.spend)}</td><td>${share}</td><td>${c.conv!=null?c.conv:'-'}</td><td>${c.cpl==null?'-':money(c.cpl)} ${v.txt||''}</td>` +
-        CATS.map(([k,l])=>`<td style="text-align:center">${cell(ch[k], l+': '+(ch[k]==null?'not checked':STATE[ch[k]]||ch[k]))}</td>`).join('') + `</tr>`;
+        `</tr>`;
     }).join('') + `</tbody>`;
   // one flat list per SECTION, routed by category. Campaign/ad-group issues stay here
   // (budget, structure, settings, assets - assets are an ad-group thing); `ads` rows render
@@ -1291,21 +1953,13 @@
   };
   const CAMP_CATS = ['budget','structure','settings','assets'];
   const campRows = allIssues.filter(([,is]) => CAMP_CATS.includes(is.cat));
-  $('campDetail').innerHTML = campRows.length ? campRows.map(issueRow).join('')
-    : '<div class="chk"><span class="dot pass">'+tick+'</span><span>No campaign has an open issue.</span></div>';
-  const adsRows = allIssues.filter(([,is]) => is.cat === 'ads');
-  if (adsRows.length) $('adsIssues').innerHTML =
-    `<h3 class="sub display">Ad issues by ad group</h3><div class="card"><div class="scrolllist" style="padding:8px 24px">${adsRows.map(issueRow).join('')}</div></div>`;
-  const pageRows = allIssues.filter(([,is]) => is.cat === 'page');
-  if (pageRows.length) $('pagesIssues').innerHTML =
-    `<h3 class="sub display">Page issues by campaign</h3><div class="card"><div class="scrolllist" style="padding:8px 24px">${pageRows.map(issueRow).join('')}</div></div>`;
-  renderGroups('structureGroups', (D.structure||{}).groups);
+  renderGroups('structureGroups', withExtra((D.structure||{}).groups, [issueGroup(CAMP_CATS,'By campaign and ad group'), findGroup('campaigns')]));
   $('structureScore').innerHTML = scoreChip(score(['structure']), true);
 
   function spendTable(rows, label){
     if (!rows || !rows.length) return `<tbody><tr><td class="k">Not measured.</td></tr></tbody>`;
     return `<thead><tr><th>${label}</th><th>Spend</th><th>Share</th><th>Leads</th><th>Cost / lead</th><th>vs avg${AVG?' ('+money(AVG)+')':''}</th></tr></thead><tbody>` +
-      rows.map(r=>{ const v=vsAvg(r.cpl, r.conv, r.share);
+      rows.slice().sort((a,b)=> (a.cpl==null?1e9:a.cpl) - (b.cpl==null?1e9:b.cpl)).map(r=>{ const v=vsAvg(r.cpl, r.conv, r.share);  // best first (Jono, 12 Sep 2026)
         return `<tr${v.cls?' class="'+v.cls+'"':''}><td>${esc(r.name)}</td><td>${money(r.spend)}</td><td>${r.share}%</td><td>${r.conv}</td><td>${r.cpl==null?'-':money(r.cpl)}</td><td>${v.txt}</td></tr>`;
       }).join('') + `</tbody>`;
   }
@@ -1315,15 +1969,21 @@
   $('spendLoc').innerHTML   = spendTable(sb.byLocation,'Location');
   $('spendDevice').innerHTML = spendTable(sb.byDevice,'Device');
   (function(){
+    const adTabs = document.getElementById('adTabs');
+    if (adTabs) adTabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      adTabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
+      ['adPane','assetPane'].forEach(t => { const el = document.getElementById('pane-'+t); if (el) el.classList.toggle('on', t===b.dataset.t); });
+    }));
     const tabs = document.getElementById('spendTabs');
     if (tabs) tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
       tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
-      ['spendGroup','spendLoc','spendDevice'].forEach(t => document.getElementById('pane-'+t).classList.toggle('on', t===b.dataset.t));
+      ['campTable','spendGroup','spendLoc','spendDevice'].forEach(t => { const el = document.getElementById('pane-'+t); if (el) el.classList.toggle('on', t===b.dataset.t); });
     }));
   })();
 
   // ---------- 05 the ads ----------
-  renderGroups('creativeGroups', (D.creative||{}).groups);
+  const buildGroup = (D.adBuild||[]).length ? { name:'Ad build, by ad', checks:(D.adBuild||[]).map(b=>({ t: b.campaign.replace(/ - Ads \d.*$/,'') + ' · ' + b.what, b:'fail', a: b.done?'pass':'fail', tag: b.tag||null })) } : null;
+  renderGroups('creativeGroups', withExtra((D.creative||{}).groups, [adsNested(), assetsNested(), buildNested(), tightnessNested(), findGroup('ads')]));
   $('creativeScore').innerHTML = scoreChip(score(['creative']), true);
 
   // Quality Score components live INSIDE the sections they describe, as full distributions -
@@ -1346,13 +2006,13 @@
   const QC = qComponents();
   // each bar's tooltip names the fix that moves it above average - the audit's job is to
   // move every keyword out of the red segment
-  $('qualityAds').innerHTML = !QC
+  (document.getElementById('qualityAds')||{}).innerHTML = !QC
     ? '<div class="chk" style="padding:14px 20px"><span class="dot na"></span><span>Quality Score components were not read this run.</span></div>'
     : `<div style="padding:14px 20px">${distRow('Expected click-through rate', QC.expectedCtr, Q.rated,
         'Moved up by better headlines: the keyword in headline 1, a number, a real offer. The ad rebuild in /write-ads targets exactly this.')}${distRow('Ad relevance', QC.adRelevance, Q.rated,
         'Moved up by tighter ad groups - one theme per group, so the ad can repeat the keyword. The recluster in /keywords stag fixes this.')}
        <div class="dist dk">${Q.rated} keywords rated · Google says Quality Score is a diagnostic, not an auction input</div></div>`;
-  $('qualityPages').innerHTML = !QC
+  (document.getElementById('qualityPages')||{}).innerHTML = !QC
     ? '<div class="chk" style="padding:14px 20px"><span class="dot na"></span><span>Not read this run.</span></div>'
     : `<div style="padding:14px 20px">${distRow('Landing page experience', QC.landingPage, Q.rated,
         'Moved up when the page repeats the search - name the service and the city at the top. The /landing-page fix targets this.')}
@@ -1373,18 +2033,61 @@
     if (solo.length) tHtml += `<details class="fold"><summary>The ${solo.length} single-ad groups</summary>` +
       solo.map(g=>`<div class="chk" style="padding-left:20px"><span class="dot fail"></span><span>${esc(g.name)} <span class="k">${money(g.spend)} spent</span></span></div>`).join('') + `</details>`;
   }
-  $('testCard').innerHTML = tHtml;
+  (document.getElementById('testCard')||{}).innerHTML = tHtml;
   const outs = (D.adPerformance||{}).outliers||[];
-  $('perfTable').innerHTML = outs.length
+  if (document.getElementById('perfTable')) $('perfTable').innerHTML = outs.length
     ? `<thead><tr><th>Ad group</th><th>What is wrong</th><th>CTR</th><th>Conv rate</th><th>Spend</th></tr></thead><tbody>` +
       outs.map(o=>`<tr><td>${esc(o.adGroup)}</td><td>${esc(o.issue)}</td><td>${o.ctr}%</td><td>${o.cvr==null?'-':o.cvr+'%'}</td><td>${money(o.spend)}</td></tr>`).join('') + `</tbody>`
     : `<tbody><tr><td class="k">No ad group is an outlier against the account average.</td></tr></tbody>`;
-  $('perfHead').textContent = '';
+  if (document.getElementById('perfHead')) $('perfHead').textContent = '';
 
+
+
+  // ---------- ads table (Jono, 12 Sep 2026): one row per live ad, best cost per lead first ----------
+  function renderAdTable(){
+    const A = D.adTable; const host = document.getElementById('adTable'); if (!host) return;
+    if (!A || !(A.ads||[]).length) { host.innerHTML = '<tbody><tr><td class="k">Not read this run.</td></tr></tbody>'; return; }
+    const av = A.avg||{};
+    const F = window.__adFilter || { campaign:'', group:'' };
+    const camps = [...new Set(A.ads.map(r=>r.campaign.replace(/ - Ads \d.*$/,'')))].sort();
+    const groups = [...new Set(A.ads.filter(r=>!F.campaign || r.campaign.replace(/ - Ads \d.*$/,'')===F.campaign).map(r=>r.ad_group))].sort();
+    const sel = (id, label, opts, cur) => '<label class="k" style="margin-right:14px">' + label + ' <select onchange="window.__adFilterSet(\'' + id + '\', this.value)"><option value="">All</option>' + opts.map(o=>'<option value="'+esc(o)+'"'+(o===cur?' selected':'')+'>'+esc(o)+'</option>').join('') + '</select></label>';
+    const bar = document.getElementById('adFilters'); if (bar) bar.innerHTML = sel('campaign','Campaign',camps,F.campaign) + sel('group','Ad group',groups,F.group);
+    window.__adFilterSet = (k, v) => { window.__adFilter = Object.assign({}, F, {[k]: v}, k==='campaign'?{group:''}:{}); renderAdTable(); };
+    const rows = A.ads.filter(r => (!F.campaign || r.campaign.replace(/ - Ads \d.*$/,'')===F.campaign) && (!F.group || r.ad_group===F.group));
+    rows.forEach(r => { r.ctr = r.impressions ? 100*r.clicks/r.impressions : 0; r.cvr = r.clicks ? 100*r.conv/r.clicks : 0; r.cpc = r.clicks ? r.cost/r.clicks : null; r.cpl = r.conv ? r.cost/r.conv : null; });
+    const sortKey = window.__adSort || 'cpl';
+    const thin = r => r.clicks < 29 ? 1 : 0;   // proven ads first, thin ones below them
+    rows.sort((a,b)=> thin(a)-thin(b) || (a[sortKey]==null?1e9:a[sortKey]) - (b[sortKey]==null?1e9:b[sortKey]));
+    window.__adSortBy = k => { window.__adSort = k; renderAdTable(); };
+    const status = r => {
+      const ul = (head, items, color) => '<b style="color:' + color + '">' + head + '</b><ul class="todo">' + items.map(i=>'<li>'+i+'</li>').join('') + '</ul>';
+      const fixKey = Object.keys(A.recentFix||{}).find(k => r.campaign.indexOf(k) === 0);
+      if (fixKey) return { cls:'neutral', txt: ul('Re-read after the fix', [A.recentFix[fixKey], 'judge it again at 30 days on the new traffic', 'no rewrite until then'], '#8a6a0c') };
+      if (r.clicks < 29) return { cls:'', txt: ul('Leave it', ['under 29 clicks, nothing to judge', 'next audit re-reads it'], 'var(--muted)') };
+      if (av.cvr && r.cvr <= 0.85*av.cvr) return { cls:'flag', txt: ul('Replace it', ['I write a challenger from your proof', 'it lands paused, you switch it on', 'loser pauses at 30 days'], '#b53333') + '<span class="st prog pyou">your proof</span>' };
+      if (av.cvr && r.cvr >= 1.15*av.cvr) return { cls:'win', txt: ul('Keep it', ['the champion in its ad group', 'never pause it', 'test challengers against it'], '#3d7a4a') };
+      return { cls:'neutral', txt: ul('Leave it for now', ['about average', 'next test candidate after the red rows'], '#8a6a0c') };
+    };
+    document.getElementById('adTableNote').textContent = rows.length + (F.campaign||F.group?' of '+A.ads.length:'') + ' live ads over ' + (A.window||'the window') + '. Account average for ads: ' + av.ctr + '% click-through, ' + av.cvr + '% conversion rate, ' + money(av.cpl) + ' a lead. Sorted by ' + (sortKey==='cpc'?'cost per click':'cost per lead') + ', best first, with ads under 29 clicks listed after the proven ones; click either cost column to switch. Cost per lead is cost per click divided by conversion rate, so it is the click price and the page in one number. The two Google grades are per keyword, rolled up to the ad\'s group: ticked when Google rates no keyword there below average, since those grades set the click price.';
+    const grade = (r, k) => { const g = ((A.groupGrades||{})[short(r.campaign) + ' ' + r.ad_group] || {})[k]; return g===undefined ? '<td><span class="k">-</span></td>' : (g ? '<td><span style="color:#b53333">&#10005; ' + esc(g.replace(/ below$/,'')) + ' keywords below average</span></td>' : '<td><span style="color:#3d7a4a">' + tick + ' no keyword below average</span></td>'); };
+    const th = (k, label) => '<th class="sortable' + (sortKey===k?' on':'') + '" onclick="window.__adSortBy(\'' + k + '\')">' + label + (sortKey===k?' &#9660;':'') + '</th>';
+    host.innerHTML = '<thead><tr><th>Campaign</th><th>Ad group</th><th>Clicks</th><th>Leads</th><th>Click-through</th><th>Conversion rate</th>' + th('cpc','Cost / click') + th('cpl','Cost / lead') + '<th>Google: click-through grade</th><th>Google: ad relevance</th><th>What to do</th></tr></thead><tbody>' +
+      rows.map(r => { const st = status(r); return '<tr' + (st.cls?' class="'+st.cls+'"':'') + '><td>' + esc(r.campaign.replace(/ - Ads \d.*$/,'')) + '</td><td>' + esc(r.ad_group) + '</td><td>' + r.clicks + '</td><td>' + (r.conv||0) + '</td><td>' + r.ctr.toFixed(1) + '%</td><td>' + r.cvr.toFixed(1) + '%</td><td>' + (r.cpc==null?'-':money(r.cpc)) + '</td><td>' + (r.cpl==null?'-':money(r.cpl)) + '</td>' + grade(r,'ctr') + grade(r,'rel') + '<td>' + st.txt + '</td></tr>'; }).join('') + '</tbody>';
+  }
+  renderAdTable();
+  // ---------- ad assets table (Jono, 12 Sep 2026): every asset type, coverage across live campaigns, what it earned ----------
+  (function(){
+    const rows = D.assetTable||[]; const host = document.getElementById('assetTable'); if (!host) return;
+    if (!rows.length) { host.innerHTML = '<tbody><tr><td class="k">Not read this run.</td></tr></tbody>'; return; }
+    const rs = rows.slice().sort((a,b)=>(b.conv||0)-(a.conv||0) || (b.clicks||0)-(a.clicks||0));
+    host.innerHTML = `<thead><tr><th>Asset</th><th>Required</th><th>Impressions, 365 days</th><th>Clicks</th><th>Leads</th></tr></thead><tbody>` +
+      rs.map(r => `<tr><td><b>${esc(r.name)}</b></td><td><span class="k">${esc(r.need)}</span></td><td>${(r.impressions||0).toLocaleString()}</td><td>${(r.clicks||0).toLocaleString()}</td><td>${r.conv||0}</td></tr>`).join('') + `</tbody>`;
+  })();
   // ---------- 06 the landing pages ----------
   // The verdict on a page is its conversion rate and cost per lead - the checklist below is
   // leverage for pushing those further, never a grade that overrules good performance.
-  renderGroups('pagesGroups', (D.pages||{}).groups);
+  renderGroups('pagesGroups', withExtra((D.pages||{}).groups, [pagesNested(), issueGroup(['page'],'By campaign'), lpNested(), findGroup('pages')]));
   $('pagesScore').innerHTML = scoreChip(score(['pages']), true);
   (function(){
     const bits = [];
@@ -1393,14 +2096,32 @@
     if (bits.length) $('pagesVerdict').textContent = bits.join(' · ') + '. That is the verdict - the checklist below is how to push it further, not a grade.';
   })();
 
+
+
+  // ---------- landing pages (Jono, 12 Sep 2026): a table per page + one nested box per check, like the ads section ----------
+  function shortUrl(u){ return String(u||'').replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,'') || '/'; }
+  (function(){
+    const P = D.pageScores||[]; const host = document.getElementById('pageTable'); if (!host) return;
+    if (!P.length) { host.innerHTML = '<tbody><tr><td class="k">Not read this run.</td></tr></tbody>'; return; }
+    const rows = P.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+    const band = s => s>=80?'win':s>=60?'neutral':'flag';
+    host.innerHTML = '<thead><tr><th>Page</th><th>Used by</th><th>Score</th><th>Proof</th><th>Loads in</th><th>Leads per 100 clicks</th><th>Jobs</th><th>Earned</th><th>Spent</th></tr></thead><tbody>' +
+      rows.map(p => { const x = p.per100||{}; return '<tr class="' + band(p.score) + '"><td><a href="' + esc(p.url) + '" target="_blank" style="color:var(--ink)">' + esc(shortUrl(p.url)) + '</a></td><td><span class="k">' + (p.groups||[]).length + ' ad group' + ((p.groups||[]).length===1?'':'s') + '</span></td><td><b>' + p.score + '</b>/100</td><td>' + esc(p.proof||'') + '</td><td>' + p.load_s + 's</td><td>' + (x.leads!=null?x.leads:'-') + '</td><td>' + (x.jobs!=null?x.jobs:'-') + '</td><td>' + (x.money!=null?money(x.money):'-') + '</td><td>' + (x.cost!=null?money(x.cost):'-') + '</td></tr>'; }).join('') + '</tbody>';
+    document.getElementById('pageTableNote').textContent = rows.length + ' live landing pages, best score first, on the 16-point checklist (proof counts double). Jobs and money use the close rate and booking value on file (assumptions, not Google data).';
+  })();
+  function pagesNested(){
+    const P = D.pageScores||[]; if (!P.length) return null; const by = {};
+    P.forEach(p => (p.checks||[]).forEach(c => { (by[c.t]=by[c.t]||{t:c.t + (c.kind==='proof'?' (proof, counts double)':''), tag:'website access', subs:[]}).subs.push({ t: shortUrl(p.url), ok: !!c.pass, done:false }); }));
+    return nestedGroup('Landing pages, by check', Object.values(by));
+  }
   // ---------- 07 keywords and search terms ----------
-  renderGroups('keywordsGroups', (D.keywords||{}).groups);
+  renderGroups('keywordsGroups', withExtra((D.keywords||{}).groups, [kwCountNested(), findGroup('keywords')]));
   $('keywordsScore').innerHTML = scoreChip(score(['keywords']), true);
 
   const wk = D.working||{};
   const wrows = [].concat((wk.keywords||[]).map(k=>['Keyword',k]), (wk.terms||[]).map(k=>['Search term',k]));
   wrows.sort((a,b)=> (a[1].cpl||1e9) - (b[1].cpl||1e9));
-  $('workTable').innerHTML = wrows.length
+  (document.getElementById('workTable_old')||{}).innerHTML = wrows.length
     ? `<thead><tr><th>Winner</th><th>Kind</th><th>Leads</th><th>Cost / lead</th><th>Verdict</th></tr></thead><tbody>` +
       wrows.map(([kind,k])=>{
         const x = (AVG && k.cpl) ? k.cpl/AVG : null;
@@ -1412,7 +2133,7 @@
       }).join('') + `</tbody>`
     : `<tbody><tr><td class="k">No converting keywords yet.</td></tr></tbody>`;
   const bc = wk.bestCampaign;
-  $('workNote').textContent = [
+  (document.getElementById('workNote_old')||{}).textContent = [
     (AVG && wk.note) ? wk.note : '',
     bc ? `Best campaign: ${bc.name} at ${money(bc.cpl)} a lead${bc.capped?' - budget-capped, the clearest place to spend more':''}.` : ''
   ].filter(Boolean).join(' ');
@@ -1420,7 +2141,7 @@
   const ng = D.negatives||{};
   const ready = (ng.ready||[]).slice(0,100);
   const readyMore = (ng.ready||[]).length - ready.length;
-  $('negTable').innerHTML = ready.length
+  (document.getElementById('negTable_old')||{}).innerHTML = ready.length
     ? `<thead><tr><th>Negative</th><th>Match</th><th>Add at</th><th>Why</th></tr></thead><tbody>` +
       ready.map(n=>`<tr><td>${esc(n.term)}</td><td><span class="k">${esc(n.match)}</span></td><td><span class="k">${esc(n.level)}</span></td><td><span class="k">${esc(n.why||'')}</span></td></tr>`).join('') +
       (readyMore>0?`<tr><td colspan="4" class="k">+ ${readyMore} more in audit-report.md</td></tr>`:'') + `</tbody>`
@@ -1430,7 +2151,7 @@
     $('negCoverage').innerHTML = `<div class="note">These ${ready.length} are what is NEW, not the whole list - already in the account: ${c.existing} negatives · universal list ${c.universalCovered} of ${c.universalTotal} covered${c.universalMissing&&c.universalMissing.length?` · still missing: ${c.universalMissing.map(esc).join(', ')}`:''}</div>`;
   }
   const af = ng.askFirst||[];
-  $('askFirst').innerHTML = af.length
+  (document.getElementById('askFirst_old')||{}).innerHTML = af.length
     ? `<div style="padding:0 20px 14px"><div class="grp" style="border-bottom:0"><h4><span>Ask first</span><span class="k">${af.length} need your call</span></h4>` +
       af.map(a=>`<div class="chk"><span class="dot routed"></span><span>${esc(a.term)} - ${esc(a.why)}</span></div>`).join('') + `</div></div>`
     : '';

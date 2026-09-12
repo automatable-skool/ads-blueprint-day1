@@ -46,7 +46,7 @@ Account setup - 7 of 16 done
 9b. Conversion window matched to the sales cycle - never shorter than the time a lead takes to book
 10. Google's auto-created goals demoted - **run `demote_conversion_goals.py --apply`, never hand this one to me**
 11. Enhanced conversions for leads ON
-12. Auto-apply recommendations OFF, both bundles
+12. Auto-apply recommendations OFF, both bundles - `python3 code/pause_auto_apply.py --apply` pauses every type the API can name; types it reports as UNKNOWN (retired from the API, still ticked on screen) need Admin → Recommendations auto-apply → untick
 13. Text customization / AI Max asset optimization OFF
 14. Account links: Business Profile first, then GA4
 15. Account-level universal negatives pushed, every serviced city removed from the geo block

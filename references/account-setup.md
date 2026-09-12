@@ -72,7 +72,7 @@ Both are chosen on the billing screen right after "Create an account without a c
 Work these in order. Each one is a line in the read-back.
 
 1. **Auto-tagging ON** · Admin then Account settings then Auto-tagging · on by default, confirm it · (a)
-2. **Auto-apply "Maintain your ads" OFF** · Recommendations then Auto-apply settings · (a)
+2. **Auto-apply "Maintain your ads" OFF** · `python3 code/pause_auto_apply.py --apply` pauses every type the API can name; types it reports as UNKNOWN are retired from the API and need Admin then Recommendations auto-apply then untick · (a)
 3. **Auto-apply "Grow your business" OFF** · same screen, then open the History tab and confirm nobody enrolled the account earlier · (a)
 4. **Text customization OFF** · per Search campaign, AI Max then Asset optimization, untick Text customization. This is the old "automatically created assets", renamed 27 May 2025. Campaigns left on are force-upgraded to AI Max in September 2026. If the legacy account-level toggle is still visible, turn it off; it cannot be turned back on · (a)
 5. **Enhanced conversions ON** · Goals then Settings, accept the Data Processing Terms. Web and leads are one switch since June 2026. Note consent mode if any EEA, UK or Swiss traffic exists · (a)

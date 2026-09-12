@@ -90,6 +90,7 @@ def main():
              metrics.impressions, metrics.clicks, metrics.conversions, metrics.cost_micros
       FROM keyword_view
       WHERE ad_group_criterion.status = 'ENABLED'
+        AND ad_group_criterion.negative = FALSE
         AND campaign.status = 'ENABLED'
         AND segments.date DURING LAST_{args.days}_DAYS
     """
@@ -108,15 +109,18 @@ def main():
 
     negs = []   # (text, match, scope_label, predicate(kw) -> bool)
 
-    # ---- account-level
+    # ---- account-level (v24: keyword negatives at account level only exist as
+    #      ACCOUNT_LEVEL_NEGATIVE_KEYWORDS shared sets attached via negative_keyword_list;
+    #      customer_negative_criterion.keyword.* is not a queryable field any more)
+    account_lists = set()
     for r in ga.search(customer_id=cid, query="""
-        SELECT customer_negative_criterion.keyword.text,
-               customer_negative_criterion.keyword.match_type,
+        SELECT customer_negative_criterion.negative_keyword_list.shared_set,
                customer_negative_criterion.type
-        FROM customer_negative_criterion"""):
-        c = r.customer_negative_criterion
-        if c.keyword.text:
-            negs.append((c.keyword.text, c.keyword.match_type.name, "ACCOUNT", lambda kw: True))
+        FROM customer_negative_criterion
+        WHERE customer_negative_criterion.type = 'NEGATIVE_KEYWORD_LIST'"""):
+        ss = r.customer_negative_criterion.negative_keyword_list.shared_set
+        if ss:
+            account_lists.add(ss)
 
     # ---- shared lists, and which campaigns they reach
     list_campaigns = defaultdict(set)
@@ -130,6 +134,10 @@ def main():
                shared_criterion.shared_set, shared_set.name
         FROM shared_criterion WHERE shared_set.type = 'NEGATIVE_KEYWORDS'"""):
         sc = r.shared_criterion
+        if sc.shared_set in account_lists:
+            negs.append((sc.keyword.text, sc.keyword.match_type.name,
+                         f"ACCOUNT LIST '{r.shared_set.name}'", lambda kw: True))
+            continue
         camps = list_campaigns.get(sc.shared_set, set())
         label = f"LIST '{r.shared_set.name}'" + ("" if camps else " (attached to nothing)")
         negs.append((sc.keyword.text, sc.keyword.match_type.name, label,

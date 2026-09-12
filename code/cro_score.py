@@ -1,0 +1,92 @@
+"""Score every live landing page on the 16-point conversion checklist, headless.
+Sources: references/cro-cheatsheet.md (7 rules) + the Agency Website cro-checks (15 machine checks),
+merged and deduped to 18 items. Proof items count double (Jono, 12 Sep 2026: "mostly social proof").
+Usage: python3 code/cro_score.py code/cache/<final-urls>.json code/cache/<out>.json
+         [--service "drain cleaning,plumber"] [--cities "dallas,plano,frisco"]
+--service and --cities are THIS account's words - take them from context/business.md.
+Without --cities the city is read from the URL path only if the page names one it can find,
+so pass the account's real service areas or the three city checks can never pass.
+Reads a {url: [ad groups]} map, loads each page in headless Chromium at phone size, writes per-page
+checks, score (0-100) and proof score. Never opens a window.
+"""
+import json, re, sys, time
+from urllib.parse import urlparse
+from playwright.sync_api import sync_playwright
+
+src, out = sys.argv[1], sys.argv[2]
+def _arg(flag, default):
+    return sys.argv[sys.argv.index(flag) + 1] if flag in sys.argv else default
+
+service = [s.strip().lower() for s in _arg('--service', 'wedding dj,dj').split(',') if s.strip()]
+raw = json.load(open(src)); urls = {}
+for u, g in raw.items():
+    k = re.sub(r'\?.*$', '', u).rstrip('/'); urls.setdefault(k, set()).update(g)
+urls = {k: sorted(v) for k, v in urls.items()}
+# The account's service areas. Pass --cities "dallas,plano,frisco" from context/business.md;
+# the fallback below is only a default so a run without the flag still does something.
+CITIES = [c.strip().lower() for c in _arg(
+    '--cities', 'toronto,montreal,vancouver,ottawa,calgary,edmonton,winnipeg').split(',') if c.strip()]
+
+def city_of(u):
+    """The city this page is for: from the URL path, else from its slug or host."""
+    p = urlparse(u).path.lower()
+    hit = next((c for c in CITIES if c in p), '')
+    if hit:
+        return hit
+    return next((c for c in CITIES if c in urlparse(u).netloc.lower()), '')
+
+def score_page(pg, url, groups):
+    t0 = time.time()
+    try: pg.goto(url, wait_until='load', timeout=30000)
+    except Exception as e: return {"url": url, "groups": groups, "error": str(e)[:120]}
+    load_s = round(time.time() - t0, 2); pg.wait_for_timeout(500)
+    html = pg.content(); text = re.sub(r'\s+', ' ', pg.inner_text('body')).lower()
+    city = city_of(url)
+    h1 = (pg.locator('h1').first.inner_text() if pg.locator('h1').count() else '').strip()
+    title = pg.title()
+    fold = pg.evaluate("""() => { const H = window.innerHeight; const els = [...document.querySelectorAll('a,button,input[type=submit]')];
+      const vis = e => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.top < H && r.width > 0 && r.height > 0; };
+      const cta = els.filter(e => vis(e) && /call|quote|book|contact|get |request|start|check|reserve|price|talk/i.test(e.innerText || e.value || ''));
+      const tel = els.filter(e => vis(e) && /^tel:/i.test(e.getAttribute('href') || ''));
+      return { cta: cta.length, tel: tel.length, navLinks: [...document.querySelectorAll('header a, nav a')].filter(vis).length }; }""")
+    forms = pg.evaluate("""() => [...document.querySelectorAll('form')].map(f => ({ fields: [...f.querySelectorAll('input:not([type=hidden]):not([type=submit]):not([type=button]),select,textarea')].length,
+      button: (f.querySelector('button, input[type=submit]') || {}).innerText || (f.querySelector('input[type=submit]') || {}).value || '' }))""")
+    real_forms = [f for f in forms if f['fields'] >= 2]
+    popup = pg.evaluate("""() => [...document.querySelectorAll('[role=dialog], .modal, .popup, [class*=popup], [class*=modal], [id*=popup]')].some(e => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return r.width > 200 && r.height > 150 && s.display !== 'none' && s.visibility !== 'hidden'; })""")
+    imgs = pg.evaluate("() => [...document.images].filter(i => i.naturalWidth > 200 && i.naturalHeight > 150).length")
+    stars = bool(re.search(r'(\d\.\d\s*(stars?|/\s*5|out of 5))|★|⭐|(\d+)\+?\s*(google\s+)?reviews|\b(5|five)[\s-]*stars?\b|5[\s-]*star[\s-]*rated|rated\s+5', text))
+    numbers = bool(re.search(r'\b(\d{1,3}(,\d{3})+|\d+\+)\s*(events|weddings|performances|clients|couples|years|djs|shows)', text)) or bool(re.search(r'\b\d+\+?\s*years', text))
+    checks = [
+      ("Headline names the service and the city, in a line that sells", any(x in (h1 or '').lower() for x in service) and bool(city) and city in (h1 or '').lower(), "match"),
+      ("Page title names the city", bool(city) and city in title.lower(), "match"),
+      ("One call to action above the fold on a phone", 1 <= fold['cta'] <= 3, "cta"),
+      ("Tap-to-call number above the fold", fold['tel'] >= 1, "cta"),
+      ("Click-to-call link anywhere", bool(re.search(r'href=["\']tel:', html, re.I)), "cta"),
+      ("Lead form on the page", len(real_forms) >= 1, "form"),
+      ("Form has 8 fields or fewer", bool(real_forms) and min(f['fields'] for f in real_forms) <= 8, "form"),
+      ("Review stars with a count", stars, "proof"),
+      ("Social proof numbers (events, years, couples)", numbers, "proof"),
+      ("Testimonials section", bool(re.search(r'testimonial|what (our )?(clients|couples|customers) say|review', text)), "proof"),
+      ("Real photos on the page (3 or more)", imgs >= 3, "proof"),
+      ("Guarantee stated", bool(re.search(r'guarantee|money.?back|satisfaction', text)), "proof"),
+      ("FAQ answers price, timing, guarantee", bool(re.search(r'\bfaq\b|frequently asked|questions', text)), "friction"),
+      ("Service area stated", bool(city) and text.count(city) >= 2, "friction"),
+      ("Loads in under 2 seconds", load_s < 2.0, "speed"),
+      ("No popup on arrival, few nav exits", (not popup) and fold['navLinks'] <= 6, "friction"),
+    ]
+    W = {"proof": 2}; tot = sum(W.get(k, 1) for _, _, k in checks); got = sum(W.get(k, 1) for _, ok, k in checks if ok)
+    pt = sum(1 for _, _, k in checks if k == 'proof'); pg_ = sum(1 for _, ok, k in checks if k == 'proof' and ok)
+    ab = bool(re.search(r'optimizely|vwo\.com|visualwebsiteoptimizer|convert\.com/js|abtasty|unbounce|instapage|splitbee|posthog.*feature|growthbook|launchdarkly|kameleoon|google_optimize|optimize\.js', html, re.I))
+    return {"url": url, "groups": groups, "city": city, "h1": h1, "title": title, "load_s": load_s, "ab_script": ab, "form_fields": min([f['fields'] for f in real_forms], default=None),
+            "score": round(100 * got / tot), "proof": f"{pg_}/{pt}", "checks": [{"t": t, "pass": bool(ok), "kind": k} for t, ok, k in checks]}
+
+res = []
+with sync_playwright() as p:
+    b = p.chromium.launch(headless=True); ctx = b.new_context(viewport={'width': 390, 'height': 844}, user_agent='Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1')
+    pg = ctx.new_page()
+    for u, groups in urls.items():
+        clean = re.sub(r'\?.*$', '', u).rstrip('/') or u
+        r = score_page(pg, clean, groups); res.append(r)
+        print(f"{r.get('score','ERR'):>3} · proof {r.get('proof','-'):5s} · {r.get('load_s','-')}s · {clean}  {('ERROR '+r['error']) if 'error' in r else ''}")
+    b.close()
+json.dump(res, open(out, 'w'), indent=1); print("wrote", out)

@@ -471,6 +471,15 @@ renders as a **watch list**:
 An owner who can see the watch list can act on their own judgement. An owner told "nothing to report"
 cannot. (Jono, 31 August 2026)
 
+### 2.9.1b The window widens until the sample clears the bar
+
+The significance gate never silences a read - and it never stops at 30 days either. When a comparison
+is under `n_min`, widen automatically: 30 → 90 → 180 → 365 days → all time, and use the first window
+that clears the bar. State that window beside every figure. If the wide window and the narrow window
+disagree, report both; the wide one carries the verdict, the narrow one shows the trend. Jono, 12 Sep
+2026, after a Brides-versus-Regular read that was "too thin" at 30 days and conclusive at 365
+(228 clicks, 19.4% conversion rate against 15.1%). Nobody should have to ask for the longer pull.
+
 ### 2.9.2 Where the money actually went - always
 
 A spend breakdown runs on every audit, three cuts, biggest first, with the share of total beside each:
@@ -545,13 +554,42 @@ Report it even when clean, and state the limit out loud: it compares negatives a
 
 ### 2.9.7 The Google Business Profile link
 
-**Not previously checked anywhere in this file.** Flag it when the account has no linked Business
-Profile: it is what switches on location assets and the Maps surface, and for a local service business
+**Readable by API since 12 Sep 2026:** query `asset_set WHERE asset_set.type = 'LOCATION_SYNC'` - a
+"Google My Business locations" set exists only when a profile is linked. Never report "could not be read".
+Flag it when the account has no linked Business Profile: it is what switches on location assets and the Maps surface, and for a local service business
 that is a whole surface missing. Check the linked-accounts state, and if GBP is linked, confirm the
 auto-created "Clicks to call" and "Local actions" goals arrived as SECONDARY rather than primary -
 Google creates them automatically and a primary one quietly reshapes bidding.
 
 ---
+
+### 2.9.8 Budget moves stay inside one campaign type
+
+When a capped winner is fed by trimming an underperformer, both must be the same campaign type: search
+funds search, Performance Max funds Performance Max, LSA funds LSA. Never net one type against another.
+Jono, 12 Sep 2026: a PMax lead is less likely to become a paying customer, so the two are not comparable
+per lead, and a PMax cost per lead that looks best is suspect until brand exclusions are on. Report one
+swap per type with three figures each (trim, feed, net leads), then the owner types the numbers.
+
+### 2.9.8b Ad types: Maps and Local Services Ads, every run
+
+Maps ads are readable: `customer_asset_set` / `campaign_asset_set` holding the LOCATION_SYNC set means
+location assets serve and the campaigns show on Maps; a linked profile with no attachment is a fail with
+the click path. Local Services Ads have no Google Ads API surface, so the check is eligibility by country
+and category from `references/lsa-setup.md` (Canada: 14 home-service trades; US: 114 categories). Eligible
+and unconfirmed is a click-needed row; not eligible is said once with the reason. Jono, 12 Sep 2026.
+
+### 2.9.9 What the API can and cannot do, confirmed on v24 and v25 (12 Sep 2026)
+
+- Auto-apply subscriptions: `RecommendationSubscriptionService` pauses every named type. Types returned
+  as UNKNOWN are retired from the API but still ticked on screen; only the screen clears them.
+- Expired experiments: `end_experiment` and pausing the trial campaign are refused;
+  `ExperimentOperation.remove` works and removes the trial campaign. A remove always gets its own yes.
+- Final URL expansion: `asset_automation_settings` type FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION, opted
+  out in the same operation as TEXT_ASSET_AUTOMATION. `campaign.url_expansion_opt_out` no longer exists.
+- Brand exclusions: no asset-set or asset type for brands exists. Screen only.
+- Google's AUTOMATICALLY_CREATED assets cannot be linked to a campaign; reuse ADVERTISER-source assets only.
+- Account-level keyword negatives: only through the attached shared set; `customer_negative_criterion.keyword` is gone.
 
 ## TIER 3 - Structure and bidding
 
@@ -580,7 +618,13 @@ Wrong when a budget is explicitly shared across campaigns with divergent cost pe
 One keyword at scale is SKAG debt. Target five to fifteen. Graded **(c)** consensus. Over 50 is the hard ceiling in every checklist read **(c)**.
 
 **Duplicate keywords across campaigns**
-Wrong when the same keyword and match type is active in two ad groups. Google picks one per auction, unpredictably, and there is no priority setting for Search **(c)**. One home per query.
+⛔ **Before this is a finding, compare every targeting dimension of the ad groups it sits in** - gender,
+age, household income, parental status, audience lists and in-market or affinity segments in targeting
+mode, location and location exclusions, language, device adjustments, ad schedule, and the ad copy. If
+anything differs, it is segmentation by design: report "segmented by design", flag only the overlap with
+the untargeted group, and never recommend a recluster on keyword text alone. Jono, 12 Sep 2026, after
+the DJNorth.ca audit called Brides (women only) / Grooms (men only) / Regular (everyone) duplicates.
+Wrong when the same keyword and match type is active in two ad groups WITH identical targeting. Google picks one per auction, unpredictably, and there is no priority setting for Search **(c)**. One home per query.
 
 ⛔ **Never write "keywords bidding against each other" or "competing for the same auction".** It is factually wrong and Google says so directly: when several of your keywords could match one search, *"they don't compete with each other in the auction"* **(a)**. The real damage is that you cannot predict **which ad and which landing page** the searcher gets, and the performance data splits across every copy. Say that instead. See `references/keyword-redundancy.md`.
 
@@ -718,7 +762,7 @@ Wrong when absent. Worth **+8% conversions (a)**. A near-universal gap and a tri
 **Keyword in the ad**
 Wrong when no headline contains the ad group's primary keyword. The only Ad Strength input with a plausible causal path to clickthrough.
 
-**Ad Strength: fix Poor, ignore Excellent.** Google says it "isn't used to calculate Ad Rank, Quality Score, or auction wins" **(a)**.
+**Ad Strength: never a goal, a high score is the flag (Jono, 12 Sep 2026).** No check ever asks for a better score; the ads check is conversion rate against the account average per ad, and a failing ad that Google rates Excellent is called out as such. Google says it "isn't used to calculate Ad Rank, Quality Score, or auction wins" **(a)**, and optimising toward it makes deliberately narrow ads worse. Ads are judged on their own click-through and conversion rate only. The evidence that retired it:
 
 The largest sample (**Optmyzr, over 22,000 accounts, over 1 million ads**) found **no correlation between Ad Strength and cost per acquisition or conversion rate** - clickthrough rises with it, conversion rate and cost per acquisition don't **(b)[V]**. Not re-verified 28 Aug 2026. Adalysis reports the same direction: lower Ad Strength ads converting better **(c)[V]**, Geddes, January 2026.
 

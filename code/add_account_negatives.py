@@ -39,7 +39,7 @@ JOB_SEEKERS = [
 DIY = [
     "diy", "do it yourself", "how to", "howto", "how do", "how do you",
     "tutorial", "tutorials", "guide", "guides", "step by step", "instructions",
-    "youtube", "video", "videos", "template", "templates", "example", "examples",
+    "video", "videos", "template", "templates", "example", "examples",
     "how to fix", "how to repair", "how to install", "how to remove",
     "how to clean", "how to replace", "how to build", "homemade", "yourself",
 ]
@@ -52,7 +52,7 @@ EDUCATION = [
 ]
 # A.4 Free / discount
 FREE = [
-    "free", "freebie", "giveaway", "giveaways", "sample", "samples", "trial",
+    "freebie", "giveaway", "giveaways", "sample", "samples", "trial",
     "discount", "discounted", "voucher", "coupon", "coupons", "promo code",
     "clearance", "secondhand",
 ]
@@ -60,21 +60,22 @@ FREE = [
 INFO = [
     "what is", "what is a", "what does", "what are", "meaning", "definition",
     "wikipedia", "wiki", "reddit", "quora", "forum", "forums", "blog",
-    "review", "reviews", "ratings",
 ]
 # A.6 Support / existing customers
 SUPPORT = [
     "complaint", "complaints", "refund", "refunds", "return policy", "cancel",
-    "cancellation", "warranty claim", "problem", "problems", "not working",
-    "broken", "contact", "phone number", "customer service", "help",
-    "login", "sign in",
+    "cancellation", "warranty claim", "contact", "phone number",
+    "customer service", "login", "sign in",
 ]
 # A.7 Restricted
 RESTRICTED = [
     "porn", "adult", "nude", "sex", "gambling", "casino", "weed", "marijuana",
     "cbd", "crypto", "bitcoin", "nft", "mlm", "ponzi",
 ]
-# From context/business.md — "What We DON'T Do"
+# From context/business.md - "What we DON'T do". REPLACE these with your own.
+# The list below is an EXAMPLE for a residential plumber, not a default to keep.
+# ⛔ Never block a word you actually sell to, and never block a city you serve -
+# a trade word or a city name in here throws away real buyers.
 DONT_DO = [
     "commercial", "industrial", "new construction", "builder", "builders",
     "septic", "septic tank", "well drilling", "well pump",
@@ -82,7 +83,6 @@ DONT_DO = [
     "hvac", "furnace", "furnaces", "boiler", "boilers", "radiant heating",
     "pool", "pools", "hot tub", "irrigation", "sprinkler", "sprinklers",
     "appliance repair", "dishwasher repair", "washing machine repair",
-    "hamilton", "oshawa", "barrie",
     "parts", "parts store", "supplies", "wholesale",
 ]
 
@@ -164,10 +164,38 @@ def verify(shared_set_rn: str) -> None:
     print(f"\nVerification: list contains {count} negative keywords (all PHRASE match)")
 
 
+def load_terms_file(path: str) -> list[str]:
+    """One PHRASE term per line; blank lines and # comments ignored; quotes stripped."""
+    out = []
+    for line in open(path, encoding="utf-8"):
+        t = line.split("#", 1)[0].strip().strip('"')
+        if t:
+            out.append(t)
+    return out
+
+
 def main() -> None:
+    import argparse
+    global LIST_NAME
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--terms-file", help="use these terms instead of the built-in list "
+                                         "(the built-in list is a starting point, not an account's real list)")
+    ap.add_argument("--name", help="shared list name (default: the name set at the top of this file)")
+    ap.add_argument("--apply", action="store_true", help="actually create/add/attach - default is a dry run")
+    args = ap.parse_args()
+    if args.name:
+        LIST_NAME = args.name
+    source = load_terms_file(args.terms_file) if args.terms_file else ALL_TERMS
     # de-dupe while preserving order
     seen: set[str] = set()
-    terms = [t for t in ALL_TERMS if not (t.lower() in seen or seen.add(t.lower()))]
+    terms = [t for t in source if not (t.lower() in seen or seen.add(t.lower()))]
+    if not args.apply:
+        print(f"DRY RUN · list '{LIST_NAME}' · {len(terms)} unique PHRASE terms would be added and "
+              f"attached at ACCOUNT level:")
+        for t in terms:
+            print(f'  "{t}"')
+        print("\nRe-run with --apply to make the changes.")
+        return
     rn = find_or_create_shared_set()
     print(f"List: '{LIST_NAME}' ({rn})")
     added = add_terms(rn, terms)

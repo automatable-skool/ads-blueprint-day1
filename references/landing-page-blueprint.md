@@ -45,7 +45,12 @@ The ad says their city through `{LOCATION(City)}` in the pinned headline. **The 
 
 ## The one law: message match
 
-The H1 repeats the ad group's promise word for word, and the line under it repeats the ad's offer. Someone who clicked "Emergency Drain Cleaning Dallas" lands on exactly that.
+The H1 carries the ad group's service AND the searcher's city (from the `loc` parameter) inside a line that
+sells - never a bare echo. Formula: **proof word + city + service**, e.g. "Hire Award-Winning Vancouver Wedding
+DJs", "Dallas's Fastest Emergency Drain Cleaning", where the proof word comes from `context/proof.md` (award,
+review count, years, speed) and the city is inserted by the City component. Someone who clicked "Emergency
+Drain Cleaning Dallas" lands on a headline that says drain cleaning and Dallas and a reason to pick you
+(Jono, 12 September 2026). The line under it repeats the ad's offer.
 
 - Matching the ad headline to the H1 alone lifted conversion 66% in one documented test and 212% with 69% lower cost per lead in another; strong match converts 2.5 to 3 times weak match (b)
 - It is also the relevance half of Google's landing page experience rating, and above-average experience plus ad relevance is cited as worth about 36% lower cost per click (b, 2023)
@@ -423,7 +428,7 @@ But the components and structure in this blueprint stay fixed. Style is the skin
 
 **The offer and the top of the page**
 
-- [ ] H1 repeats the ad group headline word for word, offer line repeats the ad's offer
+- [ ] H1 = proof word + city (from the URL) + service, in a line that sells; offer line repeats the ad's offer
 - [ ] Offer is above the fold and niche-specific, researched or confirmed with the owner
 - [ ] Sections run in the build order, 1 through 14, unchanged
 - [ ] 3 credibility bullets plus licence and insurance line above the fold
