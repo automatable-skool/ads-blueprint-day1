@@ -22,23 +22,23 @@ next-env.d.ts
 # them into place once, and from then on these are the member's files alone.
 # Without this split, the first update you push collides with a month of their
 # work and they stop pulling - which quietly turns a living repo into a snapshot.
-website/
-context/
-keyword-list.md
-keyword-list.html
-ad-library.md
-ads-pending.md
-ads-live.md
-audit-report.md
-audit-report.html
-landing-pages.md
-negatives-staged.md
-negatives-log.md
-ad-tests-log.md
-proposals-log.md
-scale-log.md
-search-terms-plan.md
-search-terms-report.html
-transcript-proof-candidates.md
-competitor-pages/
-screenshots/
+/website/
+/context/
+/keyword-list.md
+/keyword-list.html
+/ad-library.md
+/ads-pending.md
+/ads-live.md
+/audit-report.md
+/audit-report.html
+/landing-pages.md
+/negatives-staged.md
+/negatives-log.md
+/ad-tests-log.md
+/proposals-log.md
+/scale-log.md
+/search-terms-plan.md
+/search-terms-report.html
+/transcript-proof-candidates.md
+/competitor-pages/
+/screenshots/

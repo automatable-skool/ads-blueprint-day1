@@ -6,6 +6,11 @@
 # the repo's work never touch the same files.
 set -e
 [ -d website ]  || { cp -R website-starter website; echo "created website/ from the starter"; }
+[ -d starters ] && [ -n "$(find starters -type f -print -quit)" ] || {
+  echo "ERROR: starters/ is missing or empty. Your copy of the repo is incomplete."
+  echo "Re-clone the repo, then run ./setup.sh again."
+  exit 1
+}
 for f in $(cd starters && find . -type f | sed 's|^\./||'); do
   [ -f "$f" ] || { mkdir -p "$(dirname "$f")"; cp "starters/$f" "$f"; echo "created $f"; }
 done
