@@ -4,7 +4,7 @@ Next: run the same-ad test on your keyword dump (section 1), then follow the eig
 
 A STAG (Single Theme Ad Group) is one ad group built around one search intent. It holds every keyword a searcher might type when they want the same thing, served by one ad written to mirror that intent.
 
-This assumes **phrase match keywords** for a local service business (it works for any niche), and that **Claude Code is connected to your Google Ads account** (developer token plus OAuth). Claude executes the heavy steps - the Google searches, the Keyword Planner pulls, the pairwise results-page comparisons. Your job is the judgment calls it flags.
+This assumes **phrase match keywords** for a local service business (it works for any niche), and that **Claude Code is connected to your Google Ads account** (OAuth credentials from a Cloud project with Explorer access or better). Claude executes the heavy steps - the Google searches, the Keyword Planner pulls, the pairwise results-page comparisons. Your job is the judgment calls it flags.
 
 Grades: (a) Google documentation or a named Google spokesperson · (b) two or more independent practitioners agreeing, or one with a real dataset · (c) one source, or a judgment call this repo has chosen to make.
 

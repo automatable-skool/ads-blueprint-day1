@@ -64,7 +64,7 @@ Everything in `website/` that the campaigns depend on, together: the landing pag
 > "Do you own a domain for this business? If yes, paste it. If not, buy one first - about $12/year at Namecheap, Cloudflare or Porkbun - it takes five minutes and everything below depends on it."
 
 - **They have one:** `npx vercel domains add [their-domain.com]`, then read the exact records Vercel prints and walk them through adding those at their registrar - name the click path for the registrar they actually use (GoDaddy: My Products → DNS → Add · Namecheap: Domain List → Manage → Advanced DNS · Cloudflare: the domain → DNS → Add record; **on Cloudflare set the record to DNS only, not proxied**). Then wait for it to resolve, confirm the real domain serves the site over HTTPS, and record it in CLAUDE.md "## My setup".
-- **They don't:** stop here, say plainly why - final URLs, the Basic Access application, the phone snippet and every conversion tag all point at the domain, and moving later means redoing them. **Never set a `.vercel.app` URL as a final URL on an ad.**
+- **They don't:** stop here, say plainly why - final URLs, the brand-verified consent screen behind your API access, the phone snippet and every conversion tag all point at the domain, and moving later means redoing them. **Never set a `.vercel.app` URL as a final URL on an ad.**
 
 ## After the deploy - wire the account to the live URLs
 

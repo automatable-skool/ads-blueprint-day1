@@ -18,7 +18,7 @@ load_dotenv(ROOT / ".env")
 
 def get_client(login_cid: str) -> GoogleAdsClient:
     config = {
-        "developer_token": os.environ["GOOGLE_ADS_DEVELOPER_TOKEN"],
+        "developer_token": os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN"),
         "client_id":       os.environ["GOOGLE_ADS_CLIENT_ID"],
         "client_secret":   os.environ["GOOGLE_ADS_CLIENT_SECRET"],
         "refresh_token":   os.environ["GOOGLE_ADS_REFRESH_TOKEN"],
@@ -268,7 +268,7 @@ def main() -> int:
     args = p.parse_args()
 
     cid = args.customer.replace("-", "")
-    mcc = os.environ["GOOGLE_ADS_LOGIN_CUSTOMER_ID"].replace("-", "")
+    mcc = (os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID") or cid).replace("-", "")  # manager optional since 10 Sep 2026
     client = get_client(mcc)
 
     print(f"\n🔍 AUDITING CUSTOMER {cid} · LAST {args.days} DAYS\n")

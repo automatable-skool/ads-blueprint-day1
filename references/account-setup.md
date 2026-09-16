@@ -122,7 +122,7 @@ One block the owner can screenshot:
 - Verification status and any running deadline
 - Payment threshold and spend limit
 
-Next: `/api-setup` if the developer token is not yet approved, then `/keywords`.
+Next: `/api-setup` if the API is not connected yet, then `/keywords`.
 
 ---
 
@@ -159,8 +159,8 @@ Next: `/api-setup` if the developer token is not yet approved, then `/keywords`.
 
 ## What the API needs on day one
 
-- A manager account: the API Center only exists there. Link the serving account into it. Two customer IDs result: `GOOGLE_ADS_LOGIN_CUSTOMER_ID` (manager) and `GOOGLE_ADS_CUSTOMER_ID` (serving) · (a)
-- A developer token application (twenty-four to forty-eight hours), a Cloud project with the Ads API enabled, an OAuth consent screen, and a refresh token · see `references/google-ads-setup.md`
+- A manager account: optional for the API since 10 September 2026, but it is what you own while agencies come and go, and the only way to run several accounts through one set of credentials. Link the serving account into it. Two customer IDs result: `GOOGLE_ADS_LOGIN_CUSTOMER_ID` (manager, blank if you skip the manager) and `GOOGLE_ADS_CUSTOMER_ID` (serving) · (a)
+- A Cloud project with the Ads API enabled and Explorer access (instant), an OAuth consent screen that passes brand verification (Basic in minutes), and a refresh token - no developer token since 9 September 2026 · see `references/google-ads-setup.md`
 - The user generating the refresh token has 2SV (required since 21 April 2026) and a passkey (required since 5 August 2026) · (a)
 - Account negatives are `CustomerNegativeCriterion`; verification deadlines come from `IdentityVerificationService`, which is rate-limited, so poll rarely · (a)
 

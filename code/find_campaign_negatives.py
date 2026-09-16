@@ -25,11 +25,11 @@ load_dotenv(ROOT / ".env")
 
 def get_client() -> GoogleAdsClient:
     config = {
-        "developer_token": os.environ["GOOGLE_ADS_DEVELOPER_TOKEN"],
+        "developer_token": os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN"),
         "client_id": os.environ["GOOGLE_ADS_CLIENT_ID"],
         "client_secret": os.environ["GOOGLE_ADS_CLIENT_SECRET"],
         "refresh_token": os.environ["GOOGLE_ADS_REFRESH_TOKEN"],
-        "login_customer_id": os.environ["GOOGLE_ADS_LOGIN_CUSTOMER_ID"],
+        "login_customer_id": os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID") or None,
         "use_proto_plus": True,
     }
     return GoogleAdsClient.load_from_dict(config)

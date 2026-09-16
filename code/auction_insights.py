@@ -33,7 +33,7 @@ METRICS = [
 ]
 
 
-REQUIRED = ["GOOGLE_ADS_DEVELOPER_TOKEN", "GOOGLE_ADS_CLIENT_ID",
+REQUIRED = ["GOOGLE_ADS_CLIENT_ID",
             "GOOGLE_ADS_CLIENT_SECRET", "GOOGLE_ADS_REFRESH_TOKEN"]
 
 
@@ -43,7 +43,7 @@ def get_client(login_cid):
         sys.exit("Missing from .env: " + ", ".join(missing) +
                  "\nRun /api-setup to fill these in, then try again.")
     return GoogleAdsClient.load_from_dict({
-        "developer_token": os.environ["GOOGLE_ADS_DEVELOPER_TOKEN"],
+        "developer_token": os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN"),
         "client_id": os.environ["GOOGLE_ADS_CLIENT_ID"],
         "client_secret": os.environ["GOOGLE_ADS_CLIENT_SECRET"],
         "refresh_token": os.environ["GOOGLE_ADS_REFRESH_TOKEN"],
@@ -85,7 +85,7 @@ def main():
     except Exception as e:  # noqa: BLE001 - surface the API's own message, it is the useful part
         msg = str(e)
         if "have access to metrics" in msg:
-            sys.exit("Your developer token cannot read auction-insight metrics - Basic Access does not\n"
+            sys.exit("Your access level cannot read auction-insight metrics - Basic access does not\n"
                      "include them. Nothing to fix in this script. Pull the report by hand instead:\n"
                      "Google Ads -> Campaigns -> Insights and reports -> Auction insights.")
         if "auction_insight" in msg or "PROHIBITED" in msg or "UNRECOGNIZED" in msg:

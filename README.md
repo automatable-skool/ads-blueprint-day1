@@ -7,7 +7,7 @@ Run your own Google Ads with Claude Code - plan, build, launch, and optimize to 
 1. Download this folder (or clone it) anywhere on your computer
 2. Open a terminal in the folder and run `./setup.sh` once - it copies the starters into your working files. They are yours from then on; git never touches them
 3. Run `claude`
-4. Type `/api-setup` - submit the API application day 1 (it bakes while you build). Then `/audit` if you already run ads, or `/context-layer` if you are starting fresh
+4. Type `/api-setup` - connect the Google Ads API day 1 (Explorer is instant, Basic lands in minutes). Then `/audit` if you already run ads, or `/context-layer` if you are starting fresh
 
 That is it. Each command walks you through exactly what it needs, the first time you run it.
 
@@ -21,7 +21,7 @@ That is it. Each command walks you through exactly what it needs, the first time
 
 | Step | Command | What it does |
 |------|---------|--------------|
-| 1 | `/api-setup` | Google Ads API Basic Access - the application, step by step. Submit day 1, it bakes while you build |
+| 1 | `/api-setup` | Google Ads API access - Cloud project, Explorer today, Basic in minutes. Do it day 1 |
 | 2 | `/audit` | Already running ads? The ROAS audit - wasted spend ranked by dollars, one approval fixes it all |
 | 3 | `/context-layer` | The proof file: business facts + proof, scraped then interviewed. Every ad and page reads it |
 | 4 | `/keywords` | Every keyword worth bidding on, then the STAG stage: single-theme ad groups written as your account structure |
@@ -46,9 +46,9 @@ That is it. Each command walks you through exactly what it needs, the first time
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code) installed
-- Python 3.9+ (`pip install google-ads python-dotenv requests`)
+- Python 3.10+ (`pip install --upgrade "google-ads>=32" python-dotenv requests`)
 - A Google Ads account (even brand new - `/account-setup` and `/api-setup` handle the wiring)
-- Google Ads API Basic Access - `/api-setup` submits the application; everything paste-ready works while you wait
+- Google Ads API access - `/api-setup` gets Explorer the same day and Basic in minutes; no developer token since 10 September 2026
 - WordPress users: the Novamira plugin + connection (lets Claude build your landing pages directly on your site) - optional, the Next.js lane needs nothing
 
 Stuck? Post in the community - Help board answers same-day.

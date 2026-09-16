@@ -37,7 +37,7 @@ from google.ads.googleads.client import GoogleAdsClient
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 
-REQUIRED = ["GOOGLE_ADS_DEVELOPER_TOKEN", "GOOGLE_ADS_CLIENT_ID",
+REQUIRED = ["GOOGLE_ADS_CLIENT_ID",
             "GOOGLE_ADS_CLIENT_SECRET", "GOOGLE_ADS_REFRESH_TOKEN"]
 
 
@@ -46,7 +46,7 @@ def get_client(login_cid):
     if missing:
         sys.exit("Missing from .env: " + ", ".join(missing) + "\nRun /api-setup first.")
     return GoogleAdsClient.load_from_dict({
-        "developer_token": os.environ["GOOGLE_ADS_DEVELOPER_TOKEN"],
+        "developer_token": os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN"),
         "client_id": os.environ["GOOGLE_ADS_CLIENT_ID"],
         "client_secret": os.environ["GOOGLE_ADS_CLIENT_SECRET"],
         "refresh_token": os.environ["GOOGLE_ADS_REFRESH_TOKEN"],

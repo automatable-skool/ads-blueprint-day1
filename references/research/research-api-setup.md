@@ -11,6 +11,20 @@ Every claim below carries a grade and a date. Where the current repo doc disagre
 
 ---
 
+## 16 September 2026 update - developer tokens are gone
+
+Everything below was true on 28 August 2026. On 10 September 2026 Google moved API access onto the Cloud project and sunset developer tokens. `references/google-ads-setup.md` (revised 2026-09-16) is current; where this dossier and that doc disagree, the doc wins. Sources for the revision, all (a) unless marked:
+
+- Google Ads Developer Blog, "A new onboarding experience for Google Ads API developers", 10 September 2026 · https://ads-developers.googleblog.com/2026/09/new-onboarding-experience-for-google-ads-api.html · tokens sunset, access on the Cloud project, API Center retired, Basic automated after brand verification, pending Basic applications closed, mandatory notices go to the project's IAM owners and editors
+- Developer token FAQ · https://developers.google.com/google-ads/api/docs/api-policy/developer-token · sunset 9 September 2026, 90-day activity transfer, header optional and ignored, rejection in a future major version, two known issues (Free Trial or suspended billing rejects Explorer and Basic; AUTHORIZATION_ERROR after upgrading a project that called with a Test-level token before 9 September)
+- Access levels and permissible use, updated 11 September 2026 · https://developers.google.com/google-ads/api/docs/api-policy/access-levels · Test on enabling the API, Explorer from the Overview page's "Apply for access", brand verification prerequisite for Basic, Standard via "Start application" in about 10 business days, restricted services per level
+- Brand verification for the Google Ads API · https://developers.google.com/google-ads/api/docs/api-policy/brand-verification · External plus In production plus Branding filled, Verify Branding, Publish branding
+- Quick start · https://developers.google.com/google-ads/api/docs/get-started/make-first-call · Overview page, Upgrade access level, login-customer-id only when going through a manager
+- google-ads-python 32.0.0, 9 September 2026 · developer_token optional and the header omitted when unset (read from the wheel)
+- Member run, 15 September 2026 (c) · Basic approved in under a minute from the Overview page with the brand-verification notice still showing; the API Center "Apply for basic access" link now opens the App Conversion Tracking & Remarketing form
+
+---
+
 ## Headline findings (what changed since the repo doc was written)
 
 - **Explorer Access exists and is automatic.** Since 28 October 2025 most new developer tokens are granted Explorer Access on sign-up: production and test accounts, 2,880 operations a day on production, no application, no wait. (a) Google Ads Developer Blog, 28 Oct 2025; access-levels doc last updated 19 Aug 2026.

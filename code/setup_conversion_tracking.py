@@ -24,11 +24,9 @@ from google.ads.googleads.errors import GoogleAdsException
 load_dotenv()
 
 REQUIRED_ENV = [
-    "GOOGLE_ADS_DEVELOPER_TOKEN",
     "GOOGLE_ADS_CLIENT_ID",
     "GOOGLE_ADS_CLIENT_SECRET",
     "GOOGLE_ADS_REFRESH_TOKEN",
-    "GOOGLE_ADS_LOGIN_CUSTOMER_ID",
     "GOOGLE_ADS_CUSTOMER_ID",
 ]
 missing = [k for k in REQUIRED_ENV if not os.getenv(k)]
@@ -40,7 +38,7 @@ config = {
     "client_id": os.getenv("GOOGLE_ADS_CLIENT_ID"),
     "client_secret": os.getenv("GOOGLE_ADS_CLIENT_SECRET"),
     "refresh_token": os.getenv("GOOGLE_ADS_REFRESH_TOKEN"),
-    "login_customer_id": os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID"),
+    "login_customer_id": os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID") or None,
     "use_proto_plus": True,
 }
 client = GoogleAdsClient.load_from_dict(config)

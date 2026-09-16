@@ -29,7 +29,7 @@ Two guardrails that never bend:
 | Command | What it does |
 |---|---|
 | `/account-setup` | Birth the account correctly - the permanent decisions, the traps |
-| `/api-setup` | Google Ads API Basic Access - the application, step by step |
+| `/api-setup` | Google Ads API access - Cloud project, Explorer today, Basic in minutes |
 | `/lsa-setup` | Local Services Ads - verification submitted, profile built (local lane) |
 
 **Research - what to bid on**
@@ -56,7 +56,7 @@ Two guardrails that never bend:
 ## The flow (recommended order)
 
 1. `/account-setup` - birth the account right: Expert Mode (skip the Smart-campaign trap), the two PERMANENT settings (time zone + currency), billing, 2FA, then the foundation (conversion goals, autopilot off) + the universal negatives. New accounts start here; existing accounts run it as a verification pass.
-2. `/api-setup` - apply for Basic Access (submit day 1 - officially up to 5 business days, longer in 2026's backlog; Explorer access arrives instantly and runs everything except the Planner pull). **No setup command exists** - every credential is just-in-time: each command checks its own prerequisites the first time it runs (env check + `code/test_connection.py` before any API work) and walks the user through exactly what it needs, right there. Commands record state in CLAUDE.md "## My setup" so nothing gets asked twice.
+2. `/api-setup` - connect the Google Ads API, day 1 (since 10 September 2026 there is no developer token and no form: Explorer access is instant and runs everything except the Planner pull, Basic lands minutes after brand verification). **No setup command exists** - every credential is just-in-time: each command checks its own prerequisites the first time it runs (env check + `code/test_connection.py` before any API work) and walks the user through exactly what it needs, right there. Commands record state in CLAUDE.md "## My setup" so nothing gets asked twice.
 3. `/context-layer` - scrape + interview: business facts and proof
 4. `/keywords` - the keywords worth bidding on, qualified on Planner data, then clustered into single-theme ad groups → one file, `keyword-list.md`, account structure at the top
 5. `/campaign-plan` - build campaigns through the API (everything lands PAUSED)
@@ -224,7 +224,7 @@ When a task involves a tool a non-coder wouldn't know (Search Console, Vercel, G
 | `references/keyword-patterns.md` | The buyer-intent keyword buckets for any trade + **the rule that keywords never contain the city** |
 | `references/file-examples.md` | **The rendered shape of every file the user opens - match it exactly** |
 | `references/account-setup.md` | The ordered setup checklist, the nine switches, link order, where negatives go, security, 2024-2026 changes. `/account-setup` executes it |
-| `references/google-ads-setup.md` | API access levels, the Basic application field by field, the OAuth production trap, every error with its fix. `/api-setup` executes it |
+| `references/google-ads-setup.md` | API access levels, the Cloud Console path step by step, brand verification, the OAuth production trap, every error with its fix. `/api-setup` executes it |
 | `references/conversion-tracking.md` | Conversion actions for a service business, calls with recording, calendar bookings, Enhanced Conversions, offline import, consent, audiences, the Tag Assistant verification. `/landing-page` executes it |
 | `references/landing-page-blueprint.md` | **The ad landing page: the 14-section order, no header and no footer, the offer formulas, where the lead goes (GHL webhook, phone, calendar), the launch checklist.** `/landing-page` executes it |
 | `references/campaigns.md` | The nine switches with API fields, budget tests, bidding at launch and graduation, cannibalisation. `/campaign-plan` executes it |
@@ -237,7 +237,7 @@ When a task involves a tool a non-coder wouldn't know (Search Console, Vercel, G
 | `keyword-list.md` | ONE file: the account structure at the top (campaigns → ad groups → keywords → negatives, written by `/keywords stag`), the research below it (written by `/keywords`). No separate map file |
 | `ad-library.md` | Headline/description pools, tagged by angle, scored |
 | `context/competitor-ads.md` | Ranked competitor claims table + swipe file |
-| `references/api-application/` | The winning Basic Access application: field-by-field answers + the design-doc PDF to adapt |
+| `references/api-application/` | Standard access only - the application answers + the design-doc PDF. Basic needs neither since 10 September 2026 |
 | `references/lsa-profile-draft.md` | LSA profile template (local lane) |
 | `references/examples/` | Worked demo examples (fictional ABC Company) - the quality bar; never copy example claims into real ads |
 | `references/research/` | The 16 research dossiers (1,000+ sources, graded, dated) behind every reference above. Claude-facing: cite them, never paste them into a member file |
