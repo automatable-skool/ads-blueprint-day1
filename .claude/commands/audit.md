@@ -66,7 +66,7 @@ Then audit it in full. Every finding ranked by DOLLARS, then routed to the comma
 **2. Structure vs the spec.** Read `references/stag.md` + `references/campaigns.md` and grade the real account against them: mixed-intent ad groups (the same-ad test), campaigns stealing each other's searches, keywords in the wrong match type, orphan ad groups with no traffic. Structure leaks show up as low Quality Scores everywhere.
 
 **3. The relevancy triangle, per ad group:** keyword → ad → landing page. Quality Score components (expected CTR, ad relevance, landing page experience) tell me which leg is broken per ad group. Cheap clicks live here.
-- **The landing page itself** (reference Tier 6): fetch every final URL - dead or redirecting URL, homepage instead of a matched page, H1 that doesn't repeat the ad group's promise, no tap-to-call above the fold on mobile, form over five fields, load over three seconds, no distinct thank-you page (so conversions are unreliable), popups, final URL expansion on without exclusions. Route fixes to `/landing-page`.
+- **The landing page itself** (reference Tier 6): fetch every final URL - dead or redirecting URL, homepage instead of a matched page, H1 that doesn't repeat the ad group's promise, no tap-to-call above the fold on mobile, form over five fields, Lighthouse mobile performance under 50 or Largest Contentful Paint over 2.5 seconds (PageSpeed Insights API through `code/psi_speed.py`, never a stopwatch or a local DevTools run), no distinct thank-you page (so conversions are unreliable), popups, final URL expansion on without exclusions. Route fixes to `/landing-page`.
 - **Ads and assets - structure only** (reference Tier 5): fewer than two RSAs in a group, headline or description slots unfilled, every slot pinned, no keyword in headline 1, fewer than four sitelinks, no callouts, no business name and logo, no call asset on a service business, disapproved or limited ads, text customization on. Flag them and route to `/write-ads`. **Which line is winning and what to swap is NOT an audit finding** - that read lives in `/ad-tests` and stays there.
 
 **4. Tracking integrity.** Are conversions firing? Are the primaries actually the money actions? Is Enhanced Conversions on? Is anything double-counting? A broken conversion setup silently mistrains Smart Bidding for months.
@@ -242,21 +242,53 @@ Three rules:
 
 **Every run also writes one self-contained HTML page, in the repo's design theme, and opens it.** The markdown checklist is the working file; the HTML is what you show - on a call, on a screen recording, or to a prospect.
 
+**⛔ The dashboard is built by THREE COMMANDS, never by hand (15 Sep 2026).** Every run, in this order, from
+the project root, with `.env` pointing at the account being audited:
+1. `python3 code/audit_dashboard_data.py --config code/cache/<customer>-audit-config.json` - every check on the
+   page read from the API in one run (campaign settings, conversions, auto-apply, keywords and grades,
+   negatives and conflicts, a year of search terms classified, ads, assets, final URLs, retargeting, Maps).
+   The config holds the account's own facts: cities, service words, brand terms, job value, close rate,
+   benchmark row, LSA eligibility, far-away places, services not sold, towns to ask about. Write it from
+   the owner's answers before the first run; never from another account's context.
+2. `python3 code/cro_score.py code/cache/<customer>-final-urls-<date>.json code/cache/<customer>-cro-<date>.json --service "<service words>"`
+   (this also runs Lighthouse on every page through the PageSpeed Insights API; needs `PAGESPEED_API_KEY` in `.env`, raw reports cached 7 days in `code/cache/psi/`; re-run speed alone with `python3 code/psi_speed.py --pages <cro json> --max-age-days 0`)
+   - the URL map is the `finalUrls` block of step 1's JSON; the scorer is headless, retries, and refuses to
+   score a host's bot-check page.
+3. `python3 code/build_audit_dashboard.py --data <step 1 json> --pages <step 2 json> --out assets/audit-report.html [--previous <an earlier step 1 json>] [--anonymise]`
+   - assembles the template JSON: checks, findings, tags, tables, nested boxes, money at risk, dials.
+   `--previous` makes the before dial the earlier run's state (that is how a fix pass shows its after);
+   `--anonymise` swaps the domain, name and brand terms for placeholders (filming).
+Then `python3 code/render_check.py assets/audit-report.html` (zero page errors) and `open` it - unless the owner is filming or asked you to stop grabbing focus (15 Sep 2026): then say the file is rebuilt and let them reload. A page that was
+edited by hand is not a run; if a rule changes, change the builder and rebuild.
+4. For filming or a before/after pair: `python3 code/derive_before_state.py <after page> <before page> --date "<audit date>"`
+   writes the same page in its BEFORE state (every row's before flag, findings open, dial projected). The
+   locked before copy in `assets/before-<date>/` is never opened or edited; derive, never rebuild it.
+v24 lessons baked into the reads (15 Sep 2026): the account-level negative list is shared_set type
+`ACCOUNT_LEVEL_NEGATIVE_KEYWORDS`, not NEGATIVE_KEYWORDS (a read on the wrong type says "no list" while
+48 terms sit there); `change_event` refuses a start older than 30 days, so the window is 29; duplicate
+keywords compare campaign geo too, and cities are often PROXIMITY (radius) criteria, not LOCATION, so
+both feed the targeting key, otherwise every "Regular" group across cities reads as a duplicate. Radius centres are reverse-geocoded
+(OpenStreetMap Nominatim, cached in `code/cache/geocode-cache.json`) so the page names the city, and the
+own-city compare strips accents (Montréal = Montreal). `client.get_type("FieldMask")` does not exist on
+v24: build masks with `google.api_core.protobuf_helpers.field_mask(None, op.update._pb)`. The campaign
+goal level is not a campaign field: read `conversion_goal_campaign_config`, `custom_conversion_goal` and
+`campaign_conversion_goal` to find campaigns whose own goal set drops calls or forms. Ad rotation is
+`campaign.ad_serving_optimization_status`; `code/set_ad_rotation.py --apply` sets OPTIMIZE and prints the
+revert line. Location targeting must read as "presence in", other countries excluded, and every fact
+appears once on the page (the campaign section's "Settings, by campaign" box and the ads card's Quality
+Score tab follow `references/audit-dashboard-spec.md`).
+
 **⛔ The standard is `references/audit-dashboard-spec.md` (12 Sep 2026). Read it before building the page.**
 It fixes the layout, the tags, the nesting, the sorting, the colours and every rule from the September fix
-pass, so the next thousand runs produce the same dashboard. The data comes from two read-only scripts:
-`python3 code/audit_dashboard_data.py --cities <the account's cities>` (ads table, ad build checks, assets
-coverage and performance, ad groups, final URLs, retargeting, ad types, Maps impressions, auto-apply state)
-and `python3 code/cro_score.py <final-urls json> <out json> --service "<the account's services>"
---cities "<the account's service areas>"` (the 18-point page scores). Both word lists come from
-`context/business.md` - without them the service and city checks can never pass. Never re-derive
-those reads with one-off queries.
+pass, so the next thousand runs produce the same dashboard. The data comes from steps 1 and 2 above (the config file carries the account's
+cities, service words and brand terms; without them the service and city checks can never pass). Never
+re-derive those reads with one-off queries.
 
-**How it is built - never hand-write the HTML:**
-1. Copy `references/audit-report-template.html` to `audit-report.html` in the project root.
-2. Replace ONLY the JSON inside `<script id="audit-data" type="application/json">` at the top of the file. Every field in the template's sample JSON is required; keep the same keys and shapes. **Do not touch the markup, the CSS or the script.**
-3. Open it: `open audit-report.html` (Mac). Say the path in chat so the owner can open it themselves.
-4. **Re-write the JSON after every fix pass** - `after`, `issuesAfter`, `passes`, `minutes`, `wasteAfter`, each layer's `after` and `fixed` line, each leak's `status`, and each fix's `status` - then say "report refreshed" so the owner reloads.
+**How it is built:** the three commands above, nothing else. A fix pass is step 1 again, then step 3 with
+`--previous <the pre-fix step 1 json>` so the after dial is real; say "report refreshed" so the owner reloads.
+If a check or a box is missing, change the builder (or the data script) and rebuild; never paste JSON into
+the template by hand. The hand-patched pages from the first live fix pass (`assets/audit-report-fixed.html` and its filming
+copies) were a 12-15 Sep stopgap and every one of their rules now lives in the builder.
 
 **The report's shape (Jono's ruling, 2 September 2026).** The page is organised by WHERE things live, not by kind of analysis: report card with the benchmark table at the top, then a one-line-per-finding "what to fix first" index, then five sections - **the account** (tracking, setup, integrations, economics) · **the campaigns and ad groups** · **the ads** · **the landing pages** · **the keywords and search terms** - then "what we could not see". Every finding card renders INSIDE its section; the index at the top only links down. Five hard rules the renderer enforces and the JSON must feed:
 - **Say every number once.** The at-risk figure, the benchmark row, the tracking caveat - each appears in exactly one place. Never write a JSON field that restates another section's number.
@@ -268,14 +300,17 @@ those reads with one-off queries.
 **The JSON, field by field:**
 - `mode`: `"owner"` (report + fix, the after columns are real) or `"prospect"` (report only - nothing claims to have been fixed).
 - `projectedAfter`: required in prospect mode - the projected score after every fixable item is fixed, waived items still counted as failures. Owner mode uses the real `after` instead.
-- `atRisk`: `{ total, summary }`. `total` obeys the never-exceeds-spend rule above; `summary` is ONE plain sentence naming what the number is made of.
+- `atRisk`: `{ total, low, high, summary, math }`. Rendered as a range "low to high" with a hover tooltip carrying `math` (Jono, 15 Sep 2026): `low` is counted waste (spend above the account's own cost per lead + junk clicks), `high` is the page ceiling (spend on keywords whose landing page Google rates below average), never summed, never above the window's spend, phone-blind spend excluded; `summary` names both ends in one or two sentences.
 - `leaks[].section`: required - `account` | `campaigns` | `ads` | `pages` | `keywords`. Routes the finding card into its section. `leaks[].urgent: true` puts a red URGENT tag on it and sorts it to the top of the index regardless of dollars - reserve it for account-breaking faults (a campaign blocking its own city name, nine in ten clicks on broad match).
 - `quality.components`: `{ expectedCtr:{below,avg,above}, adRelevance:{...}, landingPage:{...} }` plus `rated`. Rendered as distribution bars - CTR and relevance inside the ads section, landing page experience inside the pages section. Never a lone "N below average" without the average and above counts beside it: "74 of 74 below" is a finding, "27 below" with 47 at-or-above hidden is a distortion.
 - `layers`, `fixes` and `costs` are GONE - do not write them. The eight reads live in audit-report.md; the fix list IS the leaks index; the prospect CTA renders on its own.
 - `spendBreakdown`: `byAdGroup` / `byLocation` / `byDevice` render as tabs. `byCampaign` is not rendered - the campaign table already carries spend, share, leads and cost per lead in the same row as its seven check dots.
 - `campaigns[]`: unchanged - `{ name, status, spend, conv, cpl, checks:{budget,tracking,ads,assets,page,structure,settings}, issues:[{cat,level,what,cost}] }`. Issues render as ONE flat scrolling list across all campaigns, never a checklist per campaign. Column meanings render as hover tooltips in plain words; rows color green/red by cost per lead vs the account average. Tracking is `warn`, not `bad`, when one lead type counts and another does not - a campaign showing a cost per lead cannot have zero tracking. Issue rows route by category: budget/structure/settings stay in the campaigns section, `ads` AND `assets` rows render in the ads section (a call asset or sitelink shows on the ad, so it lives with the ads - Jono, 12 Sep 2026), `page` rows in the landing-pages section, and `tracking` rows are never listed per campaign - the account says tracking once. What counts as a campaign/ad-group issue comes from `references/campaigns.md` (the nine switches: Presence-only locations, every other country excluded, networks, schedule, bidding) and `references/ad-assets.md` (the required asset roster per ad group: call, sitelinks, callouts, name and logo, snippets, lead form, messages). Never write an issue row that restates a finding card or an account check - each fact appears in exactly one list.
 - `business`, `account` (the 10-digit customer ID), `domain`, `date`, `window` (the date range audited), `spend` (spend in the window), `currency`.
-- `before` / `after`, `issuesBefore` / `issuesAfter`, `passes`, `minutes`: the whole-account numbers. Before is the first read. **`after` stays `null` until a fix pass has actually shipped** - the renderer shows `projectedAfter` until then. Writing `after` equal to `before` on a fresh audit is a bug: a report full of open findings whose two dials match says the fixes are worth nothing, which is the opposite of what the score is for.
+- `before` / `after`, `issuesBefore` / `issuesAfter`, `passes`: the whole-account numbers. **Both dials are COMPUTED the
+  same way, never set by hand** (Jono, 15 Sep 2026): passing checks out of all checks in the five sections, before
+  from `b`, after from `a`; `issues*` are the failing counts; `scoreMath` is the sentence behind the "?" on the
+  after dial. No `minutes`: it cannot be measured. Before is the first read. **`after` stays `null` until a fix pass has actually shipped** - the renderer shows `projectedAfter` until then. Writing `after` equal to `before` on a fresh audit is a bug: a report full of open findings whose two dials match says the fixes are worth nothing, which is the opposite of what the score is for.
 - `leaks`: one entry per finding - `{ name, section, severity, monthly, status, detail, evidence, fix, who, urgent? }`. `severity` is REQUIRED: 1-10 urgency, drawn as a small ring on the fix-first index (8-10 red, 5-7 yellow, 1-4 green) and it drives the sort - severity first, then dollars. Score urgency, not dollars: a $7 leak can be a 3, a $0 self-blocking negative a 10.
 - The account section is ONE grid of checklist groups (tracking groups first, the rest of `settings` after, and `economics` rendered as a group in the same shape - never its own card). GBP and GA4 status are check rows inside those groups; there is no Integrations block, and `gbp`/`other` are not rendered - anything worth showing becomes a check row, once. Account-level sitelinks are not a check - sitelinks are judged at campaign/ad-group level in the ads section. Account findings (`section: "account"`) never render a card - the checklist row is their one statement and the index links to #account; every account finding MUST have a matching fail row in the account groups. Any leak may carry `noCard: true`: it stays on the fix-first index (linking to its section) but renders no card - use it whenever a section block already tells the story, e.g. the split-test card in the ads section (never a testing card AND a testing finding back to back). The Quality Score bars carry hover tooltips naming the fix that moves each component above average - the audit's recommendations must actually target those components. `status` is `stopped` | `open` | `settings`; settings reads carry `monthly: null` - flagged, never priced. The renderer sorts urgent first, then dollars, so order in the JSON does not matter. `gbp`: `{ linked, autoGoalsSecondary, note }` renders under the account section's Integrations.
 - `settings` / `keywords` / `creative` / `pages` / `structure`: `{ groups:[ { name, checks:[ { t, b, a } ] } ] }` where `b` and `a` are `"pass"` or `"fail"`. The check text comes straight from the tiers in this file - Tier 1 and Tier 0 into `settings`, Tier 4 into `keywords`, Tier 5 into `creative`, Tier 6 into `pages`, Tier 3 into `structure`.
@@ -568,10 +603,9 @@ numbers. Never fixes on a stale audit. Never claims "fixed" without the verify r
 - **Three columns the rows flow through.** `.groups{columns:3}` with boxes allowed to break and rows never
   split, so a long box continues into the next column and the columns end level (Jono, 12 Sep 2026; box-level
   masonry and grids were tried and left one column towering or empty).
-- **"Needs your hands" renders on the HTML as a SHORT checklist** (Jono, 12 Sep 2026): a heading "N things
-  need your hands", one line "The API cannot do these. Message Claude when you are ready and we walk through
-  every step together, one at a time.", then one checkbox line per item with the first three clicks of its
-  path. The full four-part recipes (why, path, done, verify) live in audit-report.md and are walked one per
+- **"Needs your hands" on the HTML is ONE line, not a list** (Jono, 15 Sep 2026): "N things need your hands -
+  each is tagged click needed in its section. Message Claude when you are ready and we walk through them
+  together, one at a time." The items themselves live only as `click needed` rows in their sections. The full four-part recipes (why, path, done, verify) live in audit-report.md and are walked one per
   message in part two. `byHand[]` keeps all four fields; the page shows the title and a path hint only.
 - **Rebuild, never edit, the before state.** Lock `assets/before-<date>/` first; write the fixed
   dashboard as a new file (`audit-report-fixed.html`) built from the before copy; the sample JSON gains
@@ -640,7 +674,8 @@ limited ads (policy) are a separate check and stay.
 **Ad types, every run (Jono, 12 Sep 2026).** An "Ad types" box in the account section with one row per
 surface: Search · Performance Max (with guardrails) · Maps ads · Local Services Ads. Maps is READABLE:
 Maps placement is on when the linked Business Profile's LOCATION_SYNC asset set is attached at account
-level (`customer_asset_set`) or to the campaigns (`campaign_asset_set`); linked but not attached is a
+level AND its synced location assets carry impressions; nine synced assets with zero impressions for a year
+means the link points at a dead or old profile (the first live account after its sale), and the fix is relink, not attach (`customer_asset_set`) or to the campaigns (`campaign_asset_set`); linked but not attached is a
 fail with the click path. Local Services Ads are NOT readable through the Google Ads API, so the row is
 eligibility: country plus category against `references/lsa-setup.md` (Canada: 14 home-service trades
 only; US: the 114 categories). Eligible → fail, tag `click needed`, "confirm at ads.google.com/localservices,
@@ -673,12 +708,13 @@ their one statement, and the "no live ad converts below average" check points at
 
 **Landing pages are SCORED, per page, every run (Jono, 12 Sep 2026).** `code/cro_score.py` loads every
 distinct final URL from the live ad groups and asset groups in a headless phone-sized browser and runs the
-16-point checklist built from `references/cro-cheatsheet.md` and the agency CRO checks: headline names the
-service · headline names the city · title names the city · one call to action above the fold · tap-to-call
-above the fold · click-to-call anywhere · lead form · 4 fields or fewer · button says the outcome · review
-stars with a count · social-proof numbers · testimonials · 3+ real photos · guarantee · FAQ · service area ·
+13-point checklist built from `references/cro-cheatsheet.md` and the agency CRO checks: headline names the
+service and the city in a line that sells (no separate title check, 15 Sep) · one call to action above the fold · tap-to-call
+above the fold · lead form · 4 fields or fewer · button says the outcome · review
+stars with a count · social-proof numbers · testimonials · 3+ real photos · guarantee · FAQ ·
 under 2 seconds · no popup and few nav exits. The five proof items count double. Removed 12 Sep: the button-wording check and the two-headline split (now one line: service and city in a line that sells); the form bar is 8 fields; review stars also match "5 star rated" and "five star". The pages section is built like the ads
-section (Jono, 12 Sep 2026): a table with one row per page, best first, and a nested box with one line per
+section (Jono, 12 Sep 2026): a table with one row per page, best conversion rate first (the checklist score is
+a column, never the sort - Jono, 15 Sep 2026), and a nested box with one line per
 check and the pages as the tick-cross sub-line - never one block per page. JSON: `pageScores[]`. The old per-campaign page rows are gone; the block is the one
 statement. Never run it headed; never call a page "done" from this score alone - the tracking gate still applies.
 
@@ -754,7 +790,7 @@ clicks and Google's performance label (`ad_group_ad_asset_view`), rank them, and
 what already wins there: the city and root keyword pinned in headline 1, the top city lines, the top
 generic lines, the audience-specific lines the group already uses (Brides, Grooms), the four best
 descriptions. Only when no context exists for a claim does `your proof` gate a line. The challenger lands
-PAUSED and reads `click needed` until the owner switches it on. Three traps from that run: with the city pinned in headline 1, at most ONE other headline names the city (Google shows three headlines at once and a city said twice reads as filler), and every line reads as a sentence ("Book a Halifax plumber now", never "Book Halifax Plumber Now"); the 30-character limit counts a tag's FALLBACK text (`{LOCATION(City):Edmonton} Wedding DJ` is 19, not 35), and every line must be an existing winner or a city or audience variant of one - never an invented line. Script pattern: the 12 Sep DJing.ca run
+PAUSED and reads `click needed` until the owner switches it on. Three traps from that run: with the city pinned in headline 1, at most ONE other headline names the city (Google shows three headlines at once and a city said twice reads as filler), and every line reads as a sentence ("Book a Halifax plumber now", never "Book Halifax Plumber Now"); the 30-character limit counts a tag's FALLBACK text (`{LOCATION(City):Edmonton} Wedding DJ` is 19, not 35), and every line must be an existing winner or a city or audience variant of one - never an invented line. Script pattern: the 12 Sep the first live account run
 (`code/cache/<account>-winning-lines-<date>.json` → `AdGroupAdService` create, status PAUSED).
 
 **Every check always shows (Jono, 12 Sep 2026).** No box, table or check is dropped because the account
@@ -803,8 +839,8 @@ borderline items are asked in chat before anything changes. "Searches to block" 
 campaign (All + each), each row a search term with clicks, spend, why, and a status (blocked on a date, or held
 with the question). Checks: phrase match is the one actionable line · converting search terms exist as
 keywords · most keywords serve · no negative blocks a keyword you bid on (own-city block is a case of it, not
-a second row) · the universal junk list is covered · negatives are mostly phrase · search terms are visible
-enough to act on · at least 5 keywords per ad group. No Lin-Rodnitzky row: a diagnostic without an action.
+a second row) · the universal junk list is covered · negatives are mostly phrase · at least 5 keywords per ad group. The hidden-search-term
+share is NOT a check row (Jono, 15 Sep 2026: nothing to do with it); it lives in the trust note and the md. No Lin-Rodnitzky row: a diagnostic without an action.
 
 **Never negate a competitor, a brand or a rival's name (Jono, 12 Sep 2026).** Conquest and competitor searches
 are wanted traffic: the business should show for every rival's name. The junk taxonomy covers jobs, DIY,

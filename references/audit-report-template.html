@@ -169,7 +169,7 @@
   .recipe dt { font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#6e6d66; padding-top:3px; }
   /* masonry: boxes flow into balanced columns, short ones stack, long ones stand alone (Jono, 12 Sep) */
   .groups { display:block; columns:3; column-gap:32px; column-fill:balance; }
-  .grp { break-inside:auto; } .grp h4 { break-after:avoid; break-inside:avoid; } .chk, .showpass { break-inside:avoid; }
+  .grp { break-inside:auto; min-width:0; overflow-wrap:anywhere; } .grp h4 { break-after:avoid; break-inside:avoid; } .chk, .showpass { break-inside:avoid; }
   .grp { display:block; width:100%; }
   .chk { scroll-margin-top:84px; } .chk:target { background:var(--warn-bg); border-radius:8px; }
   .chksub { font-size:12px; color:var(--body); margin-top:3px; line-height:1.45; }
@@ -193,14 +193,17 @@
   ul.todo { margin:2px 0 0 14px; padding:0; font-size:12px; color:var(--body); line-height:1.4; } ul.todo li { margin:0; }
   #adFilters select { font:inherit; font-size:12px; padding:3px 6px; border:1px solid var(--ring); border-radius:6px; background:var(--ivory); color:var(--ink); }
   .subs { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:4px; font-size:12px; }
-  .subs .sub { white-space:nowrap; color:var(--body); } .subs .sub.ok { color:var(--good); } .subs .sub.no { color:var(--bad); } .subs .sub i { font-style:normal; color:var(--muted); font-size:10px; }
+  .subs .sub { white-space:normal; overflow-wrap:anywhere; max-width:100%; color:var(--body); } .subs .sub.ok { color:var(--good); } .subs .sub.no { color:var(--bad); } .subs .sub i { font-style:normal; color:var(--muted); font-size:10px; }
   .groups.few { columns:3; }
   .groups.few .grp { display:block; }
   .subs .sub.more { color:var(--coral); cursor:pointer; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.2px; }
   .subs span[hidden] { display:none; }
+  .grp.allpass h4 { color:var(--good); } .grp.allpass h4 .k.ok { color:var(--good); }
+  .hdot { display:inline-flex; width:16px; height:16px; border-radius:5px; align-items:center; justify-content:center; margin-right:8px; vertical-align:-2px; }
 </style>
 <script id="audit-data" type="application/json">{
  "mode": "owner",
+ "namePrefix": "",
  "business": "Dave's Plumbing",
  "author": "Dave's Plumbing",
  "account": "482-931-7740",
@@ -219,7 +222,10 @@
  "avgCpl": 294,
  "atRisk": {
   "total": 3240,
-  "summary": "Spend that got a fair test and returned nothing, plus spend landing on pages that break the ad's promise. Never more than you actually spent."
+  "summary": "Spend that got a fair test and returned nothing, plus spend landing on pages that break the ad's promise. Never more than you actually spent.",
+  "low": 3240,
+  "high": 3240,
+  "math": "Low end: counted waste. High end: spend on pages Google grades below average. Never summed, never above the window spend."
  },
  "benchmark": {
   "category": "Home & home improvement",
@@ -1329,7 +1335,7 @@
    "city": "dallas",
    "h1": "Emergency Drain Cleaning Dallas",
    "load_s": 1.4,
-   "score": 72,
+   "score": 43,
    "proof": "3/5",
    "checks": [
     {
@@ -1568,9 +1574,11 @@
     <div class="tabs" id="adTabs">
       <button data-t="adPane" class="on">Every live ad, best first</button>
       <button data-t="assetPane">Asset performance</button>
+      <button data-t="qualityPane">Quality Score, by ad group</button>
     </div>
     <div class="tabpane on" id="pane-adPane" style="overflow:auto;max-height:520px"><div id="adFilters" style="padding:12px 14px 4px"></div><table id="adTable" class="tbl"></table><div class="note" id="adTableNote"></div></div>
     <div class="tabpane" id="pane-assetPane" style="overflow:auto;max-height:520px"><table id="assetTable" class="tbl"></table><div class="note">What each asset type earned over the last year. Coverage and status live in the "Assets by campaign" box below.</div></div>
+    <div class="tabpane" id="pane-qualityPane" style="overflow:auto;max-height:520px"><table id="qualityTable" class="tbl"></table><div class="note" id="qualityNote"></div></div>
   </div>
   <div id="adsFindings"></div>
 </div></section>
@@ -1666,7 +1674,8 @@
       return `<div class="chk${quiet?' quiet':''}"${c.id?` id="${c.id}"`:''}><span class="dot ${now==='pass'?'pass':'fail'}">${now==='pass'?tick:''}</span><span>${esc(c.t)}${c.tip?qm(c.tip):''}${tag}${cost}${who}${sub}</span></div>`;
     }).join('');
     const toggle = (passNow && g.fold!==false) ? `<button class="showpass" onclick="var g=document.getElementById('${id}');g.classList.toggle('open');this.textContent=g.classList.contains('open')?'Hide the ${passNow} ${g.passLabel||'that pass'}':'Show the ${passNow} ${g.passLabel||'that pass'}'">Show the ${passNow} ${g.passLabel||'that pass'}</button>` : '';
-    return `<div class="grp" id="${id}"><h4><span>${esc(g.name)}</span><span class="k">${passNow} / ${total} pass</span></h4>${rows}${toggle}</div>`;
+    const allPass = total>0 && passNow===total;
+    return `<div class="grp${allPass?' allpass':''}" id="${id}"><h4><span>${allPass?'<span class="dot pass hdot">'+tick+'</span>':''}${esc(g.name)}</span><span class="k${allPass?' ok':''}">${passNow} / ${total} ${g.passLabel||'pass'}</span></h4>${rows}${toggle}</div>`;
   }
   // true masonry (Jono, 12 Sep 2026): three columns, each box goes into whichever column is shortest
   function masonry(host){
@@ -1711,11 +1720,11 @@
   else {
     $('dialBefore').innerHTML = dial(D.before);
     $('dialAfter').innerHTML  = dial(afterScore);
-    $('beforeSub').textContent = D.issuesBefore!=null ? D.issuesBefore + ' open issues' : '';
+    $('beforeSub').textContent = D.issuesBefore!=null ? D.issuesBefore + ' checks open' : '';
     $('afterLbl').textContent = fixedYet ? 'After the fixes' : 'Projected after the fixes';
-    $('afterSub').textContent = fixedYet ? (D.issuesAfter!=null ? D.issuesAfter + ' issues left' : '') : 'every fixable item fixed';
+    $('afterSub').innerHTML = (fixedYet ? (D.issuesAfter!=null ? D.issuesAfter + ' checks still open' : '') : 'every fixable item fixed') + (D.scoreMath ? ' ' + qm(D.scoreMath) : '');
     $('brag').textContent = '+' + (afterScore - D.before);
-    $('runs').textContent = fixedYet ? (D.passes!=null ? D.passes + ' passes · ' + D.minutes + ' minutes' : '') : 'projected';
+    $('runs').textContent = fixedYet ? (D.passes!=null ? D.passes + ' fix pass' + (D.passes>1?'es':'') : '') : 'projected';
   }
   const AR = D.atRisk || {};
   const TD = D.trend || {};
@@ -1723,7 +1732,7 @@
     ? (AVG < TD.cpl.then ? 'down from ' : 'up from ') + money(TD.cpl.then) + ' the month before' : '';
   $('stats').innerHTML = [
     ['Spend in window', money(D.spend), ''],
-    ['Money at risk / month', money(AR.total), esc(AR.summary || '')],
+    ['Money at risk / month' + (AR.math ? qm(AR.math) : ''), (AR.low!=null && AR.high!=null && AR.high!==AR.low) ? money(AR.low) + ' to ' + money(AR.high) : money(AR.total), esc(AR.summary || '')],
     ['Cost per lead', AVG==null?'-':money(AVG), cplSub]
   ].map(([k,v,s])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div>${s?`<div class="sub">${s}</div>`:''}</div>`).join('');
 
@@ -1774,13 +1783,14 @@
       l.items.slice(0,10).map(row).join('') +
       (n > Math.min(l.items.length,10) ? `<div class="chk"><span class="k">the full list of ${n} is in audit-report.md</span></div>` : '') + `</details>`;
   }
-  const progCls = p => (p==='fixed'?'pfixed':p==='bigger build'?'pbuild':p==='website access'?'psite':p.indexOf('click')>=0?'phands':p==='no action'?'pnone':'pyou');
+  const progCls = p => (p==='fixed'||p==='protect'?'pfixed':p==='bigger build'?'pbuild':p==='website access'?'psite':p.indexOf('click')>=0?'phands':p==='no action'?'pnone':p.indexOf('re-read')>=0?'ppartly':'pyou');
   const LEGEND = `<div class="legend"><span class="lg"><b>I can fix:</b> <span class="st prog pfixed">fixed</span> done and read back · <span class="st prog pbuild">bigger build</span> by API, needs your yes · <span class="st prog psite">website access</span> the moment I can edit ${esc(D.domain)}</span><span class="lg"><b>Out of my hands:</b> <span class="st prog phands">click needed</span> the API refuses, recipe in "Needs your hands" below · <span class="st prog pyou">your proof</span> needs your words or numbers</span></div>`;
   // Every finding is ONE checkbox row inside its section's grid (Jono, 12 Sep 2026) - the
   // index at the top links to that row. Fixed = ticked, never hidden.
 
   // ---------- nested boxes (Jono, 12 Sep 2026): one line per thing, instances as a compact sub-line ----------
-  const short = n => String(n||'').replace(/ - Ads \d.*$/,'').replace(/^Weddings - /,'').replace(/^Leads-Performance-/,'PMax ');
+  // Same rule as audit_dashboard_data.py short(): drop the naming prefix every campaign shares (carried in the data as namePrefix) and a trailing " - Ads N" counter.
+  const short = n => { n = String(n||'').replace(/ - Ads \d.*$/,''); const p = D.namePrefix||''; return p && n.startsWith(p) ? n.slice(p.length) : n; };
   function nestedGroup(name, parents){
     parents = parents.filter(p => p.subs.length);
     if (!parents.length) return null;
@@ -1844,6 +1854,16 @@
     return { name, checks: rows.map(([cn,is])=>({
       t: cn.replace(/ - Ads \d.*$/,'') + ' · ' + is.what, b: is.ok?'pass':'fail', a: (is.ok||is.done)?'pass':'fail', cost: is.cost||null, tag: is.tag||null })) };
   }
+  // The money box (Jono, 12 Sep 2026): where you bleed and what to do, then what is cheap so you
+  // protect it. A budget cap on its own is a fact, never a row.
+  function moneyGroups(){
+    const bleed = allIssues.filter(([,is]) => is.cat==='budget' && is.level!=='good');
+    const cheap = allIssues.filter(([,is]) => is.cat==='budget' && is.level==='good');
+    const out = [];
+    if (bleed.length) out.push({ name:'Bleeding money - fix these', passLabel:'fixed', checks: bleed.map(([cn,is])=>({ t: cn+' · '+is.what, b:'fail', a: is.done?'pass':'fail', cost: is.cost||null, tag: is.tag||null })) });
+    if (cheap.length) out.push({ name:'Cheap leads - protect these', fold:false, checks: cheap.map(([cn,is])=>({ t: cn+' · '+is.what, b:'pass', a:'pass', tag: is.tag||null })) });
+    return out;
+  }
   const withExtra = (groups, extra) => (groups||[]).concat(extra.filter(Boolean));
   function findingCard(l, i){
     return `<div class="leak ${l.status}" id="leak${i}">
@@ -1870,8 +1890,8 @@
   const SECTLBL = { account:'account', campaigns:'campaigns', ads:'ads', pages:'landing pages', keywords:'keywords' };
   $('fixIndex').insertAdjacentHTML('beforebegin', LEGEND);
   if ((D.byHand||[]).length) {
-    $('fixIndex').insertAdjacentHTML('afterend', `<div class="card" style="margin-top:22px;padding:18px 24px"><h3 class="sub display" style="margin:0 0 4px">${D.byHand.length} thing${D.byHand.length>1?'s':''} need${D.byHand.length>1?'':'s'} your hands</h3><p class="lead" style="color:var(--body);font-size:13.5px;margin:0 0 10px">The API cannot do these. Message Claude when you are ready and we walk through every step together, one at a time.</p>` +
-      D.byHand.map((h,i)=>`<div class="chk"><span class="dot fail"></span><span><b>${esc(h.title.replace(/^[A-Z]\. /,''))}</b><div class="chksub">${esc(h.path.split('→').slice(0,3).join('→'))}${h.path.split('→').length>3?' → …':''}</div></span></div>`).join('') + `</div>`);
+    const clicks = document.querySelectorAll('.st.phands').length || (D.byHand||[]).length;
+    $('fixIndex').insertAdjacentHTML('afterend', `<p class="lead" style="color:var(--body);font-size:13.5px;margin:16px 0 0">${D.byHand.length} thing${D.byHand.length>1?'s':''} need${D.byHand.length>1?'':'s'} your hands - each is tagged <span class="st prog phands">click needed</span> in its section. Message Claude when you are ready and we walk through them together, one at a time.</p>`);
   }
   $('fixIndex').innerHTML = leaks.map((l,i) =>
     `<a class="fx1${l.progress==='fixed'?' done':''}" href="#leak${i}"><span class="r">${i+1}</span>${sevDial(l.severity)}<span class="i">${esc(l.name)}${l.urgent?' <span class="st urgent">urgent</span>':''}${l.progress?' <span class="st prog '+progCls(l.progress)+'">'+esc(l.progress)+'</span>':''}</span><span class="w">${esc(SECTLBL[l.section]||'')}${l.who?' · '+esc(l.who):''}</span><span class="c${l.monthly==null?' set':''}">${l.monthly==null?(l.status==='settings'?'settings':'not priced'):money(l.monthly)+'/mo'}</span></a>`).join('');
@@ -1895,7 +1915,7 @@
         { t:`Break-even is ${money(E.breakEven)} a lead${AVG!=null?' and you pay '+money(AVG):''}`,
           b:(AVG!=null&&E.breakEven!=null&&AVG>E.breakEven)?'fail':'pass',
           a:(AVG!=null&&E.breakEven!=null&&AVG>E.breakEven)?'fail':'pass' } ] };
-  renderGroups('accountGroups', withExtra(sGroups.concat([econGroup]), [findGroup('account')]));
+  renderGroups('accountGroups', sGroups.concat([econGroup]));   // account findings live in the index and their check rows only
   $('accountScore').innerHTML = scoreChip(score(['settings']), true);
 
   // The tracking story is told ONCE: the checklist above plus this one note. The full
@@ -1925,7 +1945,7 @@
     if (v === 'warn') return `<span class="dot routed"${t}></span>`;
     return `<span class="dot fail"${t}></span>`;
   };
-  const qm = tip => `<span class="qm" data-tip="${esc(tip)}">?</span>`;
+  function qm(tip){ return `<span class="qm" data-tip="${esc(tip)}">?</span>`; }
   const STATE = { ok:'looks right', warn:'partly right', bad:'broken' };
   const shortWhat = w => { const s = String(w||'').replace(/^(Bleeding|Cheap):\s*/,''); const i = s.indexOf('. '); return i>0 && i<90 ? s.slice(0,i) : s.slice(0,90); };
   const openNow = c => {
@@ -1956,7 +1976,7 @@
   };
   const CAMP_CATS = ['budget','structure','settings','assets'];
   const campRows = allIssues.filter(([,is]) => CAMP_CATS.includes(is.cat));
-  renderGroups('structureGroups', withExtra((D.structure||{}).groups, [issueGroup(CAMP_CATS,'By campaign and ad group'), findGroup('campaigns')]));
+  renderGroups('structureGroups', withExtra([nestedGroup('Settings, by campaign', D.settingsByCampaign||[])].filter(Boolean).concat((D.structure||{}).groups||[]), moneyGroups().concat([issueGroup(['structure','settings'],'By campaign and ad group'), findGroup('campaigns')])));
   $('structureScore').innerHTML = scoreChip(score(['structure']), true);
 
   function spendTable(rows, label){
@@ -1975,7 +1995,7 @@
     const adTabs = document.getElementById('adTabs');
     if (adTabs) adTabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
       adTabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===b));
-      ['adPane','assetPane'].forEach(t => { const el = document.getElementById('pane-'+t); if (el) el.classList.toggle('on', t===b.dataset.t); });
+      ['adPane','assetPane','qualityPane'].forEach(t => { const el = document.getElementById('pane-'+t); if (el) el.classList.toggle('on', t===b.dataset.t); });
     }));
     const tabs = document.getElementById('spendTabs');
     if (tabs) tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
@@ -1985,7 +2005,7 @@
   })();
 
   // ---------- 05 the ads ----------
-  const buildGroup = (D.adBuild||[]).length ? { name:'Ad build, by ad', checks:(D.adBuild||[]).map(b=>({ t: b.campaign.replace(/ - Ads \d.*$/,'') + ' · ' + b.what, b:'fail', a: b.done?'pass':'fail', tag: b.tag||null })) } : null;
+  const buildGroup = (D.adBuild||[]).length ? { name:'Ad build, by ad', passLabel:'fixed', checks:(D.adBuild||[]).map(b=>({ t: b.campaign.replace(/ - Ads \d.*$/,'') + ' · ' + b.what, b:'fail', a: b.done?'pass':'fail', tag: b.tag||null })) } : null;
   renderGroups('creativeGroups', withExtra((D.creative||{}).groups, [adsNested(), assetsNested(), buildNested(), tightnessNested(), findGroup('ads')]));
   $('creativeScore').innerHTML = scoreChip(score(['creative']), true);
 
@@ -2079,6 +2099,18 @@
       rows.map(r => { const st = status(r); return '<tr' + (st.cls?' class="'+st.cls+'"':'') + '><td>' + esc(r.campaign.replace(/ - Ads \d.*$/,'')) + '</td><td>' + esc(r.ad_group) + '</td><td>' + r.clicks + '</td><td>' + (r.conv||0) + '</td><td>' + r.ctr.toFixed(1) + '%</td><td>' + r.cvr.toFixed(1) + '%</td><td>' + (r.cpc==null?'-':money(r.cpc)) + '</td><td>' + (r.cpl==null?'-':money(r.cpl)) + '</td>' + grade(r,'ctr') + grade(r,'rel') + '<td>' + st.txt + '</td></tr>'; }).join('') + '</tbody>';
   }
   renderAdTable();
+  // ---------- Quality Score, by ad group (Jono, 15 Sep 2026): the 1-10 score and its three parts, Google's own grades ----------
+  function renderQualityTable(){
+    const host = document.getElementById('qualityTable'); if (!host) return;
+    const rows = D.qualityTable || [];
+    if (!rows.length) { host.innerHTML = ''; document.getElementById('qualityNote').textContent = 'No keyword in a live group has a Quality Score yet (Google grades a keyword once it has enough impressions).'; return; }
+    const spread = a => { if (!a) return '<span class="k">-</span>'; const [b, m, u] = a; return (b ? '<b style="color:#b53333">' + b + ' below</b>' : '') + (b && (m||u) ? ' · ' : '') + (m ? m + ' average' : '') + (m && u ? ' · ' : '') + (u ? '<span style="color:#3d7a4a">' + u + ' above</span>' : ''); };
+    const qsCell = q => q==null ? '<span class="k">-</span>' : '<b style="color:' + (q >= 7 ? '#3d7a4a' : q <= 4 ? '#b53333' : '#8a6a0c') + '">' + q.toFixed(1) + '</b>';
+    host.innerHTML = '<thead><tr><th>Ad group</th><th>Keywords graded</th><th>Quality Score (1-10)</th><th>Expected click-through rate</th><th>Ad relevance</th><th>Landing page experience</th></tr></thead><tbody>' +
+      rows.map(r => '<tr><td>' + esc(r.group) + '</td><td>' + r.keywords + '</td><td>' + qsCell(r.qs) + '</td><td>' + spread(r.ctr) + '</td><td>' + spread(r.rel) + '</td><td>' + spread(r.lp) + '</td></tr>').join('') + '</tbody>';
+    document.getElementById('qualityNote').textContent = "Google's own grades, read per keyword and rolled up by ad group, best score first. Quality Score (1 to 10) is built from the three grades beside it. A below-average grade names the fix: expected click-through rate and ad relevance are the ads and headlines, landing page experience is the page.";
+  }
+  renderQualityTable();
   // ---------- ad assets table (Jono, 12 Sep 2026): every asset type, coverage across live campaigns, what it earned ----------
   (function(){
     const rows = D.assetTable||[]; const host = document.getElementById('assetTable'); if (!host) return;
@@ -2106,11 +2138,13 @@
   (function(){
     const P = D.pageScores||[]; const host = document.getElementById('pageTable'); if (!host) return;
     if (!P.length) { host.innerHTML = '<tbody><tr><td class="k">Not read this run.</td></tr></tbody>'; return; }
-    const rows = P.slice().sort((a,b)=>(b.score||0)-(a.score||0));
-    const band = s => s>=80?'win':s>=60?'neutral':'flag';
-    host.innerHTML = '<thead><tr><th>Page</th><th>Used by</th><th>Score</th><th>Proof</th><th>Loads in</th><th>Leads per 100 clicks</th><th>Jobs</th><th>Earned</th><th>Spent</th></tr></thead><tbody>' +
-      rows.map(p => { const x = p.per100||{}; return '<tr class="' + band(p.score) + '"><td><a href="' + esc(p.url) + '" target="_blank" style="color:var(--ink)">' + esc(shortUrl(p.url)) + '</a></td><td><span class="k">' + (p.groups||[]).length + ' ad group' + ((p.groups||[]).length===1?'':'s') + '</span></td><td><b>' + p.score + '</b>/100</td><td>' + esc(p.proof||'') + '</td><td>' + p.load_s + 's</td><td>' + (x.leads!=null?x.leads:'-') + '</td><td>' + (x.jobs!=null?x.jobs:'-') + '</td><td>' + (x.money!=null?money(x.money):'-') + '</td><td>' + (x.cost!=null?money(x.cost):'-') + '</td></tr>'; }).join('') + '</tbody>';
-    document.getElementById('pageTableNote').textContent = rows.length + ' live landing pages, best score first, on the 16-point checklist (proof counts double). Jobs and money use the close rate and booking value on file (assumptions, not Google data).';
+    const cv = p => (p.per100 && p.per100.leads!=null) ? p.per100.leads : null;
+    const withData = P.filter(p => cv(p)!=null); const avg = withData.length ? withData.reduce((s,p)=>s+cv(p),0)/withData.length : null;
+    const rows = P.slice().sort((a,b)=> (cv(b)==null?-1:cv(b)) - (cv(a)==null?-1:cv(a)));
+    const band = p => cv(p)==null || !avg ? '' : cv(p) >= 1.15*avg ? 'win' : cv(p) <= 0.85*avg ? 'flag' : 'neutral';
+    host.innerHTML = '<thead><tr><th>Page</th><th>Used by</th><th>Leads per 100 clicks</th><th>Cost / lead</th><th>Jobs</th><th>Earned</th><th>Spent</th><th>Checklist</th><th>Proof</th><th>Lighthouse (mobile)</th></tr></thead><tbody>' +
+      rows.map(p => { const x = p.per100||{}; return '<tr class="' + band(p) + '"><td><a href="' + esc(p.url) + '" target="_blank" style="color:var(--ink)">' + esc(shortUrl(p.url)) + '</a></td><td><span class="k">' + (p.groups||[]).length + ' ad group' + ((p.groups||[]).length===1?'':'s') + '</span></td><td><b>' + (x.leads!=null?x.leads:'-') + '</b></td><td>' + (x.cpl!=null?money(x.cpl):'-') + '</td><td>' + (x.jobs!=null?x.jobs:'-') + '</td><td>' + (x.money!=null?money(x.money):'-') + '</td><td>' + (x.cost!=null?money(x.cost):'-') + '</td><td>' + p.score + '/100</td><td>' + esc(p.proof||'') + '</td><td>' + ((p.psi && p.psi.perf!=null) ? p.psi.perf + '/100 · LCP ' + p.psi.lcp_s + 's' : p.load_s + 's') + '</td></tr>'; }).join('') + '</tbody>';
+    document.getElementById('pageTableNote').textContent = rows.length + ' live landing pages, best conversion rate first' + (avg?' (page average ' + avg.toFixed(1) + ' leads per 100 clicks; green 15% or more above it, red 15% or more below)':'') + '. The checklist score on the 13-point list is the why, not the verdict. Jobs and money use the close rate and booking value on file (assumptions, not Google data).';
   })();
   function pagesNested(){
     const P = D.pageScores||[]; if (!P.length) return null; const by = {};

@@ -46,7 +46,7 @@ That is it. Each command walks you through exactly what it needs, the first time
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code) installed
-- Python 3.10+ (`pip install --upgrade "google-ads>=32" python-dotenv requests`)
+- Python 3.10+ (`pip install --upgrade "google-ads>=32" python-dotenv requests playwright` then `python3 -m playwright install chromium` - the audit's page scorer and render check run headless)
 - A Google Ads account (even brand new - `/account-setup` and `/api-setup` handle the wiring)
 - Google Ads API access - `/api-setup` gets Explorer the same day and Basic in minutes; no developer token since 10 September 2026
 - WordPress users: the Novamira plugin + connection (lets Claude build your landing pages directly on your site) - optional, the Next.js lane needs nothing

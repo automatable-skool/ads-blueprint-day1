@@ -1,4 +1,4 @@
-"""Score every live landing page on the 16-point conversion checklist, headless.
+"""Score every live landing page on the 13-point conversion checklist, headless.
 Sources: references/cro-cheatsheet.md (7 rules) + the Agency Website cro-checks (15 machine checks),
 merged and deduped to 18 items. Proof items count double (Jono, 12 Sep 2026: "mostly social proof").
 Usage: python3 code/cro_score.py code/cache/<final-urls>.json code/cache/<out>.json
@@ -42,12 +42,28 @@ def city_of(u):
         return hit
     return next((c for c in CITIES if c in urlparse(u).netloc.lower()), '')
 
+W = {"proof": 2}   # checklist weights: proof counts double
+
+def with_lighthouse(r):
+    """The same row with its speed check judged by Lighthouse LCP (mobile) instead of the stopwatch, rescored."""
+    lcp = (r.get("psi") or {}).get("lcp_s")
+    if "error" in r or lcp is None: return r
+    checks = [{"t": f"Largest Contentful Paint under {LCP_GOOD_S} seconds (Lighthouse, mobile)", "pass": lcp <= LCP_GOOD_S, "kind": "speed"} if c["kind"] == "speed" else c for c in r["checks"]]
+    tot = sum(W.get(c["kind"], 1) for c in checks); got = sum(W.get(c["kind"], 1) for c in checks if c["pass"])
+    return {**r, "checks": checks, "score": round(100 * got / tot)}
+
 def score_page(pg, url, groups):
     t0 = time.time()
     try: pg.goto(url, wait_until='load', timeout=30000)
     except Exception as e: return {"url": url, "groups": groups, "error": str(e)[:120]}
-    load_s = round(time.time() - t0, 2); pg.wait_for_timeout(500)
-    html = pg.content(); text = re.sub(r'\s+', ' ', pg.inner_text('body')).lower()
+    load_s = round(time.time() - t0, 2)
+    try: pg.wait_for_load_state('networkidle', timeout=8000)
+    except Exception: pass
+    pg.wait_for_timeout(500)
+    try: html = pg.content(); text = re.sub(r'\s+', ' ', pg.inner_text('body')).lower()
+    except Exception as e: return {"url": url, "groups": groups, "error": 'page kept navigating: ' + str(e)[:80]}
+    if re.search(r'sgcaptcha|captcha|cf-challenge|just a moment|attention required', html, re.I) and len(html) < 20000:
+        return {"url": url, "groups": groups, "error": "blocked by the host's bot check (captcha)"}
     city = city_of(url)
     h1 = (pg.locator('h1').first.inner_text() if pg.locator('h1').count() else '').strip()
     title = pg.title()
@@ -65,10 +81,8 @@ def score_page(pg, url, groups):
     numbers = bool(re.search(r'\b(\d{1,3}(,\d{3})+|\d+\+)\s*(customers|clients|jobs|projects|homes|patients|members|students|events|weddings|couples|reviews|installs|repairs|cases|years)', text)) or bool(re.search(r'\b\d+\+?\s*years', text))
     checks = [
       ("Headline names the service and the city, in a line that sells", any(x in (h1 or '').lower() for x in service) and bool(city) and city in (h1 or '').lower(), "match"),
-      ("Page title names the city", bool(city) and city in title.lower(), "match"),
       ("One call to action above the fold on a phone", 1 <= fold['cta'] <= 3, "cta"),
       ("Tap-to-call number above the fold", fold['tel'] >= 1, "cta"),
-      ("Click-to-call link anywhere", bool(re.search(r'href=["\']tel:', html, re.I)), "cta"),
       ("Lead form on the page", len(real_forms) >= 1, "form"),
       ("Form has 8 fields or fewer", bool(real_forms) and min(f['fields'] for f in real_forms) <= 8, "form"),
       ("Review stars with a count", stars, "proof"),
@@ -77,11 +91,10 @@ def score_page(pg, url, groups):
       ("Real photos on the page (3 or more)", imgs >= 3, "proof"),
       ("Guarantee stated", bool(re.search(r'guarantee|money.?back|satisfaction', text)), "proof"),
       ("FAQ answers price, timing, guarantee", bool(re.search(r'\bfaq\b|frequently asked|questions', text)), "friction"),
-      ("Service area stated", bool(city) and text.count(city) >= 2, "friction"),
       ("Loads in under 2 seconds", load_s < 2.0, "speed"),
       ("No popup on arrival, few nav exits", (not popup) and fold['navLinks'] <= 6, "friction"),
     ]
-    W = {"proof": 2}; tot = sum(W.get(k, 1) for _, _, k in checks); got = sum(W.get(k, 1) for _, ok, k in checks if ok)
+    tot = sum(W.get(k, 1) for _, _, k in checks); got = sum(W.get(k, 1) for _, ok, k in checks if ok)
     pt = sum(1 for _, _, k in checks if k == 'proof'); pg_ = sum(1 for _, ok, k in checks if k == 'proof' and ok)
     ab = bool(re.search(r'optimizely|vwo\.com|visualwebsiteoptimizer|convert\.com/js|abtasty|unbounce|instapage|splitbee|posthog.*feature|growthbook|launchdarkly|kameleoon|google_optimize|optimize\.js', html, re.I))
     return {"url": url, "groups": groups, "city": city, "h1": h1, "title": title, "load_s": load_s, "ab_script": ab, "form_fields": min([f['fields'] for f in real_forms], default=None),
@@ -93,7 +106,19 @@ with sync_playwright() as p:
     pg = ctx.new_page()
     for u, groups in urls.items():
         clean = re.sub(r'\?.*$', '', u).rstrip('/') or u
-        r = score_page(pg, clean, groups); res.append(r)
+        path = clean.split('//', 1)[-1].split('/', 1)[1] if '/' in clean.split('//', 1)[-1] else ''
+        fetch = clean if (not path or '.' in path.split('/')[-1]) else clean + '/'   # WordPress wants the trailing slash
+        r = score_page(pg, fetch, groups)
+        for attempt in range(3):   # a page that errors, is bot-checked or comes back nearly empty gets three more tries, slower each time
+            if 'error' not in r and r.get('score', 0) >= 20: break
+            pg.wait_for_timeout(8000 * (attempt + 1)); r = score_page(pg, fetch, groups)
+        pg.wait_for_timeout(1500)   # be polite between pages
+        r['url'] = clean; res.append(r)
         print(f"{r.get('score','ERR'):>3} · proof {r.get('proof','-'):5s} · {r.get('load_s','-')}s · {clean}  {('ERROR '+r['error']) if 'error' in r else ''}")
     b.close()
+try:   # Lighthouse (PageSpeed Insights API, mobile) is the speed verdict; the stopwatch stays as load_s for reference
+    from psi_speed import attach_psi, LCP_GOOD_S, line
+    res = [with_lighthouse(r) for r in attach_psi(res)]
+    for r in res: print(line(r))
+except SystemExit as e: print("Lighthouse skipped:", e)
 json.dump(res, open(out, 'w'), indent=1); print("wrote", out)

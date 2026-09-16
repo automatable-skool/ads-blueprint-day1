@@ -51,7 +51,7 @@ Two guardrails that never bend:
 **Check + fix**
 | Command | What it does |
 |---|---|
-| `/audit` | Find everything, you review the report, then one approval fixes it all - dry-runs shown, your numbers still asked |
+| `/audit` | Find everything, you review the report, then one approval fixes it all - dry-runs shown, your numbers still asked. The dashboard is built by three scripts, never by hand: `audit_dashboard_data.py --config` → `cro_score.py` (Lighthouse via `psi_speed.py`) → `build_audit_dashboard.py` |
 
 ## The flow (recommended order)
 

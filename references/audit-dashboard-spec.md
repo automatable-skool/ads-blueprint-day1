@@ -18,20 +18,25 @@ this file wins on layout; audit.md wins on process.
 
 ## The page, top to bottom
 
-1. Header: author (the wordmark top and bottom - the business itself in owner mode, your agency when auditing a prospect), business, account, window, spend. Dials: before, after (real only once fixes shipped).
+1. Header: author (the wordmark top and bottom - the business itself in owner mode, your agency when auditing a prospect), business, account, window, spend. Dials: before, after (real only once fixes shipped). Money at
+   risk is a RANGE with a hover tooltip holding the math (Jono, 15 Sep 2026): low end counted waste (spend
+   above the account's own cost per lead plus junk clicks), high end the page ceiling (spend landing on pages
+   Google grades below average), never summed, never above the window's spend, phone-blind spend left out.
 2. **What to fix first**: one line per finding, worst first. Legend above it. Each line carries a tag:
    `fixed` · `partly fixed · click needed` · `bigger build` (API, needs a yes) · `website access` ·
    `click needed` (the API refuses) · `your proof` / `your number`. Never `no action` - those rows do
    not exist on the page. Fixed lines strike through.
-3. **N things need your hands**: a short checklist, one line per manual item with the first three
-   clicks, and the sentence "The API cannot do these. Message Claude when you are ready and we walk
+3. **N things need your hands**: ONE line under the index, no list - each manual item lives as a
+   `click needed` row in its own section (Jono, 15 Sep 2026). The line reads: the count, that each is
+   tagged click needed in its section, and the sentence "The API cannot do these. Message Claude when you are ready and we walk
    through every step together, one at a time." Full recipes live in audit-report.md.
 4. **The account**: three CSS columns that the ROWS flow through (`columns:3`, boxes allowed to break, rows and headings
    never split), so a 16-line box starts in column one and continues into column two and the three columns
    end level - tracking, networks, autopilot, budgets, economics,
    **Ad types** (Search · Performance Max with guardrails · Maps showing · Local Services Ads
    eligibility), **Retargeting** (lists big enough · watched on search · a live retargeting campaign ·
-   past customers excluded), and the section's findings as checkbox rows.
+   past customers excluded). No findings box here: an account finding is its check row plus its line in
+   the fix-first index, never a third copy (Jono, 15 Sep 2026).
 5. **The campaigns and ad groups**: ONE card with four tabs - by campaign, by ad group, by location,
    by device - each sorted best cost per lead first, green at 0.85x or better, yellow about average,
    red at 1.25x or worse; no dot columns, no "open now" column. Then the grid: **Bleeding money - fix
@@ -52,13 +57,13 @@ this file wins on layout; audit.md wins on process.
    they set the click price; the old distribution bars are gone. Landing page experience renders the same
    way in the pages section, one line, pages as the sub-line. No summary box, no catch-all row, no separate "ad performance outliers" table (the by-ad-group tab and
    the ads table carry it).
-7. **The landing pages**: built like the ads section. A table with one row per live page, best score
-   first: score on the 16-point checklist (proof counts double), proof count, load time, and per 100 clicks
-   the leads, jobs at the close rate on file, money at the booking value on file, spend (jobs and money are
-   labelled assumptions). Then a nested box **Landing pages, by check**: one line per check (headline names
-   the service and the city in a line that sells · one call to action above the fold · tap-to-call above the
-   fold · click-to-call · lead form · 8 fields or fewer · review stars · proof numbers · testimonials · 3+
-   real photos · guarantee · FAQ · service area · under 2 seconds · no popup, few exits) with the pages as
+7. **The landing pages**: built like the ads section. A table with one row per live page, best CONVERSION RATE first (leads per 100 clicks, coloured
+   against the page average with the same bands as every table; the checklist score is a column, the why,
+   never the sort - Jono, 15 Sep 2026): leads per 100 clicks, cost per lead, jobs at the close rate on file,
+   money at the booking value on file, spend, checklist score, proof count, Lighthouse mobile score and Largest Contentful Paint (a stopwatch load time only when no Lighthouse result exists). Then a nested box **Landing pages, by check**: one line per check (headline names
+   the service and the city in a line that sells - no separate page-title check · one call to action above the fold · tap-to-call above the
+   fold · lead form · 8 fields or fewer · review stars · proof numbers · testimonials · 3+
+   real photos · guarantee · FAQ · under 2 seconds · no popup, few exits) with the pages as
    the tick-cross sub-line, every line tagged `website access`. One split-test check, detection only: a testing script in the page source or two ads in one group
    landing on different pages passes it; running page tests is out of scope.
 8. **The keywords and search terms**: the check boxes (phrase match, converting terms as keywords, serving,
@@ -98,3 +103,18 @@ this file wins on layout; audit.md wins on process.
 - `adTable{window,avg{ctr,cvr,cpl},ads[],recentFix{}}` · `assetTable[]` · `adBuild[]` · `pageScores[]` (from
   `cro_score.py`, plus `per100{leads,jobs,money,cost,cpl}`) · `economics` from the account's own
   recorded facts · `settings.groups[]` includes "Ad types" and "Retargeting".
+
+- **Settings, by campaign** (Jono, 15 Sep 2026): the campaign section opens with one nested box, one line per
+  setting, one tick or cross per live campaign: location type is Presence · locations set (city or radius) ·
+  other countries excluded · Search Partners off · Display off · language set · ad schedule set · ad rotation
+  optimised · own budget · bidding suits the lead volume · no dead device modifiers · bids on every lead goal.
+  These rows live here, not in the account section; the account section keeps only account-wide facts
+  (conversion tracking, autopilot, ad types, retargeting, economics). Each line counts once in the score.
+
+## Page speed is Lighthouse, never a stopwatch (Jono, 15 Sep 2026)
+
+`code/psi_speed.py` runs Lighthouse through the PageSpeed Insights API (mobile, performance category, key `PAGESPEED_API_KEY` in `.env`), caches raw reports in `code/cache/psi/` for 7 days (`--max-age-days 0` forces a fresh run) and attaches a `psi` summary (`perf`, `lcp_s`, `fcp_s`, `si_s`, `tbt_ms`, `cls`, field data when Google has it) to every page row. `cro_score.py` calls it after the stopwatch pass and swaps the per-page speed check for "Largest Contentful Paint under 2.5 seconds (Lighthouse, mobile)". The pages section carries ONE speed row, "Pages pass Lighthouse on mobile (performance 50 or more, Largest Contentful Paint under 2.5 seconds)", tagged website access when it fails, and a failing row adds a "Speed up the landing pages on mobile" card to Needs your hands. The bar is Lighthouse's own: under 50 is red, 90 is green; 2.5 s is the Core Web Vitals threshold. Never quote a local DevTools run as the verdict: it runs on the owner's fast machine and reads higher than the API run Google grades against.
+
+## Quality Score tab on the ads card (Jono, 15 Sep 2026)
+
+The ads card has a third tab, **Quality Score, by ad group** (`qualityTable`, built by `build_audit_dashboard.py` from `gradesByGroup`): one row per ad group with keywords graded, the 1-10 Quality Score averaged over its keywords, and the three parts Google grades (expected click-through rate, ad relevance, landing page experience) each shown as "N below · N average · N above". Sorted best first. Show the 1-10 score AND its three parts, never one without the other; the parts are what the owner can act on, the score is what Google prices on.
