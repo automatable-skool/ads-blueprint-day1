@@ -3,29 +3,36 @@ Sources: references/cro-cheatsheet.md (7 rules) + the Agency Website cro-checks 
 merged and deduped to 18 items. Proof items count double (Jono, 12 Sep 2026: "mostly social proof").
 Usage: python3 code/cro_score.py code/cache/<final-urls>.json code/cache/<out>.json
          [--service "drain cleaning,plumber"] [--cities "dallas,plano,frisco"]
---service and --cities are THIS account's words - take them from context/business.md.
-Without --cities the city is read from the URL path only if the page names one it can find,
-so pass the account's real service areas or the three city checks can never pass.
+--service and --cities are THIS account's words. Pass them from context/business.md, or leave
+them off and the script reads "## What we do" and "## Service area" from that file itself.
+No service words anywhere = the script stops; the headline check is meaningless without them.
+Without cities the city is read from the URL path only if the page names one it can find,
+so a business with no service area sees the three city checks fail - by design, not by accident.
 Reads a {url: [ad groups]} map, loads each page in headless Chromium at phone size, writes per-page
 checks, score (0-100) and proof score. Never opens a window.
 """
 import json, re, sys, time
 from urllib.parse import urlparse
 from playwright.sync_api import sync_playwright
+import _business as biz
 
 src, out = sys.argv[1], sys.argv[2]
 def _arg(flag, default):
     return sys.argv[sys.argv.index(flag) + 1] if flag in sys.argv else default
 
-service = [s.strip().lower() for s in _arg('--service', 'wedding dj,dj').split(',') if s.strip()]
+service = [s.strip().lower() for s in _arg('--service', '').split(',') if s.strip()] or biz.sells()
+if not service:
+    sys.exit('cro_score: pass --service "a,b" or fill "## What we do" in context/business.md - '
+             'the headline check needs this account\'s own service words, never a default')
 raw = json.load(open(src)); urls = {}
 for u, g in raw.items():
     k = re.sub(r'\?.*$', '', u).rstrip('/'); urls.setdefault(k, set()).update(g)
 urls = {k: sorted(v) for k, v in urls.items()}
-# The account's service areas. Pass --cities "dallas,plano,frisco" from context/business.md;
-# the fallback below is only a default so a run without the flag still does something.
-CITIES = [c.strip().lower() for c in _arg(
-    '--cities', 'toronto,montreal,vancouver,ottawa,calgary,edmonton,winnipeg').split(',') if c.strip()]
+# The account's service areas. Pass --cities "dallas,plano,frisco", or the script reads
+# "## Service area" from context/business.md. Never a built-in list of somebody else's cities.
+CITIES = [c.strip().lower() for c in _arg('--cities', '').split(',') if c.strip()] or biz.service_areas()
+if not CITIES:
+    print("cro_score: no --cities and no '## Service area' in context/business.md - the city checks will fail", file=sys.stderr)
 
 def city_of(u):
     """The city this page is for: from the URL path, else from its slug or host."""
@@ -55,7 +62,7 @@ def score_page(pg, url, groups):
     popup = pg.evaluate("""() => [...document.querySelectorAll('[role=dialog], .modal, .popup, [class*=popup], [class*=modal], [id*=popup]')].some(e => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return r.width > 200 && r.height > 150 && s.display !== 'none' && s.visibility !== 'hidden'; })""")
     imgs = pg.evaluate("() => [...document.images].filter(i => i.naturalWidth > 200 && i.naturalHeight > 150).length")
     stars = bool(re.search(r'(\d\.\d\s*(stars?|/\s*5|out of 5))|★|⭐|(\d+)\+?\s*(google\s+)?reviews|\b(5|five)[\s-]*stars?\b|5[\s-]*star[\s-]*rated|rated\s+5', text))
-    numbers = bool(re.search(r'\b(\d{1,3}(,\d{3})+|\d+\+)\s*(events|weddings|performances|clients|couples|years|djs|shows)', text)) or bool(re.search(r'\b\d+\+?\s*years', text))
+    numbers = bool(re.search(r'\b(\d{1,3}(,\d{3})+|\d+\+)\s*(customers|clients|jobs|projects|homes|patients|members|students|events|weddings|couples|reviews|installs|repairs|cases|years)', text)) or bool(re.search(r'\b\d+\+?\s*years', text))
     checks = [
       ("Headline names the service and the city, in a line that sells", any(x in (h1 or '').lower() for x in service) and bool(city) and city in (h1 or '').lower(), "match"),
       ("Page title names the city", bool(city) and city in title.lower(), "match"),
@@ -65,7 +72,7 @@ def score_page(pg, url, groups):
       ("Lead form on the page", len(real_forms) >= 1, "form"),
       ("Form has 8 fields or fewer", bool(real_forms) and min(f['fields'] for f in real_forms) <= 8, "form"),
       ("Review stars with a count", stars, "proof"),
-      ("Social proof numbers (events, years, couples)", numbers, "proof"),
+      ("Social proof numbers (jobs, years, clients)", numbers, "proof"),
       ("Testimonials section", bool(re.search(r'testimonial|what (our )?(clients|couples|customers) say|review', text)), "proof"),
       ("Real photos on the page (3 or more)", imgs >= 3, "proof"),
       ("Guarantee stated", bool(re.search(r'guarantee|money.?back|satisfaction', text)), "proof"),

@@ -84,8 +84,8 @@ def pull_terms(ga, customer_id, start, end, campaign_id=None):
         segments.search_term_match_type,
         segments.keyword.info.text,
         segments.keyword.info.match_type,
-        campaign.id, campaign.name,
-        ad_group.id, ad_group.name,
+        campaign.id, campaign.name, campaign.status,
+        ad_group.id, ad_group.name, ad_group.status,
         metrics.impressions, metrics.clicks, metrics.cost_micros,
         metrics.conversions, metrics.conversions_value
       FROM search_term_view
@@ -103,8 +103,10 @@ def pull_terms(ga, customer_id, start, end, campaign_id=None):
             "keyword_match": r.segments.keyword.info.match_type.name,
             "campaign_id": str(r.campaign.id),
             "campaign": r.campaign.name,
+            "campaign_status": r.campaign.status.name,
             "ad_group_id": str(r.ad_group.id),
             "ad_group": r.ad_group.name,
+            "ad_group_status": r.ad_group.status.name,
             "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0.0, "conv_value": 0.0,
         })
         cur["impressions"] += r.metrics.impressions
@@ -124,7 +126,7 @@ def brand_tokens(raw):
 
 def is_brand(term, tokens):
     """A term is brand if any brand token appears in it. Substring, not word match -
-    'djingca' and 'djing ca' both have to count, and brand names run together."""
+    'acmeplumbing' and 'acme plumbing' both have to count, and brand names run together."""
     if not tokens:
         return None          # None means "not determined", never False
     flat = term.lower().replace(" ", "")
@@ -181,10 +183,11 @@ INFORMATIONAL = [
 ]
 
 
-# Adjacent services in the same event category. The owner should not have to
-# predict "confetti machine rental" in advance - if they sell DJ services, every
-# one of these is somebody else's job. Built in so the check works on the first
-# run, and extended by "## What we DON'T do" in context/business.md.
+# Adjacent services - somebody else's job in the same buying moment. Seeded from
+# the events trade this was first run on (the owner should not have to predict
+# "confetti machine rental" in advance); harmless for other trades because it only
+# fires on a term that does NOT also name what THIS business sells. Extended by
+# "## What we DON'T do" in context/business.md, which the script reads itself.
 #
 # ⛔ Only applied when the term does NOT also name what the business sells.
 # "dj and photo booth" is a real combo enquiry and must survive.
@@ -638,6 +641,25 @@ def main():
     print(f"pulling account {customer_id}", file=sys.stderr)
     ga = client.get_service("GoogleAdsService")
     start, end = window(args.days)
+
+    # The business inputs come from context/business.md and .env unless passed by hand.
+    # Nothing about the business is written into this script.
+    import _business as biz
+    auto = []
+    if not args.sells and biz.sells():
+        args.sells = ",".join(biz.sells()); auto.append(f"--sells ({len(biz.sells())}) from business.md")
+    if not args.not_offered and biz.not_offered():
+        args.not_offered = ",".join(biz.not_offered()); auto.append(f"--not-offered ({len(biz.not_offered())}) from business.md")
+    if not args.serve_areas and biz.service_areas():
+        args.serve_areas = ",".join(biz.service_areas()); auto.append(f"--serve-areas ({len(biz.service_areas())}) from business.md")
+    if not args.brand and biz.brand_tokens():
+        args.brand = ",".join(biz.brand_tokens()); auto.append("--brand from BUSINESS_NAME")
+    print("business inputs: " + (" · ".join(auto) if auto else "none auto-filled"), file=sys.stderr)
+    for flag, val in (("--sells", args.sells), ("--not-offered", args.not_offered),
+                      ("--serve-areas", args.serve_areas), ("--brand", args.brand)):
+        if not val:
+            print(f"  {flag} is EMPTY - fill context/business.md (or pass it); the report must say "
+                  f"that check did not run", file=sys.stderr)
 
     tokens = brand_tokens(args.brand)
     not_offered = brand_tokens(args.not_offered)

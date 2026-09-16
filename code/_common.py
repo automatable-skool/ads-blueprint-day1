@@ -116,3 +116,69 @@ def keyword_ideas(client, customer_id, geo, seeds, attempt=0):
             "comp": comp(m.competition).name,
             "cpc": (m.high_top_of_page_bid_micros or 0) / 1_000_000,
         }
+
+
+def pull_existing_negatives(client, customer_id):
+    """Every negative keyword in the account at every level, plus the enabled keywords.
+    The shape /search-terms caches as code/cache/negatives-existing.json - the conflict
+    check in build_search_terms_report.py reads it, and the command reports the live
+    campaign-negative count per campaign from it. Read-only."""
+    ga = client.get_service("GoogleAdsService")
+
+    def rows(q):
+        return ga.search(customer_id=customer_id, query=q)
+
+    out = {"campaign_negs": [], "adgroup_negs": [], "shared": [], "attached": [], "keywords": []}
+    for r in rows("""
+        SELECT campaign.id, campaign.name, campaign.status,
+               campaign_criterion.keyword.text, campaign_criterion.keyword.match_type
+        FROM campaign_criterion
+        WHERE campaign_criterion.negative = TRUE AND campaign_criterion.type = 'KEYWORD'"""):
+        out["campaign_negs"].append({
+            "cid": str(r.campaign.id), "campaign": r.campaign.name, "status": r.campaign.status.name,
+            "text": r.campaign_criterion.keyword.text, "match": r.campaign_criterion.keyword.match_type.name})
+    for r in rows("""
+        SELECT campaign.id, campaign.name, campaign.status, ad_group.id, ad_group.name, ad_group.status,
+               ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type
+        FROM ad_group_criterion
+        WHERE ad_group_criterion.negative = TRUE AND ad_group_criterion.type = 'KEYWORD'"""):
+        out["adgroup_negs"].append({
+            "cid": str(r.campaign.id), "campaign": r.campaign.name, "cstatus": r.campaign.status.name,
+            "ag": r.ad_group.name, "agid": str(r.ad_group.id), "agstatus": r.ad_group.status.name,
+            "text": r.ad_group_criterion.keyword.text, "match": r.ad_group_criterion.keyword.match_type.name})
+    for r in rows("""
+        SELECT shared_set.id, shared_set.name, shared_set.type, shared_set.status,
+               shared_criterion.keyword.text, shared_criterion.keyword.match_type
+        FROM shared_criterion
+        WHERE shared_set.type = 'NEGATIVE_KEYWORDS'"""):
+        out["shared"].append({
+            "set": r.shared_set.name, "setid": str(r.shared_set.id), "type": r.shared_set.type_.name,
+            "status": r.shared_set.status.name,
+            "text": r.shared_criterion.keyword.text, "match": r.shared_criterion.keyword.match_type.name})
+    for r in rows("""
+        SELECT campaign.id, campaign.name, campaign.status, shared_set.id, shared_set.name
+        FROM campaign_shared_set
+        WHERE campaign_shared_set.status = 'ENABLED' AND shared_set.type = 'NEGATIVE_KEYWORDS'"""):
+        out["attached"].append({
+            "cid": str(r.campaign.id), "campaign": r.campaign.name, "cstatus": r.campaign.status.name,
+            "setid": str(r.shared_set.id), "set": r.shared_set.name})
+    for r in rows("""
+        SELECT customer_negative_criterion.negative_keyword_list.shared_set
+        FROM customer_negative_criterion
+        WHERE customer_negative_criterion.type = 'NEGATIVE_KEYWORD_LIST'"""):
+        ss = r.customer_negative_criterion.negative_keyword_list.shared_set
+        if ss:
+            out["attached"].append({"cid": "account", "campaign": "ACCOUNT LEVEL", "cstatus": "ENABLED",
+                                    "setid": ss.split("/")[-1], "set": ss})
+    for r in rows("""
+        SELECT campaign.id, campaign.name, ad_group.id, ad_group.name,
+               ad_group_criterion.keyword.text, ad_group_criterion.keyword.match_type
+        FROM ad_group_criterion
+        WHERE ad_group_criterion.type = 'KEYWORD' AND ad_group_criterion.negative = FALSE
+          AND ad_group_criterion.status = 'ENABLED' AND ad_group.status = 'ENABLED'
+          AND campaign.status = 'ENABLED'"""):
+        out["keywords"].append({
+            "cid": str(r.campaign.id), "campaign": r.campaign.name, "ag": r.ad_group.name,
+            "agid": str(r.ad_group.id), "text": r.ad_group_criterion.keyword.text,
+            "match": r.ad_group_criterion.keyword.match_type.name, "status": "ENABLED"})
+    return out
