@@ -247,7 +247,7 @@ the project root, with `.env` pointing at the account being audited:
 1. `python3 code/audit_dashboard_data.py --config code/cache/<customer>-audit-config.json` - every check on the
    page read from the API in one run (campaign settings, conversions, auto-apply, keywords and grades,
    negatives and conflicts, a year of search terms classified, ads, assets, final URLs, retargeting, Maps).
-   The config holds the account's own facts: cities, service words, brand terms, job value, close rate,
+   The config holds the account's own facts (key by key: `references/audit-config.md`): cities, service words, brand terms, job value, close rate,
    benchmark row, LSA eligibility, far-away places, services not sold, towns to ask about. Write it from
    the owner's answers before the first run; never from another account's context.
 2. `python3 code/cro_score.py code/cache/<customer>-final-urls-<date>.json code/cache/<customer>-cro-<date>.json --service "<service words>"`
