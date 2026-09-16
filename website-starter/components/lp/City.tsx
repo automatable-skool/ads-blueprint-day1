@@ -32,7 +32,7 @@ export function useCity(): string | null {
 /**
  * Renders the city when it resolves, the fallback when it does not.
  *
- *   <h1>Emergency Plumber in <City fallback="Toronto" /></h1>
+ *   <h1>Emergency Plumber in <City fallback={MAIN_CITY} /></h1>   // MAIN_CITY from .env
  *
  * The fallback is not optional and it is not "your area" - it serves for everyone Google cannot
  * place, which is a large share of traffic. Write a real place you actually cover.

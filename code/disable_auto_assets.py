@@ -2,7 +2,7 @@
 (TEXT_ASSET_AUTOMATION → OPTED_OUT) and, on Performance Max, out of final URL
 expansion too (FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION → OPTED_OUT). Both go in
 ONE operation: Google refuses the text opt-out while URL expansion is still on
-(found 11 Sep 2026 on DJNorth.ca). Skips campaigns already opted out.
+(found 11 Sep 2026 on a live account). Skips campaigns already opted out.
 Dry run by DEFAULT: --apply to change anything, --enabled-only to skip paused campaigns."""
 
 import argparse

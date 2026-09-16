@@ -1,14 +1,15 @@
-"""Pre-submit checks for the Google Ads API Basic Access application.
+"""Pre-checks for Google Ads API brand verification (the gate to Basic access) and, with
+--standard, for the Standard access application.
 
-Runs every denial reason that a script can actually verify, before the form is submitted.
-The rest (contact inbox monitored, accounts linked under the MCC, no policy flags) is
+Fetches the four pages verification and any reviewer open, checks the name and address are on them,
+and matches the email domain. --standard adds the design-doc and use-case checks. The rest is
 printed as a manual checklist at the end.
 
 Usage:
   python3 code/preflight_basic_access.py --url https://yoursite.com \
       --name "Acme Plumbing" --email you@acmeplumbing.com \
-      --address "123 Main St" [--use-case use_case.txt] \
-      [--design-doc references/api-application/design-doc.pdf]
+      --address "123 Main St" [--standard --use-case use_case.txt \
+      --design-doc references/api-application/design-doc.pdf]
 
 Exit code 1 if any check FAILs. stdlib only; pypdf is optional for the design-doc word count.
 """
@@ -146,25 +147,27 @@ def main():
     ap.add_argument("--address", default="", help="street address as written on the site")
     ap.add_argument("--use-case", default="", help="text file with the use-case answer")
     ap.add_argument("--design-doc", default="references/api-application/design-doc.pdf")
+    ap.add_argument("--standard", action="store_true", help="also check the Standard access application inputs (design doc, use case)")
     args = ap.parse_args()
 
     check_site(args.url, args.name, args.address)
     check_email(args.email, args.url)
-    check_design_doc(args.design_doc)
-    if args.use_case:
-        check_use_case(args.use_case)
-    else:
-        record("WARN", "use case", "no --use-case file given - paste the answer into a file and re-run")
+    if args.standard:
+        check_design_doc(args.design_doc)
+        if args.use_case:
+            check_use_case(args.use_case)
+        else:
+            record("WARN", "use case", "no --use-case file given - paste the answer into a file and re-run")
 
     width = max(len(n) for _, n, _ in results)
     for status, name, detail in results:
         print(f"{status:4}  {name.ljust(width)}  {detail}")
     fails = sum(1 for s, _, _ in results if s == "FAIL")
     print("\nManual checks (no script can see these):")
-    print("  [ ] API contact inbox is one you check daily - an unanswered clarification email is a denial")
-    print("  [ ] every active Ads account is linked under the MCC that holds the token")
-    print("  [ ] no account under the MCC has a policy suspension or open policy flag")
-    print(f"\n{fails} FAIL" + ("" if fails == 1 else "S") + (" - fix before submitting" if fails else " - ready to submit"))
+    print("  [ ] OAuth consent screen is External and In production, every Branding field filled - verification skips it otherwise")
+    print("  [ ] the Cloud project's IAM owner or editor list holds an inbox you read - Google's notices go there now")
+    print("  [ ] no account this project calls has a policy suspension or open policy flag")
+    print(f"\n{fails} FAIL" + ("" if fails == 1 else "S") + (" - fix before verifying" if fails else " - ready for brand verification"))
     sys.exit(1 if fails else 0)
 
 

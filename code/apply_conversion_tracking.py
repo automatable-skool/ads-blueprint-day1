@@ -1,19 +1,27 @@
-"""Applies the conversion tracking plan for automatable.co.
+"""Applies the standard conversion tracking plan to the account in .env.
 
-Target end state — exactly 3 PRIMARY (money-tied, train Smart Bidding):
-  1. Lead · Form Submit           (existing, kept primary)
-  2. Phone Call 60s+ (from ads)   (created, AD_CALL, 60s threshold)
-  3. Phone Call 60s+ (from website) (created, WEBSITE_CALL, 60s threshold)
+Target end state - exactly 3 PRIMARY (money-tied, train Smart Bidding):
+  1. Your lead action (the form or call action you name with --keep)
+  2. Phone Call 60s+ (from ads)      (created, AD_CALL, 60s threshold)
+  3. Phone Call 60s+ (from website)  (created, WEBSITE_CALL, 60s threshold)
 
 Everything else PRIMARY today gets demoted to SECONDARY (observation only),
 and observation-only actions are created: Form View, Scroll 90%,
 Phone Call any duration.
 
+Nothing about any account is written into this file. The action to keep is
+named on the command line, by exact name or numeric id, and the actions to
+demote are discovered from the account at run time. Dry run by default.
+
+  python3 code/apply_conversion_tracking.py --keep "Lead - Form Submit"
+  python3 code/apply_conversion_tracking.py --keep 1234567890 --apply
+
 Demotions are attempted one at a time: some system-managed action types
-(Smart campaign, Google-hosted) may reject the update — failures are
+(Smart campaign, Google-hosted) may reject the update - failures are
 reported, not fatal.
 """
 
+import argparse
 import os
 import sys
 from dotenv import load_dotenv
@@ -35,21 +43,6 @@ customer_id = os.getenv("GOOGLE_ADS_CUSTOMER_ID")
 ga_service = client.get_service("GoogleAdsService")
 ca_service = client.get_service("ConversionActionService")
 
-KEEP_PRIMARY_ID = 7635960880  # Lead · Form Submit
-
-DEMOTE_IDS = [
-    849324632,   # Clicks to call
-    849324875,   # Local actions - Directions
-    850083061,   # Smart campaign ad clicks to call
-    850084729,   # Submit lead form (older duplicate)
-    858595618,   # Purchase
-    7346484610,  # YouTube channel subscriptions
-    7346585234,  # YouTube follow-on views
-    7370461150,  # Submit lead form | GHL Survey Qualified
-    7633251059,  # Demo 2.0 Delete
-    7633599972,  # Demo [Delete]
-]
-
 NEW_ACTIONS = [
     # (name, type, category, primary, call_duration_seconds)
     ("Phone Call 60s+ (from ads)", "AD_CALL", "PHONE_CALL_LEAD", True, 60),
@@ -58,20 +51,40 @@ NEW_ACTIONS = [
     ("Scroll 90%", "WEBPAGE", "DEFAULT", False, None),
     ("Phone Call any duration (observation)", "AD_CALL", "PHONE_CALL_LEAD", False, 1),
 ]
+NEW_PRIMARY_NAMES = {name for name, _, _, primary, _ in NEW_ACTIONS if primary}
 
 
-def existing_action_names() -> set[str]:
+def live_actions() -> list[dict]:
     query = """
-        SELECT conversion_action.name FROM conversion_action
+        SELECT conversion_action.id, conversion_action.name, conversion_action.primary_for_goal
+        FROM conversion_action
         WHERE conversion_action.status != 'REMOVED'
     """
-    return {r.conversion_action.name for r in ga_service.search(customer_id=customer_id, query=query)}
+    return [{"id": r.conversion_action.id, "name": r.conversion_action.name,
+             "primary": r.conversion_action.primary_for_goal}
+            for r in ga_service.search(customer_id=customer_id, query=query)]
 
 
-def create_new_actions(skip: set[str]) -> None:
+def resolve_keep(keep: list[str], actions: list[dict]) -> list[dict]:
+    """Each --keep is an exact action name or a numeric id. Unknown ones stop the run."""
+    out = []
+    for k in keep:
+        hit = [a for a in actions if str(a["id"]) == k.strip() or a["name"] == k.strip()]
+        if not hit:
+            names = "\n  ".join(f'[{a["id"]}] {a["name"]}' for a in actions)
+            sys.exit(f"--keep {k!r} matches no conversion action. The account has:\n  {names}")
+        out.append(hit[0])
+    return out
+
+
+def create_new_actions(skip: set[str], apply: bool) -> None:
     for name, type_name, category, primary, call_seconds in NEW_ACTIONS:
+        role = "PRIMARY" if primary else "SECONDARY"
         if name in skip:
             print(f"  · exists, skipped: {name}")
+            continue
+        if not apply:
+            print(f"  would create {role}: {name}")
             continue
         op = client.get_type("ConversionActionOperation")
         ca = op.create
@@ -85,8 +98,7 @@ def create_new_actions(skip: set[str]) -> None:
         if call_seconds is not None:
             ca.phone_call_duration_seconds = call_seconds
         try:
-            resp = ca_service.mutate_conversion_actions(customer_id=customer_id, operations=[op])
-            role = "PRIMARY" if primary else "SECONDARY"
+            ca_service.mutate_conversion_actions(customer_id=customer_id, operations=[op])
             print(f"✓ Created {role}: {name}")
         except GoogleAdsException as ex:
             msgs = "; ".join(e.message for e in ex.failure.errors)
@@ -101,14 +113,20 @@ def set_primary_flag(action_id: int, primary: bool) -> None:
     ca_service.mutate_conversion_actions(customer_id=customer_id, operations=[op])
 
 
-def demote_actions() -> None:
-    for action_id in DEMOTE_IDS:
+def demote_others(actions: list[dict], keep_ids: set[int], apply: bool) -> None:
+    """Every PRIMARY action that is not kept and is not one this script creates."""
+    for a in actions:
+        if not a["primary"] or a["id"] in keep_ids or a["name"] in NEW_PRIMARY_NAMES:
+            continue
+        if not apply:
+            print(f"  would demote to SECONDARY: [{a['id']}] {a['name']}")
+            continue
         try:
-            set_primary_flag(action_id, False)
-            print(f"✓ Demoted to SECONDARY: [{action_id}]")
+            set_primary_flag(a["id"], False)
+            print(f"✓ Demoted to SECONDARY: [{a['id']}] {a['name']}")
         except GoogleAdsException as ex:
             msgs = "; ".join(e.message for e in ex.failure.errors)
-            print(f"✗ Could not demote [{action_id}]: {msgs}")
+            print(f"✗ Could not demote [{a['id']}] {a['name']}: {msgs}")
 
 
 def show_final_state() -> None:
@@ -135,16 +153,31 @@ def show_final_state() -> None:
         a = row.conversion_action
         role = "PRIMARY  " if a.primary_for_goal else "SECONDARY"
         extra = f" ({a.phone_call_duration_seconds}s min)" if a.phone_call_duration_seconds else ""
-        print(f"  {role}  [{a.id}] {a.name} — {a.type_.name}/{a.category.name}{extra}")
+        print(f"  {role}  [{a.id}] {a.name} - {a.type_.name}/{a.category.name}{extra}")
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--keep", action="append", required=True,
+                    help="conversion action to keep PRIMARY - exact name or numeric id; repeatable")
+    ap.add_argument("--apply", action="store_true", help="make the changes - default is a dry run")
+    args = ap.parse_args()
     try:
-        create_new_actions(existing_action_names())
-        demote_actions()
-        set_primary_flag(KEEP_PRIMARY_ID, True)
-        print(f"✓ Kept PRIMARY: [{KEEP_PRIMARY_ID}] Lead · Form Submit")
-        show_final_state()
+        actions = live_actions()
+        keep = resolve_keep(args.keep, actions)
+        keep_ids = {a["id"] for a in keep}
+        print(f"Account {customer_id} · {'APPLYING' if args.apply else 'DRY RUN'}")
+        print("Keeping PRIMARY: " + ", ".join(f'[{a["id"]}] {a["name"]}' for a in keep))
+        create_new_actions({a["name"] for a in actions}, args.apply)
+        demote_others(actions, keep_ids, args.apply)
+        if args.apply:
+            for a in keep:
+                if not a["primary"]:
+                    set_primary_flag(a["id"], True)
+                    print(f"✓ Set PRIMARY: [{a['id']}] {a['name']}")
+            show_final_state()
+        else:
+            print("\nDRY RUN - nothing changed. Re-run with --apply.")
     except GoogleAdsException as ex:
         for error in ex.failure.errors:
             print(f"✗ Google Ads error: {error.message}", file=sys.stderr)

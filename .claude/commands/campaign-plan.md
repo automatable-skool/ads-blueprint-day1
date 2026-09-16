@@ -36,7 +36,7 @@ Build my campaigns. Read `references/campaigns.md` FIRST and follow it exactly.
 - **⛔ Checking the account list: `shared_set.member_count` reports 0 for `ACCOUNT_LEVEL_NEGATIVE_KEYWORDS` and is not to be trusted** [F, 1 September 2026]. It reads as an empty list when the list is full. Count the members with `SELECT shared_criterion.keyword.text FROM shared_criterion WHERE shared_set.id = <id>` instead. Never tell the owner their negatives are missing on the strength of `member_count`
 - Confirm the lead conversion action is Primary and biddable before the build (the November 2025 goals change)
 
-**Starter RSAs:** write them from `context/proof.md` via `code/build_ads.py` - real claims only. These are placeholders that make the campaigns valid; `/write-ads` builds the real library next.
+**Starter RSAs:** none from this command. `/write-ads` writes them from `context/proof.md` and `code/push_ads.py` creates them PAUSED - an ad group with no ad serves nothing, which is exactly right until the copy is approved.
 
 **EVERYTHING LANDS PAUSED.** Nothing spends until I review and flip it on myself.
 

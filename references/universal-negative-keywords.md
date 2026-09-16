@@ -450,7 +450,7 @@ Negatives:
 [paste sections A.1 through A.7 above - one term per line]
 ```
 
-The script itself lives at `google-ads-api-setup/add_shared_negative_list.py`. Build it from the SOP at `prompts/build-your-first-skag.md`, step four.
+The script is `code/add_shared_negative_list.py` - dry run by default, `--apply` to push, `--attach` to attach it to the enabled Search campaigns. It holds back any term that names a service in `context/business.md`.
 
 ---
 

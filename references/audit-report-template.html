@@ -1,5 +1,5 @@
 <!--
-  audit-report-template.html · rewritten 12 Sep 2026 after the DJNorth.ca fix pass (Jono's rulings):
+  audit-report-template.html · rewritten 12 Sep 2026 after the first fix pass (Jono's rulings):
   - leaks[].progress: fixed · partly fixed · click needed · bigger build · website access · your proof · your number
     (never "no action" - those rows stay in audit-report.md). Legend renders above the fix-first index.
   - byHand[]: {title, why, path, done, verify} - one recipe card each, rendered under the index.
@@ -202,6 +202,7 @@
 <script id="audit-data" type="application/json">{
  "mode": "owner",
  "business": "Dave's Plumbing",
+ "author": "Dave's Plumbing",
  "account": "482-931-7740",
  "domain": "davesplumbing.ca",
  "date": "31 August 2026",
@@ -1499,7 +1500,7 @@
 </head>
 <body>
 <div class="nav"><div class="rail">
-  <span class="wordmark display"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z"/></svg>Automatable</span>
+  <span class="wordmark display"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z"/></svg><span id="brand"></span></span>
   <nav class="jump" id="jump"></nav>
   <span class="chip" id="modechip"></span>
 </div></div>
@@ -1600,7 +1601,7 @@
 
 </main>
 </div>
-<footer><div class="rail"><span class="wordmark display"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z"/></svg>Automatable</span><span id="foot"></span></div></footer>
+<footer><div class="rail"><span class="wordmark display"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2 L13.4 10.6 L22 12 L13.4 13.4 L12 22 L10.6 13.4 L2 12 L10.6 10.6 Z"/></svg><span id="brand2"></span></span><span id="foot"></span></div></footer>
 
 <script>
 (function(){
@@ -1694,6 +1695,8 @@
   document.title = 'Google Ads audit · ' + D.business;
   $('modechip').textContent = P ? 'Report only' : 'Report + fix';
   $('business').textContent = D.business;
+  // The wordmark, top and bottom: the business itself in owner mode, the agency when auditing a prospect.
+  const brand = D.author || D.business; $('brand').textContent = brand; $('brand2').textContent = brand;
   $('domain').textContent = D.domain; $('domain').href = 'https://' + D.domain;
   $('stamp').textContent = D.date + ' · account ' + D.account + ' · ' + D.window;
 

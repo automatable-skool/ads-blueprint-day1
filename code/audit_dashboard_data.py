@@ -2,7 +2,7 @@
 Read-only. Produces code/cache/<customer>-dashboard-<date>.json with the blocks the
 report template consumes (see references/audit-dashboard-spec.md):
   adTable · assetTable · adBuild · adGroups · finalUrls · retargeting · adTypes · autoApply · gbp
-Usage: python3 code/audit_dashboard_data.py [--days 365] [--cities toronto,montreal,...]
+Usage: python3 code/audit_dashboard_data.py [--days 365] [--cities <city one>,<city two>,...]
 Every query names campaign.status in SELECT when it filters on it (API v24 rule).
 """
 import argparse, datetime, json, os, re, sys

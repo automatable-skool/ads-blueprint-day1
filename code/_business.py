@@ -1,8 +1,8 @@
 """Read the member's business from context/business.md - the one place every script
 gets it from. Nothing in code/ names a trade, a city or a brand; this file reads them.
 
-Written 16 September 2026, the day a member could not point judge_terms.py at a gym
-because the script had a wedding DJ company written into it.
+Written 16 September 2026, the day a member could not point judge_terms.py at their
+own business because another business was written into the script.
 
 The starter business.md has fixed headings (What we do · What we DON'T do · Service
 area) but members reshape the file, so the section finder is tolerant: it takes the
@@ -101,7 +101,7 @@ def name(md=None):
 def brand_tokens(raw=None):
     """Brand tokens, lowercase. From a comma list when given, else derived from the
     business name: 'Acme Plumbing' -> ['acme plumbing', 'acmeplumbing'];
-    'DJing.ca' -> ['djing.ca', 'djingca', 'djing', 'djing ca']. Empty when nothing is known."""
+    'AcmePlumbing.ca' -> ['acmeplumbing.ca', 'acmeplumbing', 'acmeplumbing ca']. Empty when nothing is known."""
     if raw:
         return [t.strip().lower() for t in raw.split(",") if t.strip()]
     n = name().lower().strip()
@@ -125,6 +125,23 @@ def is_brand(term, tokens):
         return False
     flat = term.lower().replace(" ", "")
     return any(t.replace(" ", "") in flat for t in tokens)
+
+
+def country():
+    """Two-letter home country: COUNTRY in .env, else the "Country customers search from" line
+    in business.md. '' when unknown - callers then skip any country-dependent check."""
+    raw = _env_value("COUNTRY")
+    if not raw:
+        m = re.search(r"country[^:\n]*:\s*([A-Za-z .]+)", _strip(read()), re.I)
+        raw = m.group(1) if m else ""
+    raw = raw.strip().lower().strip(".")
+    table = {"CA": ("ca", "canada"), "US": ("us", "usa", "u.s", "u.s.a", "united states", "united states of america", "america"),
+             "GB": ("uk", "gb", "united kingdom", "england", "britain", "great britain", "scotland", "wales"),
+             "AU": ("au", "australia"), "NZ": ("nz", "new zealand"), "IE": ("ie", "ireland")}
+    for code, names in table.items():
+        if raw in names:
+            return code
+    return ""
 
 
 def sells():

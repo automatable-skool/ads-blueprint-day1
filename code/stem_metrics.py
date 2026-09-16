@@ -8,15 +8,19 @@ Usage: python3 code/stem_metrics.py --stems-file stems.txt --country US
 import argparse, csv, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import load_client, chunks, country_geo, resolve_city_geo, ENGLISH
+from _business import country as home_country
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stems-file", required=True)
-    ap.add_argument("--country", default="US")
+    ap.add_argument("--country", default=None, help="ISO code. Default: the country in context/business.md")
     ap.add_argument("--city", help="pin volumes to one city instead of the whole country")
     ap.add_argument("--out", default="stem-metrics.csv")
     args = ap.parse_args()
+    args.country = (args.country or home_country() or "").upper()
+    if not args.country:
+        sys.exit("no country - set 'Country customers search from' in context/business.md, or pass --country XX")
 
     stems = [s.strip() for s in open(args.stems_file) if s.strip()]
     client, cid = load_client()

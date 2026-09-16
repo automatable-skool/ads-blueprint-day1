@@ -12,7 +12,7 @@ Architecture (references/stag.md section 6, campaign-plan.md):
   KEYWORDS  = the group's primary + rest, phrase match, NO city appended
   LOCATION  = campaign level, Presence only. That is what makes it local, not the keywords
   NEGATIVES = the cross-group table, applied at ad group level so one search lands in one group
-  ADS       = NOT built here. /write-ads builds the real library via code/build_ads.py
+  ADS       = NOT built here. /write-ads builds the real library via code/push_ads.py
 
 Order is keyword-list.md order, top down. Default 3 groups, HOLD groups skipped.
 No language criterion is sent: Google is removing language targeting from Search in
@@ -22,7 +22,7 @@ Usage:
   python3 code/build_campaigns.py --dry-run
   python3 code/build_campaigns.py --apply
   python3 code/build_campaigns.py --apply --groups 3 --country US
-  python3 code/build_campaigns.py --apply --cities "Toronto,Hamilton" --schedule 7-19
+  python3 code/build_campaigns.py --apply --cities "<city one>,<city two>" --schedule 7-19
   python3 code/build_campaigns.py --apply --geo-interest      # destination businesses only
 
 Nothing is created without --apply.
@@ -405,7 +405,7 @@ def main():
         print(f"Failed: {', '.join(failures)} - fix and rerun.")
         sys.exit(1)
     print("Everything created PAUSED. Nothing spends until you enable it in the UI.")
-    print("No ads were built - run /write-ads next (code/build_ads.py).")
+    print("No ads were built - run /write-ads next (code/push_ads.py).")
 
 
 if __name__ == "__main__":

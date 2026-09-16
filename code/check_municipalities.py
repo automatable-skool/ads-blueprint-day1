@@ -6,7 +6,7 @@ places with genuine demand are shown at checkpoint 2.
 
 Usage:
   python3 check_municipalities.py --probe "plumber" \
-      --munis "Toronto,Mississauga,Brampton,..." [--country CA]
+      --munis "<city one>,<city two>,..." [--country CA]
   python3 check_municipalities.py --probe "plumber" --munis-file munis.txt
 """
 
@@ -19,6 +19,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import (load_client, chunks, resolve_city_geo, country_geo,
                      keyword_ideas)
+from _business import country as home_country
 
 
 def main():
@@ -26,7 +27,7 @@ def main():
     ap.add_argument("--probe", required=True, help="core service term, e.g. 'plumber'")
     ap.add_argument("--munis", help="comma-separated municipality names")
     ap.add_argument("--munis-file", help="file with one municipality per line")
-    ap.add_argument("--country", help="ISO code e.g. CA, US (else inferred from first muni)")
+    ap.add_argument("--country", help="ISO code e.g. CA, US. Default: context/business.md, else inferred from the first muni")
     ap.add_argument("--out", default="municipalities.csv")
     args = ap.parse_args()
 
@@ -38,7 +39,7 @@ def main():
         sys.exit("Provide --munis or --munis-file")
 
     client, customer_id = load_client()
-    cc = (args.country or "").upper()
+    cc = (args.country or home_country() or "").upper()
     if not cc:
         _, cc = resolve_city_geo(client, munis[0])
     geo = country_geo(cc)

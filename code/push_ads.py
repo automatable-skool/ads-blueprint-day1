@@ -308,7 +308,7 @@ def main():
     ap.add_argument("--ad-group", action="append", default=[],
                     help="the ad group to push. One per run - that is the rule, not a suggestion.")
     ap.add_argument("--allow-batch", action="store_true",
-                    help="push more than one ad group in a run. Only when Jono asked for more than "
+                    help="push more than one ad group in a run. Only when the owner asked for more than "
                          "one in words, and only when the budget funds them.")
     ap.add_argument("--home-url", default=os.getenv("SITE_BASE_URL", ""),
                     help="home page used as the placeholder final URL for an ad group whose "

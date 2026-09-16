@@ -33,24 +33,40 @@ ACCOUNT_NEG = re.compile(
     r"free|cheap|coupon|coupons|voucher|discount|sample|samples|clearance|"
     r"part|parts|supply|supplies|wholesale|fitting|fittings|diagram|schematic|"
     r"manual|complaint|refund|cancel|login|"
-    r"home depot|lowes|rona|canadian tire|amazon|wayfair|ikea"
+    r"home depot|lowes|menards|ace hardware|rona|canadian tire|bunnings|mitre 10|screwfix|wickes|toolstation|amazon|wayfair|ikea"
     r")\b"
 )
+
+
+def _library_calls_without_token():
+    """google-ads 32.0.0 (9 September 2026) is the first release that sends no developer-token header."""
+    try:
+        from importlib.metadata import version
+        return int(version("google-ads").split(".")[0]) >= 32
+    except Exception:  # noqa: BLE001 - unknown version = assume old
+        return False
 
 
 def load_client():
     load_dotenv(os.path.join(os.getcwd(), ".env"))
     cfg = {
-        "developer_token": os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN"),
         "client_id": os.getenv("GOOGLE_ADS_CLIENT_ID"),
         "client_secret": os.getenv("GOOGLE_ADS_CLIENT_SECRET"),
         "refresh_token": os.getenv("GOOGLE_ADS_REFRESH_TOKEN"),
-        "login_customer_id": os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID"),
+        "login_customer_id": os.getenv("GOOGLE_ADS_LOGIN_CUSTOMER_ID") or None,
         "use_proto_plus": True,
     }
-    miss = [k for k, v in cfg.items() if v is None and k != "login_customer_id"]
+    miss = [k for k, v in cfg.items() if not v and k != "login_customer_id"]
     if miss:
-        sys.exit(f"Missing Google Ads credentials in ./.env: {miss}")
+        sys.exit(f"Missing Google Ads credentials in ./.env: {miss} - /api-setup walks you through each one")
+    # Developer tokens were sunset on 9 September 2026: the access level now comes from the Cloud
+    # project behind the OAuth client. An old token still in .env is passed through; Google ignores it.
+    token = os.getenv("GOOGLE_ADS_DEVELOPER_TOKEN")
+    if token:
+        cfg["developer_token"] = token
+    elif not _library_calls_without_token():
+        sys.exit("google-ads 32.0.0 or newer is needed to call the API without a developer token: "
+                 "pip install --upgrade google-ads")
     return GoogleAdsClient.load_from_dict(cfg), os.getenv("GOOGLE_ADS_CUSTOMER_ID")
 
 

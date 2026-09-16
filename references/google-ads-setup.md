@@ -63,11 +63,11 @@ Both go in the `.env`. Both are stored **without hyphens** - hyphens raise `INVA
 
 1. Open: https://ads.google.com/home/tools/manager-accounts/
 2. Click **"Create a manager account"**
-3. Account name: `Jono Catliff MCC`
+3. Account name: `<Your Name> MCC`
 4. "Are you primarily going to manage your own accounts or other people's accounts?" -> either option works. Pick **"Manage my own accounts"** if you're the only user. Both create a functional MCC that can request a developer token.
-5. Country: **Canada**
+5. Country: **the country your business is in** - the one in `context/business.md`
 6. Time zone: your local
-7. Currency: **CAD**
+7. Currency: **the currency your Google Ads account bills in** (`context/business.md`, "Account bills in") - permanent once set
 8. Submit
 
 ### After submitting
@@ -143,7 +143,7 @@ Two forms. The first gives you the token (usually with instant Explorer Access).
 
 Your email domain, Company URL and Company name should all agree. Google's written rule is only that the site is live and the email is monitored; the consistency rule is what has worked in practice and is repeated across every guide. (b)
 
-Good: `jono@jonocatliff.com` with `jonocatliff.com` and "Jono Catliff".
+Good: `dana@whitfieldelectrical.com` with `whitfieldelectrical.com` and "Whitfield Electrical".
 
 Bad: `someone@gmail.com` with `random-site.io` and "12345 Canada Inc."
 

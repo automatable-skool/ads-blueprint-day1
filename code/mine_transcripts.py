@@ -260,7 +260,7 @@ def scan(root: Path, limit=None):
 
 
 def readable_project(name: str) -> str:
-    name = name.replace("-Users-jonocatliff-Documents-", "").replace("-", " ")
+    name = re.sub(r"^-?Users-[^-]+-Documents-", "", name).replace("-", " ")
     return name.strip() or "unknown project"
 
 

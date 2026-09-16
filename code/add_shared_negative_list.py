@@ -1,20 +1,27 @@
-"""Create the account-level negative keyword list in Google Ads.
+"""Create the universal negative keyword list in Google Ads.
 
 Builds a SHARED Negative Keyword List named "Universal Service Business
-Negatives v1" in the account named by GOOGLE_ADS_CUSTOMER_ID from
-account-negatives.md, then (optionally) attaches it to every enabled Search
-campaign so it applies account-wide.
+Negatives v1" in the account named by GOOGLE_ADS_CUSTOMER_ID, and with --attach
+attaches it to every enabled Search campaign so it applies account-wide.
 
-Idempotent: find-or-create the shared set, and only add keywords that aren't
-already in it. Safe to re-run.
+The list is UNIVERSAL: job seekers, DIY, education, freebies, support, restricted.
+No trade words and no place names - a shared list reaches every campaign forever,
+so the services you do not sell and the cities you do not serve are campaign
+negatives from context/business.md (via /account-setup and /search-terms), never
+here. Any term that names a service in context/business.md is held back.
 
-Match types: bare word = BROAD, "quoted" = PHRASE, [bracket] = EXACT.
+Dry run by default. --apply pushes. Idempotent: find-or-create the shared set,
+and only add keywords that are not already in it. Safe to re-run.
+
+  python3 code/add_shared_negative_list.py                  # show the list
+  python3 code/add_shared_negative_list.py --apply --attach # push and attach
 """
 
 import os
 from dotenv import load_dotenv
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
+import _business as biz
 
 load_dotenv()
 
@@ -59,13 +66,11 @@ BROAD = [
     # restricted
     "porn", "adult", "nude", "sex", "gambling", "casino", "weed", "marijuana",
     "cbd", "crypto", "bitcoin", "nft", "mlm", "ponzi",
-    # plumbing industry / parts
-    "parts", "supplies", "wholesale", "fitting", "fittings", "diagram", "schematic",
-    "manual", "torque", "amperage", "voltage",
-    # geo (metros NOT serviced)
-    "calgary", "edmonton", "vancouver", "montreal", "ottawa", "winnipeg", "kitchener",
-    "waterloo", "windsor", "barrie", "guelph", "quebec", "alberta", "usa",
-    "california", "texas", "florida",
+    # parts shoppers (a product, not a job)
+    "parts", "supplies", "wholesale", "diagram", "schematic", "manual",
+    # ⛔ no place names and no trade words here. A shared list reaches every campaign
+    # forever; the cities you do not serve and the jobs you do not do come from
+    # context/business.md as campaign negatives, never from a universal list.
 ]
 PHRASE = [
     "hourly pay", "position open", "hiring near me", "work from home",
@@ -76,9 +81,7 @@ PHRASE = [
     "how to become", "promo code", "what is", "what is a", "what does", "what are",
     "return policy", "warranty claim", "not working", "phone number",
     "customer service", "sign in",
-    "spec sheet", "plumber salary", "plumbing apprentice", "electrician union",
-    "roofer hourly",
-    "london ontario", "united states", "new york", "british columbia",
+    "spec sheet",
 ]
 
 ga = client.get_service("GoogleAdsService")
@@ -184,9 +187,32 @@ def attach(shared_set_rn, campaigns):
 
 
 def main():
+    import argparse
+    global LIST_NAME
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--apply", action="store_true", help="create the list and add the terms - default is a dry run")
+    ap.add_argument("--attach", action="store_true", help="also attach the list to every enabled Search campaign")
+    ap.add_argument("--name", help="shared list name (default: the name set at the top of this file)")
+    args = ap.parse_args()
+    if args.name:
+        LIST_NAME = args.name
+
     want = [(t, "BROAD") for t in BROAD] + [(t, "PHRASE") for t in PHRASE]
+    # ⛔ Never push a negative that names what this business sells ("## What we do").
+    sells = biz.sells()
+    held = [(t, mt) for t, mt in want if any(w and (w in t.lower() or t.lower() in w) for w in sells)]
+    want = [w for w in want if w not in held]
+    n_broad = sum(1 for _, m in want if m == "BROAD")
     print(f"Account {customer_id} | list '{LIST_NAME}' | {len(want)} terms "
-          f"({len(BROAD)} broad, {len(PHRASE)} phrase)\n")
+          f"({n_broad} broad, {len(want) - n_broad} phrase)")
+    if held:
+        print(f"held back {len(held)} term(s) that name a service in context/business.md: "
+              + ", ".join(f'"{t}"' for t, _ in held))
+    if not args.apply:
+        for t, mt in want:
+            print(f"  {mt:6s} {t}")
+        print("\nDRY RUN - nothing changed. Re-run with --apply, plus --attach to attach it to the enabled Search campaigns.")
+        return
 
     rn = find_shared_set()
     if rn:
@@ -198,20 +224,22 @@ def main():
     added = add_criteria(rn, want)
     print(f"• Negative keywords added this run: {added}")
 
-    camps = enabled_search_campaigns()
-    if not camps:
-        print("\n• No enabled Search campaigns yet — list is created and ready to "
-              "attach when you launch one.")
+    if not args.attach:
+        print("\n• Not attached (pass --attach). A shared list only works on the campaigns it is attached to.")
     else:
-        print(f"\n• Found {len(camps)} enabled Search campaign(s):")
-        for _id, name, _rn in camps:
-            print(f"    - {name} ({_id})")
-        n = attach(rn, camps)
-        print(f"• Attached the list to {n} campaign(s) this run "
-              f"({len(camps) - n} already attached).")
+        camps = enabled_search_campaigns()
+        if not camps:
+            print("\n• No enabled Search campaigns yet - list is created and ready to "
+                  "attach when you launch one.")
+        else:
+            print(f"\n• Found {len(camps)} enabled Search campaign(s):")
+            for _id, name, _rn in camps:
+                print(f"    - {name} ({_id})")
+            n = attach(rn, camps)
+            print(f"• Attached the list to {n} campaign(s) this run "
+                  f"({len(camps) - n} already attached).")
 
-    print(f"\n✓ Done. '{LIST_NAME}' is live in the account.")
-
+    print(f"\n✓ Done. '{LIST_NAME}' is in the account.")
 
 if __name__ == "__main__":
     try:

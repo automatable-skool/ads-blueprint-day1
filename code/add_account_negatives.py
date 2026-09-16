@@ -11,6 +11,7 @@ import os
 from dotenv import load_dotenv
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
+import _business as biz
 
 load_dotenv()
 
@@ -72,19 +73,12 @@ RESTRICTED = [
     "porn", "adult", "nude", "sex", "gambling", "casino", "weed", "marijuana",
     "cbd", "crypto", "bitcoin", "nft", "mlm", "ponzi",
 ]
-# From context/business.md - "What we DON'T do". REPLACE these with your own.
-# The list below is an EXAMPLE for a residential plumber, not a default to keep.
-# ⛔ Never block a word you actually sell to, and never block a city you serve -
-# a trade word or a city name in here throws away real buyers.
-DONT_DO = [
-    "commercial", "industrial", "new construction", "builder", "builders",
-    "septic", "septic tank", "well drilling", "well pump",
-    "gas line", "gas fitter", "gas fitting",
-    "hvac", "furnace", "furnaces", "boiler", "boilers", "radiant heating",
-    "pool", "pools", "hot tub", "irrigation", "sprinkler", "sprinklers",
-    "appliance repair", "dishwasher repair", "washing machine repair",
-    "parts", "parts store", "supplies", "wholesale",
-]
+# From context/business.md - "## What we DON'T do", read at run time by _business.py, so this is
+# always THIS account's list and never somebody else's trade. (An earlier version shipped a
+# residential plumber's list here - "hvac", "septic", "pool" - which would have blocked an HVAC
+# company's own buyers.) ⛔ Never block a word you sell to, never block a city you serve.
+DONT_DO = biz.not_offered()
+SELLS = biz.sells()
 
 ALL_TERMS = (JOB_SEEKERS + DIY + EDUCATION + FREE + INFO + SUPPORT
              + RESTRICTED + DONT_DO)
@@ -186,9 +180,17 @@ def main() -> None:
     if args.name:
         LIST_NAME = args.name
     source = load_terms_file(args.terms_file) if args.terms_file else ALL_TERMS
+    if not args.terms_file:
+        print(f"{len(DONT_DO)} don't-do term(s) read from context/business.md"
+              + ("" if DONT_DO else " - fill '## What we DON'T do' or pass --terms-file"))
     # de-dupe while preserving order
     seen: set[str] = set()
     terms = [t for t in source if not (t.lower() in seen or seen.add(t.lower()))]
+    # ⛔ Never push a negative that names what this business sells ("## What we do").
+    held = [t for t in terms if any(w and (w in t.lower() or t.lower() in w) for w in SELLS)]
+    if held:
+        print(f"held back {len(held)} term(s) that name a service you sell: " + ", ".join(f'"{t}"' for t in held))
+        terms = [t for t in terms if t not in held]
     if not args.apply:
         print(f"DRY RUN · list '{LIST_NAME}' · {len(terms)} unique PHRASE terms would be added and "
               f"attached at ACCOUNT level:")

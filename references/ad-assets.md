@@ -185,7 +185,7 @@ Worth a slot in tier 2 only because it is gated. On the numbers it would be tier
 
 **Business name (a)**
 - **25 characters.**
-- Must exactly match the **verified domain root** or the verified legal entity name, and must be clearly present on the landing page. **This is not the brand name, and the difference is not cosmetic** - "Automatable" was disapproved on a live account on 1 September 2026 where the verified domain is `automatable.co`; the domain form was accepted. When the Google Ads account is named after the domain, use the domain. Keep the brand name for the lead form's `business_name`, which has no such rule.
+- Must exactly match the **verified domain root** or the verified legal entity name, and must be clearly present on the landing page. **This is not the brand name, and the difference is not cosmetic** - on a live account on 1 September 2026 the brand name ("Acme") was disapproved while the verified domain (`acme.co`) was accepted. When the Google Ads account is named after the domain, use the domain. Keep the brand name for the lead form's `business_name`, which has no such rule.
 - **No keywords.** "Emergency plumber Toronto" is rejected.
 - A different trading name needs brand verification against an active trademark.
 
@@ -195,9 +195,9 @@ Worth a slot in tier 2 only because it is gated. On the numbers it would be tier
 - Must appear on the landing page. Google checks.
 - Disapproved: blurry, poorly cropped, colour-inverted, distorted, a single block of colour, or mismatched to the business.
 
-**⛔ A disapproved business name CANNOT be fixed by creating it again [F, 1 September 2026].** Google deduplicates text assets: creating an asset with identical text resolves to the SAME asset id and it keeps its old verdict. On a live account, "Automatable" was disapproved, recreated, and came back as asset 310621690438 with `ASSET_DISAPPROVED` still on it. The only route is **Appeal** in the UI on that asset. Reason **Dispute decision** when the landing page did not change - claiming "Made changes to comply" for a change never made is what triggers Google's limit on appeals. Scope it to **business names**, not every extension in the account.
+**⛔ A disapproved business name CANNOT be fixed by creating it again [F, 1 September 2026].** Google deduplicates text assets: creating an asset with identical text resolves to the SAME asset id and it keeps its old verdict. On a live account, the brand name was disapproved, recreated, and came back as the same asset id with `ASSET_DISAPPROVED` still on it. The only route is **Appeal** in the UI on that asset. Reason **Dispute decision** when the landing page did not change - claiming "Made changes to comply" for a change never made is what triggers Google's limit on appeals. Scope it to **business names**, not every extension in the account.
 
-**The disapproval you will actually hit is "Business Information - Name Prominence."** The name has to be readable as TEXT on the landing page - `<title>`, the header wordmark and the footer all count, an SVG logo with no text does not - and it has to match the advertiser's verified identity. Worth knowing: on that same account, `Automatable` was disapproved while the Google Ads account was still named `automatable.co`, and the domain form went straight to review. If the brand form keeps failing, put the wordmark in the H1 area of the page, or fall back to the domain form. Check the page before appealing: fetch it and count the visible occurrences of the name.
+**The disapproval you will actually hit is "Business Information - Name Prominence."** The name has to be readable as TEXT on the landing page - `<title>`, the header wordmark and the footer all count, an SVG logo with no text does not - and it has to match the advertiser's verified identity. Worth knowing: on that same account, the brand form was disapproved while the Google Ads account was still named after the domain, and the domain form went straight to review. If the brand form keeps failing, put the wordmark in the H1 area of the page, or fall back to the domain form. Check the page before appealing: fetch it and count the visible occurrences of the name.
 
 **Turn off "Dynamic business information"** once you have uploaded a real name and logo, or Google's crawled version can serve instead.
 
@@ -462,7 +462,7 @@ Assets are reusable objects. The link is separate, and the link carries its own 
 - **Sitelink targets rewritten from navigation to intent.** About and Contact are dropped; pricing, emergency, reviews, financing, service areas and book-now replace them. The repo's `standard-pages.md` six-page list is right as a site build but wrong as a sitelink set.
 - **Callout level behaviour corrected.** The previous file said "higher levels serve alongside lower ones" for everything. That is true for sitelinks only. For callouts and snippets, one granular asset makes every higher-level one ineligible.
 - **The callout repetition rule upgraded from tip to policy**, with Google's verbatim wording, and extended to sitelink text - which nothing in the repo currently checks.
-- **"Services" flagged as a broken header.** It is "Service catalog". `code/build_assets.py` line 66 hard-codes the wrong one.
+- **"Services" flagged as a broken header.** It is "Service catalog". An early demo script once hard-coded the wrong one.
 - **The 15-second call figure corrected.** It is when Google shows you the caller's number, not when a call counts as a conversion. The conversion length is a separate setting; this repo sets it to 1 second.
 - **"Google places test calls" removed.** No Google documentation supports it. Verification is source-code crawl, Search Console, or the conversion tag.
 - **Call assets gained** the GoHighLevel versus Google forwarding number ruling with its reasoning, the AI-qualified call leads change of 21 April 2026, and the call recording default of 1 July 2026.

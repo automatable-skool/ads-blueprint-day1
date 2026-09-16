@@ -36,8 +36,8 @@ The ad says their city through `{LOCATION(City)}` in the pinned headline. **The 
 **How it works, and the one gotcha.** Google's `{loc_physical_ms}` ValueTrack parameter puts a NUMERIC geo criterion id in the URL, never a city name, and **there is no API call that converts one at request time** [F, verified 2 September 2026 - `geo_target_constant` is the only source]. So the map is pulled once and ships with the site.
 
 1. Every ad's final URL carries it: `https://you.com/lp/plumber?loc={loc_physical_ms}`
-2. `python3 code/build_geo_map.py --country CA` writes `website/lib/geo-map.json` (1,168 Canadian places, 26 KB)
-3. The page uses `<City fallback="Toronto" />` from `components/lp/City.tsx`
+2. `python3 code/build_geo_map.py` writes `website/lib/geo-map.json` for the country in `context/business.md` - `--country XX` overrides it (about a thousand places, under 30 KB; the repo ships the file empty)
+3. The page uses `<City fallback={MAIN_CITY} />` from `components/lp/City.tsx` - `MAIN_CITY` from `.env`
 
 **The fallback is not optional and it is never "your area".** Google cannot resolve a location on a large share of clicks, and the fallback serves every one of them. Write a real place the business actually covers, and read the headline out loud with the fallback in it - that is the version most people see.
 

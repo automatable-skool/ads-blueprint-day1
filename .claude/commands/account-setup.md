@@ -24,7 +24,7 @@ Before step 1, read the account and the project files, work out what is **alread
 ```
 Account setup - 7 of 16 done
 
-~~1. Time zone + currency locked~~ - America/Vancouver, CAD (read from account)
+~~1. Time zone + currency locked~~ - <time zone>, <currency> (read from account)
 ~~2. My email owns the account~~ - confirmed 2026-08-14
 ~~3. 2FA on~~ - confirmed 2026-08-14
 4. Passkey created - NOT DONE. Takes 1-2 days to trust, so do this first

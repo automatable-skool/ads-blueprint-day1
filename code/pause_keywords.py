@@ -5,12 +5,12 @@ reverses in one click.
 Dry run by DEFAULT. Nothing is touched without --apply.
 
 Usage (from the project root):
-  python3 code/pause_keywords.py --campaign 123 --text "wedding dj cost"     # every ad group in it
+  python3 code/pause_keywords.py --campaign 123 --text "plumber jobs"        # every ad group in it
   python3 code/pause_keywords.py --file code/cache/keywords-pause.txt --apply
 
 File format, one per line, ad group criterion address or campaign+text:
   adgroup:456789  criterion:111213
-  campaign:1234567890  "wedding dj cost"
+  campaign:1234567890  "plumber jobs"
 """
 
 import argparse

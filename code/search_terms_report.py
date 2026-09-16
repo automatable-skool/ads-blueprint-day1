@@ -142,6 +142,12 @@ def is_brand(term, tokens):
 # not part of the test.
 # ---------------------------------------------------------------------------
 
+# ⛔ THE LISTS BELOW ARE SEEDS, NOT THE VERDICT. They were first written against an
+# events account, so the adjacent-service, rental and unrelated lists lean that way.
+# Every hit is a HINT for the session. The verdict on each term comes from
+# code/judge_terms.py, which reads THIS business from context/business.md - and no
+# hit below fires on a term that also names something in '## What we do'.
+
 # Multi-service lead marketplaces. Someone searching these wants a directory
 # that resells the lead to 50 businesses, not this business.
 MARKETPLACES = [
@@ -166,7 +172,7 @@ NICHE_QUALIFIERS = [
 
 # Research intent - the searcher is deciding WHETHER, not choosing WHO. On a
 # budget-limited search campaign this is an SEO job, not a paid one. Price queries
-# are deliberately NOT here: "how much does a wedding dj cost" is a buyer, and
+# are deliberately NOT here: "how much does a plumber cost" is a buyer, and
 # blocking "cost" is one of the classic over-blocks.
 QUESTION_SHAPE = re.compile(
     r"^(what|how|when|why|who|which|should|shall|do|does|did|can|could|is|are|was|will|would)\b",
@@ -292,7 +298,7 @@ PRACTITIONER_CLEAR = [
     "dj website", "dj logo", "dj name ideas", "dj resume", "dj booking software",
 ]
 # Real ambiguity - these need the SERP check before anyone negates them.
-# "wedding dj app": almost certainly a DJ shopping for a tool, but "app" alone is
+# "plumber app": almost certainly a tradesperson shopping for a tool, but "app" alone is
 # not proof, and a wrong negative here is permanent.
 PRACTITIONER_AMBIGUOUS = [
     "app", "apps", "software", "program", "plugin", "tool", "tools", "gear",
@@ -310,15 +316,36 @@ US_STATES = {
     "la","me","md","ma","mi","mn","ms","mo","mt","ne","nv","nh","nj","nm","ny","nc",
     "nd","oh","ok","or","pa","ri","sc","sd","tn","tx","ut","vt","va","wa","wv","wi","wy",
 }
-FOREIGN_NAMES = [
+# Which names mean "another country" depends on where THIS business is. A Canadian
+# plumber's "vancouver washington" is foreign; a Seattle plumber's is home. The home
+# country comes from context/business.md ("Country customers search from") or --country.
+US_NAMES = [
     "washington", "oregon", "california", "texas", "florida", "new york", "michigan",
     "ohio", "illinois", "georgia", "arizona", "nevada", "colorado", "seattle",
-    "portland", "usa", "united states", "u.s.", "america", "uk", "england", "london uk",
-    "australia", "india", "pakistan", "philippines", "mexico", "dubai", "uae",
+    "portland", "usa", "united states", "u.s.", "america",
+]
+CA_NAMES = [
+    "canada", "ontario", "alberta", "british columbia", "quebec", "manitoba",
+    "saskatchewan", "nova scotia", "new brunswick", "newfoundland", "toronto",
+    "calgary", "montreal", "ottawa", "edmonton", "winnipeg",
+    # not "vancouver" - Vancouver, Washington is a US city; the " bc" code check covers it
+]
+OVERSEAS = [
+    "uk", "england", "london uk", "australia", "india", "pakistan", "philippines",
+    "mexico", "dubai", "uae",
 ]
 
 
-def foreign_marker(term, home_provinces, all_places=()):
+def foreign_names(home):
+    """The place names that are abroad for this business. Unknown home = overseas only."""
+    if home == "CA":
+        return US_NAMES + OVERSEAS
+    if home == "US":
+        return CA_NAMES + OVERSEAS
+    return OVERSEAS
+
+
+def foreign_marker(term, home, all_places=()):
     """Return the marker that puts this term in another country, or None.
 
     ⛔ A two-letter code is ONLY trusted when a known place name sits immediately
@@ -328,18 +355,20 @@ def foreign_marker(term, home_provinces, all_places=()):
     "dj near me" in the account - which would have been the single most expensive
     negative batch this tool could produce.
     """
-    for n in FOREIGN_NAMES:
+    for n in foreign_names(home):
         if (" " + n + " ") in term:
             return n
+    # a two-letter code from the OTHER side of the border, only after a known place name
+    codes = US_STATES if home == "CA" else CA_PROVINCES if home == "US" else set()
     words = term.split()
     if len(words) >= 2:
         last, prev = words[-1].strip(".,"), words[-2].strip(".,")
-        if last in US_STATES and last not in home_provinces and prev in set(all_places):
+        if last in codes and prev in set(all_places):
             return prev + " " + last
     return None
 
 
-def flag_terms(rows, not_offered, serve_areas, all_places, sells=None, home_provinces=None):
+def flag_terms(rows, not_offered, serve_areas, all_places, sells=None, home_country=""):
     """Tag every term with the intent categories it hits. Cost plays no part.
 
     not_offered  - services this business does not sell, from context/business.md
@@ -362,10 +391,10 @@ def flag_terms(rows, not_offered, serve_areas, all_places, sells=None, home_prov
                     # ⛔ Never negated on the pattern alone. Goes to the SERP check.
                     f.append("practitioner_verify:" + w); break
         for w in UNRELATED:
-            if (" " + w) in term:
+            if not sells_too and (" " + w) in term:
                 f.append("unrelated:" + w); break
         for w in EXTRA_JUNK:
-            if not f and (" " + w) in term:
+            if not f and not sells_too and (" " + w) in term:
                 f.append("other_service:" + w); break
         # The rental PATTERN - rent/hire + a physical object we do not rent out.
         # Order-independent on purpose, and it never fires on our own service.
@@ -397,7 +426,7 @@ def flag_terms(rows, not_offered, serve_areas, all_places, sells=None, home_prov
         # the whole long tail; matching phrases ("what to ask a dj") never will.
         q = QUESTION_SHAPE.match(term.strip())
         if q:
-            # Price questions are split out on purpose. "how much does a wedding dj
+            # Price questions are split out on purpose. "how much does a plumber
             # cost" is a buyer researching budget, and blocking "cost" is one of the
             # classic over-blocks - so it is flagged separately for the owner to call.
             kind = "price_question" if PRICE_WORDS.search(term) else "informational"
@@ -409,8 +438,7 @@ def flag_terms(rows, not_offered, serve_areas, all_places, sells=None, home_prov
         for w in NICHE_QUALIFIERS:
             if (" " + w + " ") in term or term.strip().startswith(w + " "):
                 f.append("niche:" + w); break
-        fm = foreign_marker(term, home_provinces if home_provinces is not None else CA_PROVINCES,
-                            all_places or ())
+        fm = foreign_marker(term, home_country, all_places or ())
         if fm:
             f.append("out_of_country:" + fm)
         if not fm and all_places:
@@ -425,7 +453,7 @@ def flag_terms(rows, not_offered, serve_areas, all_places, sells=None, home_prov
             if outside:
                 f.append("out_of_area:" + outside[0])
         if not f and not transactional(term, sells or []):
-            f.append("no_service_named:event-related, names no service and asks to buy nothing")
+            f.append("no_service_named:names no service and asks to buy nothing")
         t["flags"] = f
     return rows
 
@@ -627,6 +655,9 @@ def main():
     ap.add_argument("--brand", help="comma-separated brand tokens (the business name and its "
                                     "variants) so brand and non-brand get judged on separate "
                                     "thresholds. Without it every threshold is blended")
+    ap.add_argument("--country", help="two-letter home country (CA, US, GB, AU...). Default: the "
+                                      "'Country customers search from' line in context/business.md. "
+                                      "Decides which place names count as another country")
     ap.add_argument("--out", help="write JSON here instead of stdout")
     args = ap.parse_args()
 
@@ -654,6 +685,9 @@ def main():
         args.serve_areas = ",".join(biz.service_areas()); auto.append(f"--serve-areas ({len(biz.service_areas())}) from business.md")
     if not args.brand and biz.brand_tokens():
         args.brand = ",".join(biz.brand_tokens()); auto.append("--brand from BUSINESS_NAME")
+    country = (args.country or biz.country() or "").upper()
+    auto.append(f"--country {country}" + ("" if args.country else " from business.md") if country
+                else "--country UNKNOWN (only overseas markers checked; set it in business.md)")
     print("business inputs: " + (" · ".join(auto) if auto else "none auto-filled"), file=sys.stderr)
     for flag, val in (("--sells", args.sells), ("--not-offered", args.not_offered),
                       ("--serve-areas", args.serve_areas), ("--brand", args.brand)):
@@ -673,7 +707,7 @@ def main():
             w = part.strip()
             if w and 3 <= len(w) <= 18 and w.isalpha() and w not in places:
                 places.append(w)
-    terms = flag_terms(terms, not_offered, serve_areas, places, brand_tokens(args.sells))
+    terms = flag_terms(terms, not_offered, serve_areas, places, brand_tokens(args.sells), home_country=country)
     totals = pull_campaign_totals(ga, customer_id, start, end, args.campaign)
 
     visible = {}
@@ -748,6 +782,7 @@ def main():
             "serve_areas": serve_areas,
             "not_offered_available": bool(not_offered),
             "serve_areas_available": bool(serve_areas),
+            "home_country": country or None,
             "note": "Empty not_offered or serve_areas means that check DID NOT RUN. "
                     "Report it as not measured; never as a clean result.",
         },

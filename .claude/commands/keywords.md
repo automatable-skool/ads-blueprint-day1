@@ -179,7 +179,7 @@ A free bet against a real loss is not a decision. Add it. The volume figure cann
 
 Then add the **service-specific layer** the generic template can't guess: sub-services, the crisis phrasings people actually type, trade jargon. **No misspellings** - close variants already match them on keywords, and negatives have auto-covered misspellings since 2024. Plurals and synonyms still need their own entries on the negative side.
 
-**1b. The service axis - what I actually sell.** From `context/business.md`, list every service as a **stem** (the searchable phrase, not my internal name): "emergency plumber", "drain cleaning", "water heater repair". Then widen each stem with how customers actually say it - the trade word, the layman word, the symptom word ("burst pipe" not just "pipe repair"). `code/generate_keyword_ideas.py` pulls Planner's related terms per stem.
+**1b. The service axis - what I actually sell.** From `context/business.md`, list every service as a **stem** (the searchable phrase, not my internal name): "emergency plumber", "drain cleaning", "water heater repair". Then widen each stem with how customers actually say it - the trade word, the layman word, the symptom word ("burst pipe" not just "pipe repair"). `python3 code/pull_keywords.py --city "<main city>" --seeds "<stem one>,<stem two>"` pulls Planner's related terms per stem (the city defaults to `MAIN_CITY` in `.env`).
 
 Cut against the DON'T list in `context/business.md` immediately. A service I don't offer never enters the matrix.
 

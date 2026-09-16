@@ -20,7 +20,7 @@
 //   - invent a rating, a review count, a client count, a result or a years-in-business figure.
 //     Every number here must exist in context/proof.md first. Delete the slot instead.
 //   - put a stock face beside a real client's name or a real number. That is a fabricated person.
-//   - add, remove or reorder a section without Jono saying so.
+//   - add, remove or reorder a section without the owner saying so.
 import type { Metadata } from "next";
 import "@/app/mainstay.css";
 import { SourceCapture } from "@/components/lp/SourceCapture";
@@ -36,9 +36,9 @@ import {
 import { AvatarCluster, ProcessSteps, CtaBlock } from "@/components/kit/Marketing";
 
 export const metadata: Metadata = {
-  title: "Google Business Profile Optimization",
+  title: "[Ad group service] in [Main city]",
   description:
-    "The profile, the map pack signals behind it and your citations - rebuilt in your account, in your name. Live in 8 weeks or we keep working free.",
+    "[One sentence: what you do, for whom, and the guarantee from context/proof.md.]",
   robots: { index: false, follow: false },
 };
 
@@ -49,6 +49,8 @@ const BUSINESS = "[Business name]";
 // MAIN_CITY=none (remote or national): delete the <City> tag and write the H1 without a place.
 const MAIN_CITY = "[Main city]";
 const PHONE = "[+1 555 555 5555]";
+// The response-time CLAIM, printed under every button. True for this business and in context/proof.md, or delete it.
+const RESPONSE_TIME = "[response time, from proof.md]";
 
 // Client marks stay distinct by GLYPH, never by a hue the kit does not ship.
 const MARK_INK = ["var(--ink-700)", "var(--text-brand)", "var(--ink-500)", "var(--ink-800)", "var(--surface-brand)", "var(--ink-600)"];
@@ -102,26 +104,17 @@ export default function Page() {
               [One sentence: what you do, and the guarantee. Plain, no adjectives you cannot evidence.]
             </p>
             <div style={{ display: "flex", gap: "var(--space-4)", flexWrap: "wrap", justifyContent: "center" }}>
-              <a href="#lead-form" className="ms-btn ms-btn--primary" data-l>Get my free graded audit <Icon name="arrow-right" size={17} /></a>
+              <a href="#lead-form" className="ms-btn ms-btn--primary" data-l>[Primary action, e.g. Get my free quote] <Icon name="arrow-right" size={17} /></a>
               <CalmCallLink phone={PHONE} className="ms-btn ms-btn--outline" />
             </div>
             {/* Three proof points under the promise - blueprint component 2.
-                ⛔ THESE ARE NOT THE THREE JONO ASKED FOR, AND HERE IS WHY (2 September 2026).
-                He asked for "money back guarantee", "10 years in business" and "512 customers".
-                None is in context/proof.md and two contradict it outright:
-                  - the guarantee on file is DELIVERY, not money: "live in 8 weeks or we keep
-                    working free". NEVER SAY lists "guaranteed results" - never blur the two.
-                  - no business age is on file. The CHANNEL opened Nov 2014; the agency's age is
-                    on the hold list, "unnamed and undated".
-                  - no customer count exists. 411 paying community members is recorded as
-                    "weak, do not publish", and community members are not customers anyway.
-                The three below are the strongest CHECKABLE equivalents. Swap in his three the
-                moment they land in proof.md with a source. */}
+                ⛔ Each one must exist in context/proof.md with a source. No proof for a slot?
+                Delete the slot - never soften it into something plausible. */}
             <ul style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-7)", justifyContent: "center", margin: 0, padding: 0, listStyle: "none" }}>
               {[
-                ["shield-check", "Live in 8 weeks or we work free"],
-                ["clock", "On YouTube since 2014"],
-                ["users", "20,000+ owners in the community"],
+                ["shield-check", "[The guarantee, word for word from proof.md]"],
+                ["clock", "[Years in business or since-year, from proof.md]"],
+                ["users", "[A count - jobs, customers or reviews - from proof.md]"],
               ].map(([icon, text]) => (
                 <li key={text} style={{ display: "inline-flex", alignItems: "center", gap: "8px", font: "var(--type-body-sm)", color: "var(--text-body)" }}>
                   <Icon name={icon} size={17} color="var(--text-brand)" />{text}
@@ -129,10 +122,9 @@ export default function Page() {
               ))}
             </ul>
 
-            {/* ⛔ 4.9/5 IS NOT IN context/proof.md. There is no review platform on file for this
-                business, so this rating has no source and must not ship. Replace it with a real
-                platform score and count, or remove the rating and keep the label. */}
-            <AvatarCluster people={["JK", "NB", "TA", "AE"]} rating="4.9" label="Built for service businesses over $25,000 a month" style={{ marginTop: "var(--space-2)" }} />
+            {/* ⛔ A rating is a CLAIM. Add rating="4.9" ONLY as the real platform score and count from
+                context/proof.md. No review platform on file? Leave the rating off and keep the label. */}
+            <AvatarCluster people={["AB", "CD", "EF", "GH"]} label="[Who it is for, in one line]" style={{ marginTop: "var(--space-2)" }} />
 
           </div>
           {/* The founder, on camera, directly under the promise. Full width - the face is the
@@ -177,18 +169,18 @@ export default function Page() {
         {/* 4 · Selected work - the portfolio is the pitch. Four 3:4 frames. */}
         <section style={{ padding: "var(--section-y) 0" }}>
           <div className="gw-container">
-            <Head eyebrow="Selected work" title="Profiles we have rebuilt" />
+            <Head eyebrow="Selected work" title="[Recent jobs, in four photos]" />
             <div className="lp-4up" style={{ display: "grid", gap: "var(--space-7)" }}>
               {[
-                ["Profile · before", "office"],
-                ["Profile · after", "laptop"],
-                ["Map pack position", "meeting"],
-                ["Citations cleaned", "desk"],
+                ["[Job one · before]", "office"],
+                ["[Job one · after]", "laptop"],
+                ["[Job two]", "meeting"],
+                ["[Job three]", "desk"],
               ].map(([l, kw], i) => (
                 <Figure key={l} ratio="3 / 4" label={l} src={photo(kw, 600, 800, 110 + i)} />
               ))}
             </div>
-            <CtaBlock responseTime="75 seconds" />
+            <CtaBlock responseTime={RESPONSE_TIME} />
           </div>
         </section>
 
@@ -208,16 +200,16 @@ export default function Page() {
                 </Figure>
               ))}
             </div>
-            <CtaBlock responseTime="75 seconds" />
+            <CtaBlock responseTime={RESPONSE_TIME} />
           </div>
         </section>
 
-        {/* 3 · Featured in - wordmarks only, no invented press. */}
+        {/* 3 · Featured in - wordmarks and PUBLIC numbers only (a platform count anyone can check). No invented press. */}
         <section style={{ padding: "var(--section-y) 0" }}>
           <div className="gw-container" style={{ display: "grid", gap: "var(--space-6)", justifyItems: "center" }}>
             <span style={{ font: "var(--type-body-sm)", color: "var(--text-muted)" }}>Where the record is public</span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-9)", justifyContent: "center" }}>
-              {["YouTube · 150,000+", "8M+ views", "284 videos", "Since 2014", "20,000+ community"].map((l) => (
+              {["[Public number one]", "[Public number two]", "[Public number three]"].map((l) => (
                 <span key={l} style={{ font: "var(--weight-bold) 17px/1 var(--font-core)", letterSpacing: "-0.02em", color: "var(--ink-600)" }}>{l}</span>
               ))}
             </div>
@@ -234,12 +226,12 @@ export default function Page() {
                 <h2 style={{ margin: 0, font: "var(--type-display)", letterSpacing: "var(--track-display)", color: "var(--text-strong)" }}>Four steps, and the first costs nothing</h2>
               </div>
               <ProcessSteps steps={[
-                { title: "The graded audit", body: "By email, within minutes. Yours to keep whether we ever speak again." },
-                { title: "A 15 minute call", body: "We tell you what the grades mean. If it does not fit, we say so." },
-                { title: "The build", body: "Profile, citations, the pages it points at, tracking and follow-up. In your accounts, in your name." },
-                { title: "We teach you to fire us", body: "A 60-minute walkthrough, then you run it. Or we do, month to month." },
+                { title: "[Step one - the free first step]", body: "[What happens and how fast, one line]" },
+                { title: "[Step two]", body: "[One line]" },
+                { title: "[Step three - the work]", body: "[One line]" },
+                { title: "[Step four - what they are left with]", body: "[One line]" },
               ]} />
-              <CtaBlock responseTime="75 seconds" />
+              <CtaBlock responseTime={RESPONSE_TIME} />
             </div>
           </div>
         </section>
@@ -253,17 +245,17 @@ export default function Page() {
               <div style={{ display: "grid", gap: "var(--space-4)" }}>
                 <span className="ms-sh__eyebrow">What you get</span>
                 <h2 style={{ margin: 0, font: "var(--type-display)", letterSpacing: "var(--track-display)", color: "var(--text-strong)" }}>
-                  Everything in the build
+                  [What you get, as a headline]
                 </h2>
                 <p style={{ margin: 0, font: "var(--type-body-lg)", color: "var(--text-muted)" }}>
-                  One price, all three. A profile on its own holds nothing.
+                  [One line on why it comes as a package]
                 </p>
               </div>
               <div style={{ display: "grid", gap: "var(--space-6)" }}>
                 {[
-                  { icon: "map-pin", title: "Google Business Profile", body: "Rebuilt, so you show in the map pack." },
-                  { icon: "search", title: "SEO", body: "The pages behind it, written to what people search." },
-                  { icon: "sparkles", title: "AI Overviews + LLMs", body: "Named where the answer engines look." },
+                  { icon: "circle-check", title: "[Included item one]", body: "[One line]" },
+                  { icon: "circle-check", title: "[Included item two]", body: "[One line]" },
+                  { icon: "circle-check", title: "[Included item three]", body: "[One line]" },
                                 ].map((c) => (
                   <div key={c.title} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "var(--space-5)", alignItems: "start" }}>
                     <span style={{ width: 38, height: 38, borderRadius: "var(--radius-sm)", background: "var(--surface-sunken)", display: "grid", placeItems: "center", flex: "0 0 auto" }}>
@@ -276,7 +268,7 @@ export default function Page() {
                   </div>
                 ))}
               </div>
-              <CtaBlock responseTime="75 seconds" />
+              <CtaBlock responseTime={RESPONSE_TIME} />
             </div>
           </div>
         </section>
@@ -286,30 +278,30 @@ export default function Page() {
           <div className="gw-container">
             <Head eyebrow="Kind words" title="What clients said afterwards"
               aside={<StatBlock stats={[
-                { value: "8 weeks", label: "live by then, or free" },
-                { value: "$0", label: "for the graded audit" },
+                { value: "[number]", label: "[what it measures, from proof.md]" },
+                { value: "[number]", label: "[what it measures, from proof.md]" },
               ]} />} />
             <div className="lp-3up" style={{ display: "grid", gap: "var(--space-7)" }}>
-              <TestimonialCard rating={5} quote="My reps get booked solid with qualified leads, documents go out automatically." name="Nathan Bekmezian" meta="Roofing and exteriors · paying client" />
-              <TestimonialCard rating={5} quote="Alex has awesome communication skills, keeps all his commitments, and is super easy to work with." name="Troy Angrignon" meta="Business owner · paying client" />
-              <TestimonialCard rating={5} quote="He implemented an elegant solution that saves us countless hours and one that allows us to focus on creating new products." name="Andy Eadie" meta="Business owner · paying client" />
+              <TestimonialCard rating={5} quote="[Review one, word for word from context/proof/reviews/quote-bank.md]" name="[Reviewer]" meta="[What they hired you for · the platform it is on]" />
+              <TestimonialCard rating={5} quote="[Review two, word for word]" name="[Reviewer]" meta="[What they hired you for · the platform it is on]" />
+              <TestimonialCard rating={5} quote="[Review three, word for word]" name="[Reviewer]" meta="[What they hired you for · the platform it is on]" />
             </div>
-            <CtaBlock responseTime="75 seconds" />
+            <CtaBlock responseTime={RESPONSE_TIME} />
           </div>
         </section>
 
-        {/* 8 · Real results - automation wins, labelled as exactly that. No search claim exists. */}
+        {/* 8 · Real results - two case studies from proof.md, labelled as exactly what they are. */}
         <section style={{ padding: "var(--section-y) 0", background: "var(--surface-brand)" }}>
           <div className="gw-container">
             <Head eyebrow="Case studies" title="Two builds, and what they saved" />
             <div className="lp-2up" style={{ display: "grid", gap: "var(--space-7)" }}>
               {[
-                { who: "Psychotherapy clinic, Toronto", name: "Jordan Kilpatrick-Smith", face: portrait(2), num: "$50,000+", per: "saved a year",
-                  body: "Admin work was eating staff time and leads slipped between sessions.",
-                  marks: ["12+ leads a week, followed up automatically", "100% show rate on booked calls"] },
-                { who: "Straightline Design, roofing and siding", name: "Nate Bekmezian", face: portrait(9), num: "$45,000+", per: "cut a year",
-                  body: "A receptionist role and an ageing customer system were costing six figures a year combined.",
-                  marks: ["Every lead answered", "A $26,000-a-year system cut to a fraction"] },
+                { who: "[Client one - type, city]", name: "[Client name]", face: portrait(2), num: "[Result number]", per: "[what it measures, e.g. saved a year]",
+                  body: "[The problem they came with, one line]",
+                  marks: ["[Outcome one, from proof.md]", "[Outcome two, from proof.md]"] },
+                { who: "[Client two - type, city]", name: "[Client name]", face: portrait(9), num: "[Result number]", per: "[what it measures]",
+                  body: "[The problem they came with, one line]",
+                  marks: ["[Outcome one, from proof.md]", "[Outcome two, from proof.md]"] },
               ].map((c) => (
                 <article key={c.who} style={{ display: "grid", gap: "var(--space-6)", padding: "var(--space-8)", background: "var(--surface-card)", borderRadius: "var(--radius-card)", boxShadow: "var(--shadow-lg)" }}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "var(--space-4)", flexWrap: "wrap" }}>
@@ -347,9 +339,9 @@ export default function Page() {
               ))}
             </div>
             <p style={{ margin: "var(--space-7) 0 0", font: "var(--type-body-sm)", color: "var(--blue-100)", maxWidth: "var(--container-text)" }}>
-              Both are automation wins from paying clients, not map pack results. Results vary and are not typical.
+              [What kind of results these are, honestly - e.g. two paying clients, not an average]. Results vary and are not typical.
             </p>
-            <CtaBlock responseTime="75 seconds" tone="on-brand" />
+            <CtaBlock responseTime={RESPONSE_TIME} tone="on-brand" />
           </div>
         </section>
 
@@ -358,16 +350,16 @@ export default function Page() {
         <section id="lead-form" style={{ padding: "var(--section-y) 0" }}>
           <div className="gw-container lp-2up-form" style={{ display: "grid", gap: "var(--space-12)", alignItems: "start" }}>
             <div style={{ display: "grid", gap: "var(--space-6)" }}>
-              <span className="ms-sh__eyebrow">Free graded audit</span>
+              <span className="ms-sh__eyebrow">[The free first step]</span>
               <h2 style={{ margin: 0, font: "var(--type-display)", letterSpacing: "var(--track-display)", color: "var(--text-strong)", maxWidth: "14ch" }}>
-                See what your profile is missing
+                [The close - what they get, in the words of the ad]
               </h2>
               <p style={{ margin: 0, font: "var(--type-body-lg)", color: "var(--text-muted)", maxWidth: "var(--container-text)" }}>
-                A person grades your search rankings, your ads, your local presence and your website, then emails the lot back within minutes.
+                [What happens after they send the form, and how fast. One sentence.]
               </p>
-              <TrustBar items={["Free, and no card", "Yours to keep either way", "Live in 8 weeks or we work free"]} />
+              <TrustBar items={["[Trust line one]", "[Trust line two]", "[The guarantee, from proof.md]"]} />
               <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "var(--border-hairline) solid var(--line-hairline)" }}>
-                <AvatarCluster people={["JK", "NB", "TA"]} size={30} label="Average response time: 75 seconds" />
+                <AvatarCluster people={["AB", "CD", "EF"]} size={30} label={`Average response time: ${RESPONSE_TIME}`} />
               </div>
             </div>
             <div style={{ padding: "var(--space-9)", background: "var(--surface-card)", border: "var(--border-hairline) solid var(--line-hairline)", borderRadius: "var(--radius-card)", boxShadow: "var(--shadow-md)" }}>
@@ -388,11 +380,11 @@ export default function Page() {
             </div>
             <div>
               {[
-                { question: "Is this just my Google Business Profile, or more than that?", answer: "More. The profile is the front door, but it only holds a position if the pages behind it and your citations agree with it. All three are in the build." },
-                { question: "What does it cost?", answer: "$9,500 for the SEO Sprint, which includes the profile work. $12,500 for both engines, search and ads, in one build. Month to month after that, and you keep everything." },
-                { question: "Can you show me a map pack result?", answer: "No. There is no map pack result on file for a client yet, and we will not show you someone else's. What we can show you is the method, on camera, since 2014." },
-                { question: "Can I not just do this myself?", answer: "Yes, and we will teach you to. That is the last step of the build - a 60-minute walkthrough, then you run it. The retainer is optional." },
-                { question: "We are fully remote. Does that matter?", answer: "For a profile, yes - it changes what you can claim and where you can show. We will tell you on the call whether it is worth doing at all." },
+                { question: "[The objection buyers raise most, in their words]", answer: "[The honest answer, two sentences at most]" },
+                { question: "[What does it cost?]", answer: "[The price or range from context/business.md - or exactly how they get one]" },
+                { question: "[Objection three]", answer: "[Honest answer]" },
+                { question: "[Objection four]", answer: "[Honest answer]" },
+                { question: "[Objection five]", answer: "[Honest answer]" },
               ].map((q, i) => <FAQItem key={q.question} {...q} defaultOpen={i === 0} />)}
             </div>
           </div>
@@ -409,7 +401,7 @@ export default function Page() {
           </span>
         </div>
       </main>
-      <MobileCtaBar phone={PHONE} label="Free audit" />
+      <MobileCtaBar phone={PHONE} label="[Action]" />
     </>
   );
 }

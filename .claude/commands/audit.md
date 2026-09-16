@@ -211,7 +211,7 @@ optional and does not depend on finding waste.** Every one of these appears in b
 | **Not measured** | Could not see it | Say what would close it. Goes in `notMeasured`, never omitted |
 
 **A finding is only as strong as its weakest input, and an `Assumed` number may never appear in a headline
-total without its assumption beside it.** That is the exact failure of the DJNorth.ca run: a $1,368 figure
+total without its assumption beside it.** That is the exact failure of the first live run: a $1,368 figure
 resting on an unstated 50% phone-share guess, sitting beside a $7.01 counted figure with nothing to tell
 them apart.
 
@@ -240,10 +240,10 @@ Three rules:
 
 ## The second deliverable: `audit-report.html` - the thing you show
 
-**Every run also writes one self-contained HTML page, in the Automatable design theme, and opens it.** The markdown checklist is the working file; the HTML is what you show - on a call, on a screen recording, or to a prospect.
+**Every run also writes one self-contained HTML page, in the repo's design theme, and opens it.** The markdown checklist is the working file; the HTML is what you show - on a call, on a screen recording, or to a prospect.
 
 **⛔ The standard is `references/audit-dashboard-spec.md` (12 Sep 2026). Read it before building the page.**
-It fixes the layout, the tags, the nesting, the sorting, the colours and every rule from the DJing.ca fix
+It fixes the layout, the tags, the nesting, the sorting, the colours and every rule from the September fix
 pass, so the next thousand runs produce the same dashboard. The data comes from two read-only scripts:
 `python3 code/audit_dashboard_data.py --cities <the account's cities>` (ads table, ad build checks, assets
 coverage and performance, ad groups, final URLs, retargeting, ad types, Maps impressions, auto-apply state)
@@ -341,8 +341,8 @@ Done 13 Aug. Was showing ads on other websites, not Google search.
 **The scripts that back the fixes - every finding class has one. Run them; never hand-build what a script already does.** All of the mutating ones dry-run by default and change nothing without `--apply`:
 - Negatives: `find_campaign_negatives.py` surfaces them · `add_account_negatives.py` / `add_campaign_negatives.py` / `add_adgroup_negatives.py` / `add_shared_negative_list.py` / `push_negatives.py` add · **`remove_negatives.py` removes** (the self-blocking class) · `find_negative_conflicts.py` checks
 - Tracking: `setup_conversion_tracking.py` · `apply_conversion_tracking.py` · `demote_conversion_goals.py` (junk goals like app installs) · `check_conversion_setup.py`
-- Autopilot and assets: `check_autopilot.py` · **`pause_auto_apply.py`** (pauses every auto-apply type the API can name) · `disable_auto_assets.py` (text automation AND final URL expansion, PMax included) · `build_assets.py` / `push_assets.py`
-- Ads and tests: `build_ads.py` / `push_ads.py` · `ad_test_report.py` / `ad_test_apply.py`
+- Autopilot and assets: `check_autopilot.py` · **`pause_auto_apply.py`** (pauses every auto-apply type the API can name) · `disable_auto_assets.py` (text automation AND final URL expansion, PMax included) · `push_assets.py`
+- Ads and tests: `push_ads.py` · `ad_test_report.py` / `ad_test_apply.py`
 - Campaigns: **`pmax_guardrails.py`** (negative list + negatives onto Performance Max; brand exclusions stay on-screen) · **`exclude_placements.py`** (account-level YouTube/site placement junk) · **`attach_audiences.py`** (lists in observation mode) · **`set_campaign_target.py`** (unexplained cost-per-lead targets) · `exclude_other_countries.py`
 - Keywords: `add_keywords.py` · **`pause_keywords.py`** (duplicate cleanup - pause, never remove)
 - Left on-screen because the API genuinely refuses (confirmed 11-12 Sep 2026 on v24 and v25): the auto-apply types Google returns as UNKNOWN (retired types still ticked - read their names off the screen), and picking a brand exclusion list (no brand asset-set type exists). Everything else on that old "screen only" list is scriptable.
@@ -401,7 +401,7 @@ the fix half never invents findings, and it never starts before the owner has re
   keep ONE primary per money event
 - Auto-apply recommendations ON → **`pause_auto_apply.py --apply`** pauses every type the
   API can name. Types returned as UNKNOWN (Google retired them from the API, they stay
-  ticked on screen - on DJNorth.ca: Remove redundant keywords · Remove non-serving keywords ·
+  ticked on screen - on the first live account: Remove redundant keywords · Remove non-serving keywords ·
   Remove conflicting negative keywords · Upgrade your conversion tracking · Target impression
   share) are ON-SCREEN: Admin > Recommendations auto-apply > untick > Save. Verify with
   `pause_auto_apply.py` (expect 0 ENABLED). All 21 types off, both bundles, no exceptions
@@ -413,7 +413,7 @@ the fix half never invents findings, and it never starts before the owner has re
 - GBP link → READABLE by API: an `asset_set` of type LOCATION_SYNC exists only when a
   Business Profile is linked. Never say "could not be read". GA4 link → ON-SCREEN
 - Economics missing (job value, close rate) → READ CLAUDE.md "## My setup" and
-  `context/business.md` FIRST - DJNorth.ca's $1,200 booking and 2-in-10 close rate were on
+  `context/business.md` FIRST - one account's $1,200 job value and 2-in-10 close rate were on
   file since 1 Sep and the 11 Sep run still asked. Only then an OWNER QUESTION, two lines
 
 **THE CAMPAIGNS AND AD GROUPS**
@@ -424,7 +424,7 @@ the fix half never invents findings, and it never starts before the owner has re
   (usually an untargeted sibling group winning the same searcher), compare the groups on the widest
   window that is conclusive, and recommend in order: second ad in the starved group first, then a
   targeting exclusion on the untargeted group in ONE campaign as a test, re-read at 30 days, then roll
-  out. The owner picks. (Jono, 12 Sep 2026, DJNorth Brides vs Regular)
+  out. The owner picks. (Jono, 12 Sep 2026, a wedding DJ's Brides vs Regular groups)
 - Presence-or-interest targeting → **`set_locations.py --presence`** (ASK FIRST if the
   business could be destination-based - hotels and tours stay presence-or-interest)
 - Other countries not excluded → `exclude_other_countries.py --keep <CC>`
@@ -433,7 +433,7 @@ the fix half never invents findings, and it never starts before the owner has re
 - Unexplained bid targets → OWNER QUESTION (what number), then **`set_campaign_target.py`**
 - PMax with no negatives or brand exclusions → an ACCOUNT-level negative list reaches PMax
   (add it with `add_account_negatives.py --terms-file`), so that is the negatives fix.
-  ⛔ `pmax_guardrails.py` attaches "the largest enabled list" by default - on DJNorth.ca that
+  ⛔ `pmax_guardrails.py` attaches "the largest enabled list" by default - on one live account that
   was "Out Of Service Locations" holding broad `montreal`, `toronto`, every live city. Never
   run it without `--list`, never attach a list you have not read. Brand list is ON-SCREEN
   (no API surface on v24 or v25)
@@ -443,7 +443,7 @@ the fix half never invents findings, and it never starts before the owner has re
   targeting mode, location and exclusions, language, device, schedule, and the ad copy). If
   anything differs it is SEGMENTATION BY DESIGN - report it as such, flag only overlap with
   the untargeted group, never recommend a recluster on keyword text alone (Jono, 12 Sep 2026:
-  DJNorth's Brides = women only, Grooms = men only, Regular = everyone). Only when nothing
+  a wedding DJ's Brides = women only, Grooms = men only, Regular = everyone). Only when nothing
   differs: recluster ROUTED to `/keywords stag`, cleanup **`pause_keywords.py`**
 - Zombie experiments on paused bases → read `experiment.end_date` first. Expired: `end_experiment`
   and pausing the trial campaign are both REFUSED; the route is `ExperimentOperation.remove`,
@@ -459,12 +459,11 @@ the fix half never invents findings, and it never starts before the owner has re
   always SHOWN and explained even when the owner decides to leave it; it is never an auto-fix
 
 **THE ADS**
-- Single-ad groups → ROUTED to `/write-ads` (`build_ads.py` /
-  `push_ads.py` do the writes, everything lands PAUSED)
+- Single-ad groups → ROUTED to `/write-ads` (`push_ads.py` does the writes, everything lands PAUSED)
 - Missing sitelinks, callouts, snippets, call asset, logo → reuse first: attach existing
   assets with `asset.source = ADVERTISER` only (Google's AUTOMATICALLY_CREATED ones refuse
   campaign linking: "Advertiser links cannot link to automatically created asset"), every
-  final URL curl-checked 200; else `build_assets.py` then `push_assets.py`; Advertiser
+  final URL curl-checked 200; else `push_assets.py`; Advertiser
   Verification for name/logo is ON-SCREEN
 - Stale champion/challenger tests → `ad_test_report.py` then `ad_test_apply.py`
 
@@ -477,8 +476,9 @@ the fix half never invents findings, and it never starts before the owner has re
 
 **THE KEYWORDS AND SEARCH TERMS**
 - Universal junk list gaps → `add_account_negatives.py --terms-file <per-account file> --name <list> --apply`
-  (dry run by default). ⛔ Its built-in list is Automatable's and carries "school", "class",
-  "video", "sample", "contact" - buyer words for most trades. Stage a per-account file, conflict-
+  (dry run by default). ⛔ Its built-in list is a universal starter that still carries "school", "class",
+  "video", "sample", "contact" - buyer words for some trades; it holds back any term naming a
+  service in `context/business.md`, but that is a net, not a review. Stage a per-account file, conflict-
   check it against every enabled keyword text, and hold buyer-adjacent words (free, review,
   reviews) for the owner's yes
 - New negatives from the window's traffic → the staging comes from `/search-terms`
@@ -523,7 +523,7 @@ gets done.
 - **Budget changes** → the campaign → Budget pencil → one number, typed by the owner →
   verify via campaign read-back (budget is ALWAYS by-hand, never scripted silently)
 - **Advertiser Verification / business name + logo** → Billing → Advertiser verification
-  → follow Google's flow → verify `build_assets.py` report mode
+  → follow Google's flow → verify with a campaign asset read-back
 
 **In `audit-report.md` these live under their own heading - "Needs your hands - N items,
 walked together at the end"** - each with its four-part recipe already written, so the
@@ -551,7 +551,7 @@ Never enables anything. Never removes a keyword (pause only). Never invents a bu
 a target, answered hours, a service area or a job value - those are the owner's five
 numbers. Never fixes on a stale audit. Never claims "fixed" without the verify read.
 
-## Learned on the DJNorth.ca fix pass, 11-12 September 2026 (Jono's rulings, all binding)
+## Learned on the first live fix pass, a wedding DJ account, 11-12 September 2026 (Jono's rulings, all binding)
 
 **The dashboard.**
 - Every finding carries a tag by who can fix it: `fixed` · `partly fixed · click needed` · `bigger build`
@@ -654,7 +654,7 @@ anything required that is not on every live campaign reads INCOMPLETE, never par
 assets count too); impressions, clicks and leads on a 365-day window from `asset_field_type_view`; a
 status dot and a tag. Missing on some campaigns is a `bigger build` row (reuse ADVERTISER assets by API);
 missing images is `your proof` unless the owner's site carries real photos of their own work, which may be cropped to 1200x628 and 1200x1200 and attached by API (field type AD_IMAGE on Search; MARKETING_IMAGE only on Display and PMax); the scan counts AD_IMAGE too; an asset that is attached but served 0 impressions in a year is a fail
-with the reason (DJNorth's location asset: attached through the profile sync, 0 impressions, so Maps is
+with the reason (one account's location asset: attached through the profile sync, 0 impressions, so Maps is
 set up but not showing). JSON: `assetTable[]`.
 
 **The ads table, every run (Jono, 12 Sep 2026).** In the ads section, one row per live ad, sorted best
@@ -728,7 +728,7 @@ show their sub-line. Renderer: `nestedGroup()`, fed by `assetsNested()`, `adsNes
 pinned first headline: add `{LOCATION(City):<campaign city>} <root keyword>` pinned to HEADLINE_1 via
 `AdService.mutate_ads` with update mask `responsive_search_ad.headlines`, keeping every existing headline and
 pin; if the ad is already at 15, drop the unpinned headline with the fewest impressions on 365 days
-(`ad_group_ad_asset_view`). The root keyword is "Wedding DJ" when any keyword in the group contains it,
+(`ad_group_ad_asset_view`). The root keyword is "Emergency Plumber" when any keyword in the group contains it,
 else "DJ". Print the dry run (added line, dropped line per ad) before applying; say that an in-place edit
 restarts Google's learning on that ad.
 
@@ -754,7 +754,7 @@ clicks and Google's performance label (`ad_group_ad_asset_view`), rank them, and
 what already wins there: the city and root keyword pinned in headline 1, the top city lines, the top
 generic lines, the audience-specific lines the group already uses (Brides, Grooms), the four best
 descriptions. Only when no context exists for a claim does `your proof` gate a line. The challenger lands
-PAUSED and reads `click needed` until the owner switches it on. Three traps from that run: with the city pinned in headline 1, at most ONE other headline names the city (Google shows three headlines at once and a city said twice reads as filler), and every line reads as a sentence ("Book an Edmonton DJ now", never "Book Edmonton DJ Now"); the 30-character limit counts a tag's FALLBACK text (`{LOCATION(City):Edmonton} Wedding DJ` is 19, not 35), and every line must be an existing winner or a city or audience variant of one - never an invented line. Script pattern: the 12 Sep DJing.ca run
+PAUSED and reads `click needed` until the owner switches it on. Three traps from that run: with the city pinned in headline 1, at most ONE other headline names the city (Google shows three headlines at once and a city said twice reads as filler), and every line reads as a sentence ("Book a Halifax plumber now", never "Book Halifax Plumber Now"); the 30-character limit counts a tag's FALLBACK text (`{LOCATION(City):Edmonton} Wedding DJ` is 19, not 35), and every line must be an existing winner or a city or audience variant of one - never an invented line. Script pattern: the 12 Sep DJing.ca run
 (`code/cache/<account>-winning-lines-<date>.json` → `AdGroupAdService` create, status PAUSED).
 
 **Every check always shows (Jono, 12 Sep 2026).** No box, table or check is dropped because the account
@@ -778,7 +778,7 @@ JSON: `keywordCounts[]`.
 
 **Pages checks (Jono, 12 Sep 2026).** No "page title matches the campaign" check - it is the headline check
 said twice. The homepage check names the exact ad or asset group that lands on the homepage in its sub line
-(on DJing.ca: Performance Max Montreal asset group 2), never a bare fail.
+(on one live account: Performance Max asset group 2), never a bare fail.
 
 **No finding card that restates a check row (Jono, 12 Sep 2026).** If a check row already says it ("the
 headline names the service and the city", tagged website access, with the fix in its sub line), there is no

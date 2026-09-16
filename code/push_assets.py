@@ -30,7 +30,7 @@ ad-assets.md: a single ad-group callout makes every campaign and account callout
 ad group, so an ad-group set has to carry the universal claims too, not just the specific ones.
 
 Inputs it cannot invent, so it names them and refuses to guess:
-    --business-name "Automatable"      25 chars, matches the verified domain root or legal entity
+    --business-name "Acme Plumbing"    25 chars, matches the verified domain root or legal entity
     --logo path/to/logo.png            square 1:1, 128x128 min, under 5120 KB. NEVER generate one
                                        without Jono saying yes first - ask, show, wait
     --privacy-url https://.../privacy  Google requires it inside the lead form
@@ -45,6 +45,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import load_client  # noqa: E402
+from _business import country as home_country  # noqa: E402
 from push_ads import parse, pick_url, url_is_live  # noqa: E402
 
 from dotenv import load_dotenv  # noqa: E402
@@ -595,7 +596,7 @@ def main():
     ap.add_argument("--business-name",
                     default=os.getenv("BUSINESS_NAME_ASSET", "") or os.getenv("BUSINESS_NAME", ""),
                     help="the business name ASSET, which must match the VERIFIED DOMAIN ROOT or the "
-                         "verified legal entity exactly - 'automatable.co', not 'Automatable'. "
+                         "verified legal entity exactly - 'acme.co', not 'Acme'. "
                          "Set BUSINESS_NAME_ASSET in .env; BUSINESS_NAME stays the brand name the "
                          "lead form uses. (Jono, 1 September 2026 - the brand name was disapproved.)")
     ap.add_argument("--logo", default=os.getenv("LOGO_PATH", ""),
@@ -612,7 +613,8 @@ def main():
                     help="the number that receives message replies. Falls back to BUSINESS_PHONE - "
                          "a normal GoHighLevel number texts fine, it does not have to be a "
                          "WhatsApp-only line. (Jono, 1 September 2026.)")
-    ap.add_argument("--country", default=os.getenv("ADS_COUNTRY_CODE", "US"))
+    ap.add_argument("--country", default=os.getenv("ADS_COUNTRY_CODE") or os.getenv("COUNTRY") or home_country() or "US",
+                    help="two-letter country for the call and message assets. Default: COUNTRY in .env, else context/business.md")
     ap.add_argument("--starter-message", default="Hi, I'd like a quote.")
     ap.add_argument("--form-headline", default="Get your free graded audit")
     ap.add_argument("--form-description", default="Tell us where to send it. No sales call needed.")
@@ -622,7 +624,7 @@ def main():
     ap.add_argument("--skip", action="append", default=[],
                     choices=["sitelinks", "callouts", "snippets", "call", "leadform",
                              "businessname", "logo", "messages"],
-                    help="leave one asset type out. ONLY when Jono asked for it in words.")
+                    help="leave one asset type out. ONLY when the owner asked for it in words.")
     ap.add_argument("--level", choices=["adgroup", "campaign"], default="adgroup",
                     help="AD GROUP is the default and the most granular level the API has. Only the "
                          "lead form, business name and logo go campaign-wide, because Google does "

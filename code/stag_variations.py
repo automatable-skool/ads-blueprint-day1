@@ -24,7 +24,12 @@ needs. Google's idea service returns semantic neighbours, not string matches.
 import argparse
 import os
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _business import country as home_country  # noqa: E402
+from _common import COUNTRY_GEO  # noqa: E402
 
 from dotenv import load_dotenv
 from google.ads.googleads.client import GoogleAdsClient
@@ -82,9 +87,15 @@ def main():
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--min-volume", type=int, default=10)
     ap.add_argument("--limit", type=int, default=12)
-    ap.add_argument("--geo", default="geoTargetConstants/2840", help="default: United States")
+    ap.add_argument("--geo", default=None, help="geoTargetConstants/<id>. Default: the country in context/business.md")
     ap.add_argument("--language", default="languageConstants/1000")
     args = ap.parse_args()
+    if not args.geo:
+        cc = home_country()
+        args.geo = COUNTRY_GEO.get(cc)
+        if not args.geo:
+            sys.exit("no country - set 'Country customers search from' in context/business.md, or pass --geo geoTargetConstants/<id>")
+        print(f"geo: {cc} -> {args.geo}")
 
     load_dotenv()
     client = GoogleAdsClient.load_from_dict({

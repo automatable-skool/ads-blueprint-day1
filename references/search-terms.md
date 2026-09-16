@@ -93,7 +93,7 @@ Two failures follow from using the blend, and they pull in opposite directions:
 `code/search_terms_report.py --brand "<name>,<variants>"` computes both sides. Without the flag the pull
 returns `brand_split.available: false`, and **every threshold in the run is blended and must say so** -
 that is an `Assumed` grade, not a silent approximation. Brand detection is substring-based on purpose, so
-a name written solid ("djingca") and spaced ("djing ca") both count.
+a name written solid ("acmeplumbing") and spaced ("acme plumbing") both count.
 
 **Do not convert this into brand negatives.** Per the brand-exclusions note below, exclusions are the
 supported mechanism. This split is for calibrating thresholds, nothing else.

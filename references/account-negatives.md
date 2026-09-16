@@ -1,5 +1,5 @@
-# Account-level negative keywords - Toronto plumbing
-Built August 2026 from the universal list · about 190 terms, competitor brands held back
+# Account-level negative keywords - the universal starter
+Built August 2026 from the universal list · about 165 terms · trade words, cities and competitor names come from YOUR `context/business.md`, never from this file
 Next: paste the copy-paste block at the bottom into Google Ads, Tools then Shared library then Negative keyword lists.
 
 Apply at the **account level**, or as one shared list attached to every campaign.
@@ -14,9 +14,9 @@ Google reads the quotes and brackets as match types, so the punctuation is the i
 
 **Exact** is `[in brackets]`. Use it for one precise query you want blocked without its variants.
 
-## Cities you serve are deliberately absent
+## Cities and trade words are deliberately absent
 
-Hamilton, Oakville, Burlington, Milton, Oshawa, Ajax, Pickering, Whitby and every other GTA municipality in your matrix are serviced, so none of them appear in the geographic negatives below. Do not add them.
+Nothing below names a place or a trade. The cities you do not serve and the jobs you do not do become campaign negatives built from `context/business.md` (`## Service area`, `## What we DON'T do`). A universal list reaches every campaign forever, so a city or a service in it is a permanent self-block.
 
 ---
 
@@ -64,25 +64,21 @@ broad: `porn` `adult` `nude` `sex` `gambling` `casino` `weed` `marijuana` `cbd` 
 
 ---
 
-## B. Plumbing parts, products and trade research - eleven broad, five phrase
+## B. Parts, products and trade research - eleven broad, one phrase
 
 broad: `parts` `supplies` `wholesale` `fitting` `fittings` `diagram` `schematic` `manual` `torque` `amperage` `voltage`
 
-phrase: `"spec sheet"` `"plumber salary"` `"plumbing apprentice"` `"electrician union"` `"roofer hourly"`
+phrase: `"spec sheet"`
 
-Broad `parts` already blocks plumbing parts, hvac parts and electrical parts, so do not add those separately.
+Broad `parts` already blocks every kind of parts search, so do not add trade-specific ones.
 
 ---
 
-## C. Metros you do not serve - seventeen broad, four phrase
+## C. Metros you do not serve - filled from your service area
 
-broad: `calgary` `edmonton` `vancouver` `montreal` `ottawa` `winnipeg` `kitchener` `waterloo` `windsor` `barrie` `guelph` `quebec` `alberta`
+Presence-based targeting already catches most out-of-area searches. These close the remaining gap: someone inside your area searching for a provider in a city you do not cover.
 
-broad: `usa` `california` `texas` `florida`
-
-phrase: `"london ontario"` `"united states"` `"new york"` `"british columbia"`
-
-Presence-based targeting on the GTA plus fifty kilometres already catches most of this. These close the remaining gap: a Toronto resident searching for a Vancouver plumber.
+List the big metros near you that you do NOT serve as broad negatives, and the country, state or province names beyond your border as phrase negatives. `/search-terms` builds this list from `## Service area` in `context/business.md`. Nothing is pre-filled here on purpose - a wrong city in a universal list is a permanent self-block.
 
 ---
 
@@ -90,7 +86,7 @@ Presence-based targeting on the GTA plus fifty kilometres already catches most o
 
 Competitor searches convert two to three times higher than generic ones, so they are usually worth keeping unless you have no Conquest campaign running. Add these only if you want to stop brand-mismatched clicks today, and drop any you would rather bid on later.
 
-Ten phrase terms: `"roto rooter"` `"mr rooter"` `"mister plumber"` `"drain rescue"` `"john the plumber"` `"drainworks"` `"dr pipe"` `"express rooter"` `"anta plumbing"` `"ba robinson"`
+Write each rival's name as a phrase negative, one per line, from `context/competitor-ads.md` once `/scrape-competitors` has run.
 
 These are **not** in the copy-paste block below. Add them by hand if you decide to.
 
@@ -262,31 +258,6 @@ torque
 amperage
 voltage
 "spec sheet"
-"plumber salary"
-"plumbing apprentice"
-"electrician union"
-"roofer hourly"
-calgary
-edmonton
-vancouver
-montreal
-ottawa
-winnipeg
-kitchener
-waterloo
-windsor
-barrie
-guelph
-quebec
-alberta
-usa
-california
-texas
-florida
-"london ontario"
-"united states"
-"new york"
-"british columbia"
 ```
 
-Source list: [universal-negative-keywords.md](universal-negative-keywords.md), sections A, B.1, C and D, deduped and match-typed.
+Source list: [universal-negative-keywords.md](universal-negative-keywords.md), sections A and B.1, deduped and match-typed. Geography and rivals are per account, from `context/business.md` and `context/competitor-ads.md`.

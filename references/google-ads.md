@@ -319,7 +319,7 @@ All fifteen are 25 characters or fewer; five are under 20. The keyword and proof
 ### The display URL
 
 ```
-automatable.com/emergency/toronto
+yourdomain.com/emergency/toronto
 ```
 
 path1 is `emergency`, path2 is `toronto`.

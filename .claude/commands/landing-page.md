@@ -65,7 +65,7 @@ cp -r website/app/lp/_template website/app/lp/<ad-group-slug>
 **What you change, and nothing else:**
 
 - `BUSINESS`, `PHONE` and `MAIN_CITY` at the top. `MAIN_CITY` is the H1's `<City fallback>` - the city Google shows when it cannot resolve the click, which is most of the time. `MAIN_CITY=none`: delete the `<City>` tag and write the H1 without a place
-- **Build the geo map once per country, before the first page ships:** `python3 code/build_geo_map.py --country CA` writes `website/lib/geo-map.json`. `/write-ads` appends `loc={loc_physical_ms}` to every ad, and the page turns that number into the searcher's city with it. No map file means every visitor silently sees the fallback
+- **Build the geo map once per country, before the first page ships:** `python3 code/build_geo_map.py` writes `website/lib/geo-map.json` for the country in `context/business.md` (the repo ships the file empty). `/write-ads` appends `loc={loc_physical_ms}` to every ad, and the page turns that number into the searcher's city with it. No map file means every visitor silently sees the fallback
 - every `[SQUARE BRACKET]` - the copy waiting for this business's words
 - the `photo(...)` keywords, or a real `src` once the business supplies photography
 - the FAQ entries, for the real reasons THIS business's buyers do not enquire

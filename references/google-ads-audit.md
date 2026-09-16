@@ -623,7 +623,7 @@ age, household income, parental status, audience lists and in-market or affinity
 mode, location and location exclusions, language, device adjustments, ad schedule, and the ad copy. If
 anything differs, it is segmentation by design: report "segmented by design", flag only the overlap with
 the untargeted group, and never recommend a recluster on keyword text alone. Jono, 12 Sep 2026, after
-the DJNorth.ca audit called Brides (women only) / Grooms (men only) / Regular (everyone) duplicates.
+a wedding DJ audit called Brides (women only) / Grooms (men only) / Regular (everyone) duplicates.
 Wrong when the same keyword and match type is active in two ad groups WITH identical targeting. Google picks one per auction, unpredictably, and there is no priority setting for Search **(c)**. One home per query.
 
 ⛔ **Never write "keywords bidding against each other" or "competing for the same auction".** It is factually wrong and Google says so directly: when several of your keywords could match one search, *"they don't compete with each other in the auction"* **(a)**. The real damage is that you cannot predict **which ad and which landing page** the searcher gets, and the performance data splits across every copy. Say that instead. See `references/keyword-redundancy.md`.

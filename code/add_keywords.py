@@ -15,7 +15,7 @@ What it refuses to do:
   - Add a duplicate. Same text and match type already in the ad group is skipped.
 
 Staged file format, one keyword per line, ad group ID first:
-  1234567890  [drain cleaning toronto]   # EXACT (bracketed) - the harvest default
+  1234567890  [emergency drain cleaning]  # EXACT (bracketed) - the harvest default
   1234567890  "emergency plumber"        # PHRASE (quoted)
   1234567890  water heater repair        # BROAD (bare) - rarely what you want
 Lines starting with # are ignored. Same file can mix ad groups.

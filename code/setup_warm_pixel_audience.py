@@ -3,7 +3,7 @@ Create a warm-pixel remarketing audience (anyone who visited the domain),
 then optionally attach it to an ad group as RLSA observation with a bid modifier.
 
 Args:
-  --domain         e.g. automatable.co
+  --domain         e.g. acmeplumbing.com
   --name           Audience name (default derived from domain)
   --lookback       Membership lifespan in days (default 540, max 540)
   --ad-group-id    Numeric ad group ID to attach to (optional)

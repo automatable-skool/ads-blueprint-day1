@@ -1,7 +1,7 @@
 # The audit dashboard - the standard, fixed 12 September 2026
 
 What every `/audit` run produces, in this exact shape, for every account. Jono's rulings from the
-DJing.ca fix pass, 11-12 September 2026. When this file and `.claude/commands/audit.md` disagree,
+first live fix pass, 11-12 September 2026. When this file and `.claude/commands/audit.md` disagree,
 this file wins on layout; audit.md wins on process.
 
 ## The two files
@@ -18,7 +18,7 @@ this file wins on layout; audit.md wins on process.
 
 ## The page, top to bottom
 
-1. Header: business, account, window, spend. Dials: before, after (real only once fixes shipped).
+1. Header: author (the wordmark top and bottom - the business itself in owner mode, your agency when auditing a prospect), business, account, window, spend. Dials: before, after (real only once fixes shipped).
 2. **What to fix first**: one line per finding, worst first. Legend above it. Each line carries a tag:
    `fixed` · `partly fixed · click needed` · `bigger build` (API, needs a yes) · `website access` ·
    `click needed` (the API refuses) · `your proof` / `your number`. Never `no action` - those rows do

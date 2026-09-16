@@ -4,7 +4,7 @@ the API can name (RecommendationSubscriptionService, status -> PAUSED).
 
 Dry run by DEFAULT. Nothing is touched without --apply.
 
-Known limit (found 11 Sep 2026 on DJNorth.ca): some subscriptions come back as type
+Known limit (found 11 Sep 2026 on a live account): some subscriptions come back as type
 UNKNOWN with resource name .../recommendationSubscriptions/UNKNOWN - recommendation
 types Google has retired from the API but never cleared from the account. Even the
 newest API version returns UNKNOWN for them, and a mutate on that name is refused.

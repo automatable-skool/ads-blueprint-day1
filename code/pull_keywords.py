@@ -6,8 +6,8 @@ candidates.csv ranked by volume. Claude then clusters these into the top 10-20
 services to present at checkpoint 1.
 
 Usage:
-  python3 pull_keywords.py --city "Toronto" --seeds-file seeds.txt [--floor 50]
-  python3 pull_keywords.py --city "Toronto" --seeds "plumber,drain cleaning,..."
+  python3 pull_keywords.py --seeds-file seeds.txt [--floor 50]        # city = MAIN_CITY in .env
+  python3 pull_keywords.py --city "<main city>" --seeds "<service one>,<service two>,..."
 """
 
 import argparse
@@ -22,7 +22,7 @@ from _common import load_client, chunks, resolve_city_geo, keyword_ideas, ACCOUN
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--city", required=True)
+    ap.add_argument("--city", default=None, help="the city to pull volume for. Default: MAIN_CITY in .env")
     ap.add_argument("--seeds", help="comma-separated seed keywords")
     ap.add_argument("--seeds-file", help="file with one seed per line")
     ap.add_argument("--floor", type=int, default=50)
@@ -37,6 +37,9 @@ def main():
         sys.exit("Provide --seeds or --seeds-file")
 
     client, customer_id = load_client()
+    args.city = args.city or os.getenv("MAIN_CITY", "")
+    if not args.city or args.city.lower() == "none":
+        sys.exit("no city - pass --city or set MAIN_CITY in .env (a remote or national business runs stem_metrics.py on the country instead)")
     geo, cc = resolve_city_geo(client, args.city)
     print(f"City {args.city} -> {geo} ({cc}); {len(seeds)} seeds")
 

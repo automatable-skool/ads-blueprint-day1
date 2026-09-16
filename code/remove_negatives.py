@@ -11,8 +11,8 @@ Usage (from the project root):
   python3 code/remove_negatives.py --file code/cache/negatives-remove.txt --apply
 
 File format, one per line, campaign ID first (same shapes as the add script):
-  1234567890  "wedding dj cost"     # PHRASE
-  1234567890  [dj vibe]             # EXACT
+  1234567890  "plumber jobs"        # PHRASE
+  1234567890  [home depot]          # EXACT
   1234567890  calgary               # matches ANY match type of that text
 """
 

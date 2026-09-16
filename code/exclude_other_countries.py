@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import load_client  # noqa: E402
+from _business import country as home_country  # noqa: E402
 from google.ads.googleads.errors import GoogleAdsException  # noqa: E402
 
 
@@ -85,11 +86,14 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--campaign", help="numeric campaign ID")
     ap.add_argument("--all-search", action="store_true", help="every non-removed Search campaign in the account")
-    ap.add_argument("--keep", required=True, help="two-letter country code to keep, e.g. CA")
+    ap.add_argument("--keep", default=None, help="two-letter country code to keep, e.g. CA. Default: the country in context/business.md")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     if not args.campaign and not args.all_search:
         sys.exit("give --campaign <id> or --all-search")
+    args.keep = (args.keep or home_country() or "").upper()
+    if not args.keep:
+        sys.exit("no country to keep - set it in context/business.md (Country customers search from) or pass --keep XX")
 
     client, customer_id = load_client()
     ga = client.get_service("GoogleAdsService")
